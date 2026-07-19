@@ -1,0 +1,13 @@
+{
+  "name": "lens-price-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ワンデーアキュビューオアシスの楽天・Yahoo!ショッピング最安値を毎日自動更新するサイト",
+  "scripts": {
+    "fetch": "node scripts/fetch-prices.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
