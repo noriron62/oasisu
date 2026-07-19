@@ -55,15 +55,25 @@ const VALUECOMMERCE_PID = process.env.VALUECOMMERCE_PID || "";
 
 /**
  * 商品名から「90枚入り×2箱（180枚）セット」らしきものだけを判定する。
- * 1箱・3箱・6箱(90×2以外の意味)などの誤マッチを避けるための簡易フィルタ。
+ * 「90」を含まない「ただの2箱（=60枚）」を誤って拾わないよう、
+ * 90枚を示す表記と2箱系の表記の両方がそろっている場合のみ true にする
+ * （「180枚」の直接表記がある場合はそれ単独でも true）。
  * 商品名の表記ゆれが多いジャンルのため、必要に応じて正規表現を調整すること。
  */
 function isTargetBundle(name) {
   if (!name) return false;
   const n = name.replace(/\s/g, "");
-  const positive = /(2箱|×2箱|ｘ2箱|x2箱|2箱セット|180枚)/;
+
   const negative = /(1箱|単品|お試し|サンプル)(?!.*2箱)/;
-  return positive.test(n) && !negative.test(n);
+  if (negative.test(n)) return false;
+
+  const has180 = /180枚/.test(n);
+  if (has180) return true;
+
+  const has90 = /90/.test(n);
+  const has2Box = /(2箱|×2箱|ｘ2箱|x2箱|2箱セット|90.{0,4}×2|90.{0,4}x2|90.{0,4}ｘ2)/i.test(n);
+
+  return has90 && has2Box;
 }
 
 /** アフィリエイトリンクへの変換 */
