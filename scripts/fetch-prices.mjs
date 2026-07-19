@@ -54,10 +54,29 @@ const VALUECOMMERCE_SID = process.env.VALUECOMMERCE_SID || "";
 const VALUECOMMERCE_PID = process.env.VALUECOMMERCE_PID || "";
 
 /**
+ * 商品名が「ワンデーアキュビューオアシス」であることを確認する。
+ * Yahoo!ショッピングの検索結果には、キーワードの緩い一致により
+ * 別ブランドの商品（例: ロート製薬「フレッシュビュー」等）が
+ * 紛れ込むことがあるため、ブランド名を明示的にチェックする。
+ */
+function isCorrectProduct(name) {
+  if (!name) return false;
+  const n = name.replace(/\s/g, "");
+  return /アキュビュー/.test(n) && /オアシス/.test(n);
+}
+
+/**
  * 商品名から「90枚入り×2箱（180枚）セット」らしきものだけを判定する。
  * 「90」を含まない「ただの2箱（=60枚）」を誤って拾わないよう、
  * 90枚を示す表記と2箱系の表記の両方がそろっている場合のみ true にする
  * （「180枚」の直接表記がある場合はそれ単独でも true）。
+ *
+ * 「2箱で送料無料」のような表現は、実際には90枚1箱のみの商品で
+ * 「2箱まとめ買いすると送料が無料になる」という購入促進の文言であり、
+ * 実売価格が180枚分ではなく90枚分のことがあるため、
+ * 「セット」「×2」「180枚」など、明確に2箱1セットであることを示す
+ * 表記が無い限りは対象外として扱う。
+ *
  * 商品名の表記ゆれが多いジャンルのため、必要に応じて正規表現を調整すること。
  */
 function isTargetBundle(name) {
@@ -69,6 +88,13 @@ function isTargetBundle(name) {
 
   const has180 = /180枚/.test(n);
   if (has180) return true;
+
+  // 「2箱で送料無料」のような、購入数のしきい値を示すだけの表現は
+  // 明確なセット表記が無ければ対象外にする
+  const isShippingThresholdOnly =
+    /\d箱で送料無料/.test(n) &&
+    !/(セット|×2|x2|ｘ2|180枚)/i.test(n);
+  if (isShippingThresholdOnly) return false;
 
   const has90 = /90/.test(n);
   const has2Box = /(2箱|×2箱|ｘ2箱|x2箱|2箱セット|90.{0,4}×2|90.{0,4}x2|90.{0,4}ｘ2)/i.test(n);
@@ -164,6 +190,7 @@ async function fetchRakuten() {
   return items
     .filter(
       (item) =>
+        isCorrectProduct(item.itemName) &&
         isTargetBundle(item.itemName) &&
         isPrescriptionFree(item.itemName) &&
         isPrescriptionFree(item.itemCaption) &&
@@ -214,6 +241,7 @@ async function fetchYahoo() {
   return items
     .filter(
       (item) =>
+        isCorrectProduct(item.name) &&
         isTargetBundle(item.name) &&
         isPrescriptionFree(item.name) &&
         isPrescriptionFree(item.description) &&
