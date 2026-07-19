@@ -80,6 +80,29 @@
     </div>
   </section>
 
+  <section class="single90-intro" aria-label="90枚1箱について">
+    <h2 class="section-heading">90枚1箱(単品)でも比較したい方へ</h2>
+    <p>
+      「まずは1箱だけ試したい」という方向けに、90枚1箱(単品)の価格帯も
+      別枠で掲載しています。<strong>上記の90枚×2箱セットとは金額の単位が異なる</strong>ため、
+      混同しないようご注意ください(こちらは90枚1箱分の価格です)。
+    </p>
+  </section>
+
+  <section class="shop-section" aria-label="楽天市場ランキング(90枚1箱)">
+    <h2 class="shop-heading"><span class="shop-mark rakuten">楽天</span>楽天市場 90枚1箱 最安値TOP5</h2>
+    <div class="chart" id="chart-rakuten-single90">
+      <p class="empty">価格情報を読み込んでいます…</p>
+    </div>
+  </section>
+
+  <section class="shop-section" aria-label="Yahoo!ショッピングランキング(90枚1箱)">
+    <h2 class="shop-heading"><span class="shop-mark yahoo">Yahoo!</span>Yahoo!ショッピング 90枚1箱 最安値TOP5</h2>
+    <div class="chart" id="chart-yahoo-single90">
+      <p class="empty">価格情報を読み込んでいます…</p>
+    </div>
+  </section>
+
   <section class="product-info" aria-label="商品情報">
     <h2 class="section-heading">ワンデーアキュビューオアシスとは</h2>
 
@@ -229,6 +252,8 @@ async function render() {
 
   renderList("chart-rakuten", data.rakuten);
   renderList("chart-yahoo", data.yahoo);
+  renderList("chart-rakuten-single90", data.rakutenSingle90);
+  renderList("chart-yahoo-single90", data.yahooSingle90);
   renderReviewLinks(data.rakuten, data.yahoo);
 
   // 商品情報セクションの写真：楽天の商品画像があれば自動で使う
