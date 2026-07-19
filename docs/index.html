@@ -56,9 +56,9 @@
   <section class="hero" id="hero" hidden>
     <p class="hero-label" id="hero-label">本日の総合最安値（90枚入り×2箱セット／180枚）</p>
     <p class="hero-price"><span class="yen">¥</span><span id="hero-price-value">-</span></p>
-    <p class="hero-unit">1枚あたり <span id="hero-unit-price">-</span>円</p>
+    <p class="hero-unit">1箱(30枚)あたり <span id="hero-box-unit-price">-</span>円 ・ 1枚あたり <span id="hero-unit-price">-</span>円</p>
     <div class="hero-meta">
-      <span class="hero-name" id="hero-name">-</span>
+      <span class="hero-name" id="hero-name">ワンデーアキュビューオアシス 90枚入り×2箱セット(180枚)</span>
       <span class="badge" id="hero-source">-</span>
     </div>
     <a class="hero-cta" id="hero-link" href="#" target="_blank" rel="noopener sponsored">
@@ -244,8 +244,10 @@ async function render() {
     const top = data.overallBest;
     heroEl.hidden = false;
     document.getElementById("hero-price-value").textContent = yen(top.price);
+    document.getElementById("hero-box-unit-price").textContent = yen(top.boxUnitPrice ?? "-");
     document.getElementById("hero-unit-price").textContent = yen(top.unitPrice ?? "-");
-    document.getElementById("hero-name").textContent = top.name;
+    // hero-name は「90枚×2箱セット」という固定の商品説明を表示する
+    // （実際の商品名は販促文言が羅列されがちなため、あえて表示しない）
     document.getElementById("hero-source").textContent = `${top.source} ・ ${top.shop}`;
     document.getElementById("hero-link").href = top.url;
   }
