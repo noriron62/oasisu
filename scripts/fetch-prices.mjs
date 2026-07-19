@@ -246,6 +246,22 @@ async function fetchRakuten() {
   const json = await res.json();
   const items = json.Items || [];
 
+  if (RAKUTEN_AFFILIATE_ID) {
+    // 診断用ログ：affiliateUrlが正しく返ってきているか確認するため
+    const withAffiliateUrl = items.filter(
+      (item) => item.affiliateUrl && item.affiliateUrl.length > 0
+    ).length;
+    console.log(
+      `[debug] 楽天APIレスポンス: 全${items.length}件中、affiliateUrlが取得できたのは${withAffiliateUrl}件`
+    );
+    if (withAffiliateUrl === 0 && items.length > 0) {
+      console.warn(
+        "[warn] affiliateUrlが1件も取得できていません。RAKUTEN_AFFILIATE_IDの値、" +
+          "または楽天アフィリエイト側のサイト登録状況を確認してください。"
+      );
+    }
+  }
+
   const base = items.filter(
     (item) =>
       isCorrectProduct(item.itemName) &&
