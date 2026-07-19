@@ -83,11 +83,23 @@ function isTargetBundle(name) {
  * （タイトルに記載が無いだけで、処方箋不要で購入できる商品も多いため）。
  * 「処方箋不要」「処方箋なし」を明記した商品は当然許可する。
  */
-function isPrescriptionFree(name) {
-  if (!name) return true;
-  const n = name.replace(/\s/g, "");
-  const requiresPrescription = /(処方箋あり|要処方箋|処方箋必要|処方箋提出|処方箋が必要)/;
+function isPrescriptionFree(text) {
+  if (!text) return true;
+  const n = text.replace(/\s/g, "");
+  const requiresPrescription =
+    /(処方箋あり|要処方箋|処方箋必要|処方箋提出|処方箋が必要|処方箋を提出)/;
   return !requiresPrescription.test(n);
+}
+
+/**
+ * 商品コード・URLに「-rx-」のような処方箋(Rx)を示す記号が
+ * 含まれている場合、処方箋提出が必要な商品コードとみなして除外する。
+ * ショップによっては商品名・説明文に「処方箋」の文字を含めず、
+ * 商品コードの中だけで区別している場合があるための補助チェック。
+ */
+function hasRxCode(text) {
+  if (!text) return false;
+  return /(^|[^a-z0-9])rx([^a-z0-9]|$)/i.test(text);
 }
 
 /** アフィリエイトリンクへの変換 */
@@ -150,7 +162,15 @@ async function fetchRakuten() {
   const items = json.Items || [];
 
   return items
-    .filter((item) => isTargetBundle(item.itemName) && isPrescriptionFree(item.itemName))
+    .filter(
+      (item) =>
+        isTargetBundle(item.itemName) &&
+        isPrescriptionFree(item.itemName) &&
+        isPrescriptionFree(item.itemCaption) &&
+        isPrescriptionFree(item.catchcopy) &&
+        !hasRxCode(item.itemCode) &&
+        !hasRxCode(item.itemUrl)
+    )
     .map((item) => ({
       source: "楽天市場",
       name: item.itemName,
@@ -192,7 +212,15 @@ async function fetchYahoo() {
   const items = json.hits || [];
 
   return items
-    .filter((item) => isTargetBundle(item.name) && isPrescriptionFree(item.name))
+    .filter(
+      (item) =>
+        isTargetBundle(item.name) &&
+        isPrescriptionFree(item.name) &&
+        isPrescriptionFree(item.description) &&
+        isPrescriptionFree(item.headLine) &&
+        !hasRxCode(item.code) &&
+        !hasRxCode(item.url)
+    )
     .map((item) => ({
       source: "Yahoo!ショッピング",
       name: item.name,
