@@ -98,10 +98,16 @@ function isTargetBundle(name) {
   const raw = name.replace(/\s/g, "");
   const n = stripShippingPromoText(raw);
 
-  // 「1箱」「単品」等の表記があっても、文中のどこかに「2箱」表記が
+  // 「単品」は購入単位が1個であることを明示する強いシグナルのため、
+  // タイトルの目立つ位置に「2箱」等の表記があっても最優先で除外する
+  // （ショップによっては「【2箱】」のような紛らわしい見出しを付けつつ、
+  // 商品説明の中で「1箱90枚入 単品」と明記しているケースがあるため）
+  if (/単品/.test(n)) return false;
+
+  // 「1箱」等の表記があっても、文中のどこかに「2箱」表記が
   // あれば2箱セットの商品として扱う（「1箱90枚入 2箱セット」「左右各1箱」
   // のように、1箱を説明する語が2箱表記の前後どちらに来ても対応できるようにする）
-  const mentionsSingleBoxTerms = /(1箱|単品|お試し|サンプル)/.test(n);
+  const mentionsSingleBoxTerms = /(1箱|お試し|サンプル)/.test(n);
   const mentions2Box = /2箱/.test(n);
   if (mentionsSingleBoxTerms && !mentions2Box) return false;
 
