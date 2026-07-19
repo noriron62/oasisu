@@ -399,6 +399,24 @@ h1 {
   background: var(--teal-dim);
 }
 
+.single90-intro {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+.single90-intro p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.single90-intro strong {
+  color: var(--teal);
+}
+
 /* ---------- product info ---------- */
 
 .section-heading {
