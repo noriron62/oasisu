@@ -82,9 +82,21 @@ function isCorrectProduct(name) {
  *
  * 商品名の表記ゆれが多いジャンルのため、必要に応じて正規表現を調整すること。
  */
+/**
+ * 「2箱で送料無料」「2箱購入で送料無料」「2箱以上ご購入で送料無料」のような、
+ * 購入数のしきい値を示すだけの販促文言を、箱数判定の対象から取り除く。
+ * この手の文言はショップによって表記が微妙に異なり、その都度「2箱」等の
+ * 文字列だけを見て判定すると実際の梱包数を誤認識するため、
+ * 判定処理の前段階で文章から除去してしまう。
+ */
+function stripShippingPromoText(n) {
+  return n.replace(/\d箱[^\d]{0,6}?で送料無料/g, "");
+}
+
 function isTargetBundle(name) {
   if (!name) return false;
-  const n = name.replace(/\s/g, "");
+  const raw = name.replace(/\s/g, "");
+  const n = stripShippingPromoText(raw);
 
   // 「1箱」「単品」等の表記があっても、文中のどこかに「2箱」表記が
   // あれば2箱セットの商品として扱う（「1箱90枚入 2箱セット」「左右各1箱」
@@ -95,13 +107,6 @@ function isTargetBundle(name) {
 
   const has180 = /180枚/.test(n);
   if (has180) return true;
-
-  // 「2箱で送料無料」のような、購入数のしきい値を示すだけの表現は
-  // 明確なセット表記が無ければ対象外にする
-  const isShippingThresholdOnly =
-    /\d箱で送料無料/.test(n) &&
-    !/(セット|×2|x2|ｘ2|180枚)/i.test(n);
-  if (isShippingThresholdOnly) return false;
 
   const has90 = /90/.test(n);
   const has2Box = /(2箱|×2箱|ｘ2箱|x2箱|2箱セット|90.{0,4}×2|90.{0,4}x2|90.{0,4}ｘ2)/i.test(n);
@@ -120,7 +125,7 @@ function isTargetBundle(name) {
  */
 function isSingleBox90(name) {
   if (!name) return false;
-  const n = name.replace(/\s/g, "");
+  const n = stripShippingPromoText(name.replace(/\s/g, ""));
 
   const otherBoxCount = /(3箱|4箱|5箱|6箱|180枚|270枚|360枚)/;
   if (otherBoxCount.test(n)) return false;
