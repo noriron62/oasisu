@@ -86,8 +86,12 @@ function isTargetBundle(name) {
   if (!name) return false;
   const n = name.replace(/\s/g, "");
 
-  const negative = /(1箱|単品|お試し|サンプル)(?!.*2箱)/;
-  if (negative.test(n)) return false;
+  // 「1箱」「単品」等の表記があっても、文中のどこかに「2箱」表記が
+  // あれば2箱セットの商品として扱う（「1箱90枚入 2箱セット」「左右各1箱」
+  // のように、1箱を説明する語が2箱表記の前後どちらに来ても対応できるようにする）
+  const mentionsSingleBoxTerms = /(1箱|単品|お試し|サンプル)/.test(n);
+  const mentions2Box = /2箱/.test(n);
+  if (mentionsSingleBoxTerms && !mentions2Box) return false;
 
   const has180 = /180枚/.test(n);
   if (has180) return true;
