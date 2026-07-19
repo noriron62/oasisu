@@ -40,6 +40,9 @@ const TOP_N = 5;
 const LENSES_PER_SET = 180; // 90枚入り×2箱 = 180枚（1枚あたり単価の計算に使用）
 const BOXES_OF_30_PER_SET = 6; // 180枚 ÷ 30枚 = 6箱分（1箱30枚あたり単価の計算に使用）
 
+const SINGLE_BOX_LENSES = 90; // 90枚1箱の場合の枚数（1枚あたり単価の計算に使用）
+const SINGLE_BOX_OF_30 = 3; // 90枚 ÷ 30枚 = 3箱分（1箱30枚あたり単価の計算に使用）
+
 const RAKUTEN_APP_ID = process.env.RAKUTEN_APP_ID || "";
 const RAKUTEN_ACCESS_KEY = process.env.RAKUTEN_ACCESS_KEY || "";
 const SITE_URL = process.env.SITE_URL || "https://example.com";
@@ -103,6 +106,25 @@ function isTargetBundle(name) {
 }
 
 /**
+ * 商品名から「90枚1箱（単品）」の商品を判定する。
+ * isTargetBundle() が false と判定した商品のうち、
+ * 「90」を含み、かつ 3箱・4箱・6箱など他の箱数を明確に示していないものを
+ * 「90枚1箱」として扱う（「2箱で送料無料」のような購入促進の文言だけの
+ * 商品も、実売価格は90枚1箱分とみなしてここに含める）。
+ * isTargetBundle() と重複しないよう、必ず isTargetBundle() が false の
+ * 商品に対してのみ呼び出すこと。
+ */
+function isSingleBox90(name) {
+  if (!name) return false;
+  const n = name.replace(/\s/g, "");
+
+  const otherBoxCount = /(3箱|4箱|5箱|6箱|180枚|270枚|360枚)/;
+  if (otherBoxCount.test(n)) return false;
+
+  return /90/.test(n);
+}
+
+/**
  * 商品名から「処方箋あり(処方箋の提出が必要)」の商品を除外する。
  * 明示的に「処方箋あり」「要処方箋」等と書かれている商品のみを除外し、
  * 処方箋について何も書かれていない商品は許可する
@@ -158,7 +180,7 @@ async function fetchRakuten() {
     console.warn(
       "[skip] RAKUTEN_APP_ID または RAKUTEN_ACCESS_KEY が未設定のため楽天の取得をスキップしました"
     );
-    return [];
+    return { bundle: [], single: [] };
   }
 
   const url = new URL(
@@ -182,44 +204,50 @@ async function fetchRakuten() {
   });
   if (!res.ok) {
     console.error(`[error] 楽天API failed: ${res.status} ${await res.text()}`);
-    return [];
+    return { bundle: [], single: [] };
   }
   const json = await res.json();
   const items = json.Items || [];
 
-  return items
-    .filter(
-      (item) =>
-        isCorrectProduct(item.itemName) &&
-        isTargetBundle(item.itemName) &&
-        isPrescriptionFree(item.itemName) &&
-        isPrescriptionFree(item.itemCaption) &&
-        isPrescriptionFree(item.catchcopy) &&
-        !hasRxCode(item.itemCode) &&
-        !hasRxCode(item.itemUrl)
-    )
-    .map((item) => ({
-      source: "楽天市場",
-      name: item.itemName,
-      shop: item.shopName,
-      price: item.itemPrice,
-      url: toRakutenAffiliateUrl(item.itemUrl),
-      reviewUrl: item.itemUrl, // レビュー確認用（アフィリエイト加工なしの直リンク）
-      reviewCount: typeof item.reviewCount === "number" ? item.reviewCount : null,
-      reviewAverage:
-        typeof item.reviewAverage === "number" ? item.reviewAverage : null,
-      image:
-        item.mediumImageUrls && item.mediumImageUrls[0]
-          ? item.mediumImageUrls[0]
-          : null,
-    }));
+  const base = items.filter(
+    (item) =>
+      isCorrectProduct(item.itemName) &&
+      isPrescriptionFree(item.itemName) &&
+      isPrescriptionFree(item.itemCaption) &&
+      isPrescriptionFree(item.catchcopy) &&
+      !hasRxCode(item.itemCode) &&
+      !hasRxCode(item.itemUrl)
+  );
+
+  const toEntry = (item) => ({
+    source: "楽天市場",
+    name: item.itemName,
+    shop: item.shopName,
+    price: item.itemPrice,
+    url: toRakutenAffiliateUrl(item.itemUrl),
+    reviewUrl: item.itemUrl, // レビュー確認用（アフィリエイト加工なしの直リンク）
+    reviewCount: typeof item.reviewCount === "number" ? item.reviewCount : null,
+    reviewAverage:
+      typeof item.reviewAverage === "number" ? item.reviewAverage : null,
+    image:
+      item.mediumImageUrls && item.mediumImageUrls[0]
+        ? item.mediumImageUrls[0]
+        : null,
+  });
+
+  const bundle = base.filter((item) => isTargetBundle(item.itemName)).map(toEntry);
+  const single = base
+    .filter((item) => !isTargetBundle(item.itemName) && isSingleBox90(item.itemName))
+    .map(toEntry);
+
+  return { bundle, single };
 }
 
 /** Yahoo!ショッピングから商品を取得する */
 async function fetchYahoo() {
   if (!YAHOO_CLIENT_ID) {
     console.warn("[skip] YAHOO_CLIENT_ID が未設定のためYahoo!の取得をスキップしました");
-    return [];
+    return { bundle: [], single: [] };
   }
 
   const url = new URL(
@@ -233,45 +261,52 @@ async function fetchYahoo() {
   const res = await fetch(url);
   if (!res.ok) {
     console.error(`[error] Yahoo API failed: ${res.status} ${await res.text()}`);
-    return [];
+    return { bundle: [], single: [] };
   }
   const json = await res.json();
   const items = json.hits || [];
 
-  return items
-    .filter(
-      (item) =>
-        isCorrectProduct(item.name) &&
-        isTargetBundle(item.name) &&
-        isPrescriptionFree(item.name) &&
-        isPrescriptionFree(item.description) &&
-        isPrescriptionFree(item.headLine) &&
-        !hasRxCode(item.code) &&
-        !hasRxCode(item.url)
-    )
-    .map((item) => ({
-      source: "Yahoo!ショッピング",
-      name: item.name,
-      shop: item.seller && item.seller.name ? item.seller.name : "Yahoo!ショッピング",
-      price: item.price,
-      url: toYahooAffiliateUrl(item.url),
-      reviewUrl: item.url, // レビュー確認用（アフィリエイト加工なしの直リンク）
-      reviewCount:
-        item.review && typeof item.review.count === "number"
-          ? item.review.count
-          : null,
-      reviewAverage:
-        item.review && typeof item.review.rate === "number"
-          ? item.review.rate
-          : null,
-      image: item.image && item.image.medium ? item.image.medium : null,
-    }));
+  const base = items.filter(
+    (item) =>
+      isCorrectProduct(item.name) &&
+      isPrescriptionFree(item.name) &&
+      isPrescriptionFree(item.description) &&
+      isPrescriptionFree(item.headLine) &&
+      !hasRxCode(item.code) &&
+      !hasRxCode(item.url)
+  );
+
+  const toEntry = (item) => ({
+    source: "Yahoo!ショッピング",
+    name: item.name,
+    shop: item.seller && item.seller.name ? item.seller.name : "Yahoo!ショッピング",
+    price: item.price,
+    url: toYahooAffiliateUrl(item.url),
+    reviewUrl: item.url, // レビュー確認用（アフィリエイト加工なしの直リンク）
+    reviewCount:
+      item.review && typeof item.review.count === "number"
+        ? item.review.count
+        : null,
+    reviewAverage:
+      item.review && typeof item.review.rate === "number"
+        ? item.review.rate
+        : null,
+    image: item.image && item.image.medium ? item.image.medium : null,
+  });
+
+  const bundle = base.filter((item) => isTargetBundle(item.name)).map(toEntry);
+  const single = base
+    .filter((item) => !isTargetBundle(item.name) && isSingleBox90(item.name))
+    .map(toEntry);
+
+  return { bundle, single };
 }
 
 const SITE_NAME = process.env.SITE_NAME || "ワンデーアキュビューオアシス最安値通販価格情報";
 
-/** 価格の安い順に並べ替え、単価を付与して上位N件を作る */
-function buildRanking(items) {
+/** 価格の安い順に並べ替え、単価を付与して上位N件を作る（枚数を指定して単価を計算） */
+function buildRanking(items, lensesPerUnit) {
+  const boxesOf30 = lensesPerUnit / 30;
   return items
     .filter((i) => typeof i.price === "number" && i.price > 0)
     .sort((a, b) => a.price - b.price)
@@ -279,17 +314,23 @@ function buildRanking(items) {
     .map((item, index) => ({
       rank: index + 1,
       ...item,
-      unitPrice: Math.round(item.price / LENSES_PER_SET),
-      boxUnitPrice: Math.round(item.price / BOXES_OF_30_PER_SET),
+      unitPrice: Math.round(item.price / lensesPerUnit),
+      boxUnitPrice: Math.round(item.price / boxesOf30),
     }));
 }
 
 async function main() {
   const [rakutenRaw, yahooRaw] = await Promise.all([fetchRakuten(), fetchYahoo()]);
 
-  const rakuten = buildRanking(rakutenRaw);
-  const yahoo = buildRanking(yahooRaw);
-  const overallBest = buildRanking([...rakutenRaw, ...yahooRaw])[0] || null;
+  // 90枚入り×2箱セット（180枚）
+  const rakuten = buildRanking(rakutenRaw.bundle, LENSES_PER_SET);
+  const yahoo = buildRanking(yahooRaw.bundle, LENSES_PER_SET);
+  const overallBest =
+    buildRanking([...rakutenRaw.bundle, ...yahooRaw.bundle], LENSES_PER_SET)[0] || null;
+
+  // 90枚1箱（単品）
+  const rakutenSingle90 = buildRanking(rakutenRaw.single, SINGLE_BOX_LENSES);
+  const yahooSingle90 = buildRanking(yahooRaw.single, SINGLE_BOX_LENSES);
 
   const payload = {
     siteName: SITE_NAME,
@@ -300,16 +341,23 @@ async function main() {
     overallBest,
     rakuten,
     yahoo,
+    single90Unit: "90枚1箱（単品）",
+    single90Lenses: SINGLE_BOX_LENSES,
+    rakutenSingle90,
+    yahooSingle90,
   };
 
   await writeFile(OUTPUT_PATH, JSON.stringify(payload, null, 2), "utf-8");
   console.log(`書き出し完了: ${OUTPUT_PATH}`);
   console.log(
-    `2箱セット該当件数: 楽天 ${rakutenRaw.length}件(掲載${rakuten.length}) / Yahoo! ${yahooRaw.length}件(掲載${yahoo.length})`
+    `2箱セット該当件数: 楽天 ${rakutenRaw.bundle.length}件(掲載${rakuten.length}) / Yahoo! ${yahooRaw.bundle.length}件(掲載${yahoo.length})`
+  );
+  console.log(
+    `90枚1箱該当件数: 楽天 ${rakutenRaw.single.length}件(掲載${rakutenSingle90.length}) / Yahoo! ${yahooRaw.single.length}件(掲載${yahooSingle90.length})`
   );
   if (rakuten.length === 0 && yahoo.length === 0) {
     console.warn(
-      "[warn] 該当商品が0件でした。isTargetBundle() の正規表現やKEYWORDを見直してください。"
+      "[warn] 2箱セットの該当商品が0件でした。isTargetBundle() の正規表現やKEYWORDを見直してください。"
     );
   }
 }
