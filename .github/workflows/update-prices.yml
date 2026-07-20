@@ -2,8 +2,10 @@ name: Update lens prices
 
 on:
   schedule:
-    # 毎日 10:00 と 22:00（UTC 1:00 / 13:00）に実行
-    - cron: "0 1,13 * * *"
+    # 毎日 10:05 と 22:05（UTC 1:05 / 13:05）に実行
+    # ちょうど毎時0分は、GitHub Actions全体が混雑してスケジュール実行が
+    # 遅延・スキップされやすいため、公式の推奨に従い5分ずらしている
+    - cron: "5 1,13 * * *"
   workflow_dispatch: {} # 手動実行用ボタン
 
 permissions:
