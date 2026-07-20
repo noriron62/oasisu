@@ -208,7 +208,7 @@ function renderList(elId, items) {
     row.innerHTML = `
       <span class="rank">${String(item.rank).padStart(2, "0")}</span>
       <img class="thumb" src="${item.image || PLACEHOLDER_IMG}" alt="" loading="lazy" onerror="this.src='${PLACEHOLDER_IMG}'" />
-      <span>
+      <span class="row-info">
         <p class="shop-name">${escapeHtml(item.shop)}</p>
         <p class="unit-prices">
           1箱(30枚)あたり <strong>¥${yen(item.boxUnitPrice ?? "-")}</strong>
