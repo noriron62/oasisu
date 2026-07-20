@@ -269,8 +269,11 @@ h1 {
 }
 
 .row-info {
+  /* CSS Gridの既定では、中の文字が長いとこのカラム自体が広がってしまい、
+     text-overflow: ellipsis が効かなくなる。min-width: 0 で解除する */
   min-width: 0;
 }
+
 /* ---------- ranked chart list ---------- */
 
 .chart {
@@ -296,9 +299,8 @@ h1 {
   /* 視力検査表のように、順位が下がるほど少しずつ小さく・薄くなる */
   font-size: var(--row-size, 18px);
   color: var(--row-color, var(--ink));
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  line-height: 1.25;
 }
 
 .row .unit-prices {
@@ -552,6 +554,9 @@ footer.bottom {
   .row .thumb {
     width: 40px;
     height: 40px;
+  }
+  .row .shop-name {
+    font-size: calc(var(--row-size, 18px) * 0.82);
   }
   .row .price {
     grid-column: 1 / -1;
