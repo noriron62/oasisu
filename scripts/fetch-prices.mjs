@@ -34,7 +34,7 @@
 //
 // 検索キーワードは KEYWORD 定数、または環境変数 SEARCH_KEYWORD で変更できる。
 
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -356,6 +356,179 @@ async function fetchYahoo() {
 }
 
 const SITE_NAME = process.env.SITE_NAME || "ワンデーアキュビューオアシス最安値通販価格情報";
+const TEMPLATE_PATH = path.join(__dirname, "..", "docs", "index.template.html");
+const HTML_OUTPUT_PATH = path.join(__dirname, "..", "docs", "index.html");
+const SITEMAP_OUTPUT_PATH = path.join(__dirname, "..", "docs", "sitemap.xml");
+const ROBOTS_OUTPUT_PATH = path.join(__dirname, "..", "docs", "robots.txt");
+
+const PLACEHOLDER_IMG =
+  "data:image/svg+xml;charset=UTF-8," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" fill="#dce8e5"/></svg>'
+  );
+
+const yenFmt = new Intl.NumberFormat("ja-JP");
+const yen = (n) => (typeof n === "number" ? yenFmt.format(n) : "-");
+
+/** HTMLの特殊文字をエスケープする（Node環境にDOMが無いため手動実装） */
+function escapeHtml(str) {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/** テンプレート文字列中の {{KEY}} を vars の値で置き換える */
+function renderTemplate(template, vars) {
+  let out = template;
+  for (const [key, value] of Object.entries(vars)) {
+    out = out.split(`{{${key}}}`).join(value ?? "");
+  }
+  return out;
+}
+
+function formatReviewMeta(item) {
+  if (!item || !item.reviewCount) return "";
+  const avg = typeof item.reviewAverage === "number" ? item.reviewAverage.toFixed(1) : null;
+  return avg
+    ? ` (★${avg}・${item.reviewCount.toLocaleString("ja-JP")}件のレビュー)`
+    : ` (${item.reviewCount.toLocaleString("ja-JP")}件のレビュー)`;
+}
+
+/** 1件分のランキング行のHTMLを生成する */
+function renderRow(item) {
+  const img = item.image || PLACEHOLDER_IMG;
+  return `      <a class="row" href="${escapeHtml(item.url)}" target="_blank" rel="noopener sponsored" data-rank="${item.rank}">
+        <span class="rank">${String(item.rank).padStart(2, "0")}</span>
+        <img class="thumb" src="${escapeHtml(img)}" alt="" loading="lazy" />
+        <span class="row-info">
+          <p class="shop-name">${escapeHtml(item.shop)}</p>
+          <p class="unit-prices">
+            1箱(30枚)あたり <strong>¥${yen(item.boxUnitPrice)}</strong>
+            ・ 1枚あたり <strong>¥${yen(item.unitPrice)}</strong>
+          </p>
+        </span>
+        <span class="price">¥${yen(item.price)}</span>
+      </a>`;
+}
+
+/** ランキング一覧（該当0件の場合は案内文）のHTMLを生成する */
+function renderList(items) {
+  if (!items || items.length === 0) {
+    return '      <p class="empty">該当する商品が見つかりませんでした。</p>';
+  }
+  return items.map(renderRow).join("\n");
+}
+
+/** 口コミ情報セクションのリンク一覧HTMLを生成する */
+function renderReviewLinks(rakuten, yahoo) {
+  const rakutenTop = Array.isArray(rakuten) ? rakuten[0] : null;
+  const yahooTop = Array.isArray(yahoo) ? yahoo[0] : null;
+
+  if (!rakutenTop && !yahooTop) {
+    return '      <li class="empty">現在ご案内できる口コミリンクがありません。</li>';
+  }
+
+  const links = [];
+  if (rakutenTop) {
+    links.push(`      <li>
+        <a href="${escapeHtml(rakutenTop.reviewUrl || rakutenTop.url)}" target="_blank" rel="noopener">
+          <span class="shop-mark rakuten">楽天</span>
+          ${escapeHtml(rakutenTop.shop)}の商品ページで口コミを見る${escapeHtml(formatReviewMeta(rakutenTop))}
+        </a>
+      </li>`);
+  }
+  if (yahooTop) {
+    links.push(`      <li>
+        <a href="${escapeHtml(yahooTop.reviewUrl || yahooTop.url)}" target="_blank" rel="noopener">
+          <span class="shop-mark yahoo">Yahoo!</span>
+          ${escapeHtml(yahooTop.shop)}の商品ページで口コミを見る${escapeHtml(formatReviewMeta(yahooTop))}
+        </a>
+      </li>`);
+  }
+  return links.join("\n");
+}
+
+/** 「本日の総合最安値」セクションのHTMLを生成する（データが無い場合は空文字） */
+function renderHeroSection(overallBest, unitLabel) {
+  if (!overallBest) return "";
+  const top = overallBest;
+  return `  <section class="hero">
+    <p class="hero-label">本日の総合最安値（${escapeHtml(unitLabel)}）</p>
+    <p class="hero-price"><span class="yen">¥</span><span>${yen(top.price)}</span></p>
+    <p class="hero-unit">1箱(30枚)あたり ${yen(top.boxUnitPrice)}円 ・ 1枚あたり ${yen(top.unitPrice)}円</p>
+    <div class="hero-meta">
+      <span class="hero-name">ワンデーアキュビューオアシス 90枚入り×2箱セット(180枚)</span>
+      <span class="badge">${escapeHtml(top.source)} ・ ${escapeHtml(top.shop)}</span>
+    </div>
+    <a class="hero-cta" href="${escapeHtml(top.url)}" target="_blank" rel="noopener sponsored">
+      このショップで見る →
+    </a>
+  </section>`;
+}
+
+function formatUpdatedText(updatedAt) {
+  if (!updatedAt) return "";
+  const d = new Date(updatedAt);
+  const formatted = new Intl.DateTimeFormat("ja-JP", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Tokyo",
+  }).format(d);
+  return `最終更新: ${formatted}`;
+}
+
+/**
+ * 構造化データ（JSON-LD, schema.org Product）を生成する。
+ * 検索エンジンに価格・レビュー情報を正しく伝え、リッチリザルト表示を狙う。
+ */
+function buildJsonLd(payload, canonicalUrl) {
+  const allItems = [...payload.rakuten, ...payload.yahoo];
+  if (allItems.length === 0) return "";
+
+  const offers = allItems.map((item) => ({
+    "@type": "Offer",
+    url: item.url,
+    price: item.price,
+    priceCurrency: "JPY",
+    availability: "https://schema.org/InStock",
+    seller: { "@type": "Organization", name: item.shop },
+  }));
+
+  const withReviews = allItems.filter((i) => i.reviewCount && i.reviewAverage);
+  let aggregateRating;
+  if (withReviews.length > 0) {
+    const totalCount = withReviews.reduce((sum, i) => sum + i.reviewCount, 0);
+    const weightedAvg =
+      withReviews.reduce((sum, i) => sum + i.reviewAverage * i.reviewCount, 0) / totalCount;
+    aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: Number(weightedAvg.toFixed(2)),
+      reviewCount: totalCount,
+    };
+  }
+
+  const json = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: "ワンデーアキュビューオアシス 90枚入り×2箱セット（180枚）",
+    description: payload.siteName,
+    brand: { "@type": "Brand", name: "ACUVUE" },
+    ...(aggregateRating ? { aggregateRating } : {}),
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "JPY",
+      lowPrice: Math.min(...allItems.map((i) => i.price)),
+      highPrice: Math.max(...allItems.map((i) => i.price)),
+      offerCount: offers.length,
+      offers,
+    },
+  };
+
+  return `<script type="application/ld+json">${JSON.stringify(json)}</script>`;
+}
 
 /** 価格の安い順に並べ替え、単価を付与して上位N件を作る（枚数を指定して単価を計算） */
 function buildRanking(items, lensesPerUnit) {
@@ -413,6 +586,57 @@ async function main() {
       "[warn] 2箱セットの該当商品が0件でした。isTargetBundle() の正規表現やKEYWORDを見直してください。"
     );
   }
+
+  // ---- SEO対応: index.html を完成品として直接生成する ----
+  // （これまではJavaScriptが後からdata.jsonを読み込んで中身を書き込む方式だったが、
+  //   検索エンジンに正しく内容を認識させるため、ビルド時に完成したHTMLを出力する）
+  const canonicalUrl = SITE_URL.endsWith("/") ? SITE_URL : `${SITE_URL}/`;
+  const unitLabel = payload.unit;
+
+  const rakutenImage = payload.rakuten.find((i) => i.image)?.image || "images/product-1.jpg";
+
+  const template = await readFile(TEMPLATE_PATH, "utf-8");
+  const html = renderTemplate(template, {
+    PAGE_TITLE: escapeHtml(payload.siteName),
+    META_DESCRIPTION: escapeHtml(
+      `ワンデーアキュビューオアシス 90枚入り×2箱セット（180枚）の楽天市場・Yahoo!ショッピングの価格を毎日自動で比較し、それぞれの最安値トップ5を掲載しています。`
+    ),
+    CANONICAL_URL: escapeHtml(canonicalUrl),
+    JSON_LD: buildJsonLd(payload, canonicalUrl),
+    UPDATED_TEXT: escapeHtml(formatUpdatedText(payload.updatedAt)),
+    HERO_SECTION: renderHeroSection(payload.overallBest, unitLabel),
+    RAKUTEN_LIST: renderList(payload.rakuten),
+    YAHOO_LIST: renderList(payload.yahoo),
+    RAKUTEN_SINGLE_LIST: renderList(payload.rakutenSingle90),
+    YAHOO_SINGLE_LIST: renderList(payload.yahooSingle90),
+    PRODUCT_INFO_IMAGE: escapeHtml(rakutenImage),
+    REVIEW_LINKS: renderReviewLinks(payload.rakuten, payload.yahoo),
+  });
+
+  await writeFile(HTML_OUTPUT_PATH, html, "utf-8");
+  console.log(`書き出し完了: ${HTML_OUTPUT_PATH}`);
+
+  // ---- sitemap.xml ----
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${escapeHtml(canonicalUrl)}</loc>
+    <lastmod>${payload.updatedAt.slice(0, 10)}</lastmod>
+    <changefreq>daily</changefreq>
+  </url>
+</urlset>
+`;
+  await writeFile(SITEMAP_OUTPUT_PATH, sitemap, "utf-8");
+
+  // ---- robots.txt ----
+  const robots = `User-agent: *
+Allow: /
+
+Sitemap: ${canonicalUrl}sitemap.xml
+`;
+  await writeFile(ROBOTS_OUTPUT_PATH, robots, "utf-8");
+
+  console.log("sitemap.xml / robots.txt も書き出しました");
 }
 
 main().catch((err) => {
