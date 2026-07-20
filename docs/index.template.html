@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{{PAGE_TITLE}}｜楽天・Yahoo!ショッピング比較</title>
+<meta name="description" content="{{META_DESCRIPTION}}" />
+<link rel="canonical" href="{{CANONICAL_URL}}" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="{{PAGE_TITLE}}" />
+<meta property="og:description" content="{{META_DESCRIPTION}}" />
+<meta property="og:url" content="{{CANONICAL_URL}}" />
+<meta property="og:image" content="{{CANONICAL_URL}}images/banner.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+{{JSON_LD}}
+</head>
+<body>
+
+<img class="title-banner" src="images/banner.jpg" alt="{{PAGE_TITLE}}" />
+
+<div class="wrap">
+
+  <header class="top">
+    <span class="eyebrow">Daily Price Check</span>
+    <h1>{{PAGE_TITLE}}</h1>
+    <p class="subtitle">
+      ワンデーアキュビューオアシスの「90枚入り×2箱セット(180枚)」を基準に、楽天市場・Yahoo!ショッピングの価格を毎日チェックし、それぞれのショップ別最安値トップ5を掲載しています。
+    </p>
+  </header>
+
+  <section class="value-explainer" aria-label="90枚入り×2箱セットがお得な理由">
+    <h2 class="section-heading">どうして「90枚入り×2箱セット」がお得なのでしょうか？</h2>
+    <p>
+      ワンデーアキュビューオアシスは、購入する数量によって1枚あたりの単価が変わります。
+      1箱(30枚)だけの購入は数量が少ないため単価が割高になりがちで、
+      2箱に増やしても送料や販売手数料の比率はあまり下がらず、単価の下がり方はゆるやかです。
+    </p>
+    <p>
+      一方で、<strong>90枚入り×2箱セット(180枚)</strong>は、多くのショップが
+      「送料込み・まとめ買い向け」として力を入れて価格設定している定番の販売単位のため、
+      1枚あたりの単価がもっとも下がりやすい傾向があります。
+      そのため当サイトでは、この90枚入り×2箱セットに絞って、
+      楽天市場・Yahoo!ショッピングの最安値価格を比較しています。
+    </p>
+  </section>
+
+  <!-- 商品写真セクション：ここの画像はご自身で用意したものに差し替えてください -->
+  <section class="product-photos" aria-label="商品写真">
+    <figure>
+      <img src="images/product-1.jpg" alt="ワンデーアキュビューオアシス 本体" loading="lazy" />
+      <figcaption>本体</figcaption>
+    </figure>
+    <figure>
+      <img src="images/product-2.jpg" alt="ワンデーアキュビューオアシス 90枚入りパッケージ" loading="lazy" />
+      <figcaption>90枚入りパッケージ</figcaption>
+    </figure>
+    <figure>
+      <img src="images/product-3.jpg" alt="ワンデーアキュビューオアシス レンズ拡大" loading="lazy" />
+      <figcaption>レンズ拡大</figcaption>
+    </figure>
+  </section>
+
+  <p class="updated">{{UPDATED_TEXT}}</p>
+
+  {{HERO_SECTION}}
+
+  <section class="shop-section" aria-label="楽天市場ランキング">
+    <h2 class="shop-heading"><span class="shop-mark rakuten">楽天</span>楽天市場 最安値TOP5</h2>
+    <div class="chart">
+{{RAKUTEN_LIST}}
+    </div>
+  </section>
+
+  <section class="shop-section" aria-label="Yahoo!ショッピングランキング">
+    <h2 class="shop-heading"><span class="shop-mark yahoo">Yahoo!</span>Yahoo!ショッピング 最安値TOP5</h2>
+    <div class="chart">
+{{YAHOO_LIST}}
+    </div>
+  </section>
+
+  <section class="single90-intro" aria-label="90枚1箱について">
+    <h2 class="section-heading">90枚1箱(単品)でも比較したい方へ</h2>
+    <p>
+      「まずは1箱だけ試したい」という方向けに、90枚1箱(単品)の価格帯も
+      別枠で掲載しています。<strong>上記の90枚×2箱セットとは金額の単位が異なる</strong>ため、
+      混同しないようご注意ください(こちらは90枚1箱分の価格です)。
+    </p>
+  </section>
+
+  <section class="shop-section" aria-label="楽天市場ランキング(90枚1箱)">
+    <h2 class="shop-heading"><span class="shop-mark rakuten">楽天</span>楽天市場 90枚1箱 最安値TOP5</h2>
+    <div class="chart">
+{{RAKUTEN_SINGLE_LIST}}
+    </div>
+  </section>
+
+  <section class="shop-section" aria-label="Yahoo!ショッピングランキング(90枚1箱)">
+    <h2 class="shop-heading"><span class="shop-mark yahoo">Yahoo!</span>Yahoo!ショッピング 90枚1箱 最安値TOP5</h2>
+    <div class="chart">
+{{YAHOO_SINGLE_LIST}}
+    </div>
+  </section>
+
+  <section class="product-info" aria-label="商品情報">
+    <h2 class="section-heading">ワンデーアキュビューオアシスとは</h2>
+
+    <div class="product-info-body">
+      <img class="product-info-image" src="{{PRODUCT_INFO_IMAGE}}" alt="ワンデーアキュビューオアシス" loading="lazy" />
+
+      <div class="product-info-text">
+        <p>
+          ワンデーアキュビューオアシスは、ジョンソン・エンド・ジョンソンが展開する
+          「アキュビュー」シリーズの1日使い捨てタイプのコンタクトレンズです。
+          シリコーンハイドロゲルという素材を使用しており、レンズを通して角膜に
+          酸素を届けやすい設計になっているのが特徴です。
+        </p>
+
+        <h3>素材と装用感</h3>
+        <p>
+          シリコーンハイドロゲル素材は、従来の含水率重視の素材に比べて、
+          長時間の装用でも乾燥感を抑えやすいとされています。
+          涙となじみやすい表面設計により、まばたきの際の摩擦を軽減する
+          工夫がされている点も特徴です。
+        </p>
+
+        <h3>UVカット機能</h3>
+        <p>
+          レンズには紫外線をカットする機能が備わっており、
+          屋外での活動が多い方にも配慮された設計になっています
+          （UVカット機能はあくまで補助的なものであり、サングラス等の
+          代わりにはなりませんのでご注意ください）。
+        </p>
+
+        <h3>1日使い捨てのメリット</h3>
+        <p>
+          毎日新しいレンズに交換するため、レンズケースや洗浄液を使った
+          お手入れが不要です。衛生面を重視したい方や、レンズケアの
+          手間を減らしたい方に選ばれています。
+        </p>
+
+        <h3>こんな方におすすめ</h3>
+        <ul>
+          <li>乾燥や装用中の違和感が気になる方</li>
+          <li>レンズケアの手間を減らしたい方</li>
+          <li>紫外線対策も意識したい方</li>
+          <li>まとめ買いでコストを抑えたい方</li>
+        </ul>
+
+        <p class="note">
+          ※ 度数・カーブ・含水率などの詳細仕様は変更される場合があります。
+          ご購入前に、各販売店の商品ページやメーカーの公式情報で
+          最新の仕様をご確認ください。本ページは購入の最終判断材料として
+          ではなく、比較検討のための参考情報としてご活用ください。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bottom">
+    <p class="ad-disclosure">【広告】本サイトは広告を含みます。</p>
+    価格は楽天市場／Yahoo!ショッピングを毎日価格を調査比較して、「90枚入り×2箱セット(180枚)」の最安値価格の情報を提示しています。<br />
+    表示価格は毎日更新していますが、調べた時点のものなので、実際の購入時点の価格・送料・在庫状況とは異なる場合があります。最新の情報は各ショップのページでご確認ください。
+  </footer>
+
+  <section class="reviews" aria-label="口コミ情報">
+    <h2 class="section-heading">口コミ情報</h2>
+    <p class="reviews-lead">
+      実際に使用した方のレビューが気になる方は、各ショップの商品ページに
+      掲載されている口コミもあわせてご確認ください（本ページではレビュー本文の
+      転載は行わず、各ショップの商品ページへのリンクのみをご案内しています）。
+    </p>
+    <ul class="review-links">
+{{REVIEW_LINKS}}
+    </ul>
+  </section>
+
+</div>
+</body>
+</html>
