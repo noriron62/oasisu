@@ -45,3 +45,13 @@ jobs:
           git add docs/data.json
           git diff --cached --quiet && echo "変更なし" || git commit -m "chore: update prices $(date -u +%Y-%m-%d)"
           git push
+
+      - name: Deploy to existing site's subdirectory via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./docs/
+          server-dir: ${{ secrets.FTP_TARGET_DIR }}
+          protocol: ftps
