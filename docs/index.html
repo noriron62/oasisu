@@ -56,6 +56,8 @@
     </figure>
   </section>
 
+  <p class="updated" id="updated"></p>
+
   <section class="hero" id="hero" hidden>
     <p class="hero-label" id="hero-label">本日の総合最安値（90枚入り×2箱セット／180枚）</p>
     <p class="hero-price"><span class="yen">¥</span><span id="hero-price-value">-</span></p>
@@ -160,8 +162,6 @@
       </div>
     </div>
   </section>
-
-  <p class="updated" id="updated"></p>
 
   <footer class="bottom">
     <p class="ad-disclosure">【広告】本サイトはアフィリエイト広告を利用しています。</p>
@@ -277,7 +277,7 @@ async function render() {
       timeStyle: "short",
       timeZone: "Asia/Tokyo",
     }).format(d);
-    updatedEl.textContent = `最終更新: ${formatted}（日本時間）`;
+    updatedEl.textContent = `最終更新: ${formatted}`;
   } else {
     updatedEl.textContent = "";
   }
