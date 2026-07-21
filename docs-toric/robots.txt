@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://example.com/oasys-ranshi-saiyasu/sitemap.xml
+Sitemap: https://newmediagallery.org/oasys-ranshi-saiyasu/sitemap.xml
