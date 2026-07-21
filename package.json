@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "ワンデーアキュビューオアシスの楽天・Yahoo!ショッピング最安値を毎日自動更新するサイト",
+  "description": "ワンデーアキュビューオアシス関連サイトの楽天・Yahoo!ショッピング最安値を毎日自動更新するサイト群",
   "scripts": {
-    "fetch": "node scripts/fetch-prices.mjs"
+    "build": "node scripts/build-all.mjs",
+    "deploy": "node scripts/deploy-ftp.mjs"
+  },
+  "dependencies": {
+    "basic-ftp": "^5.0.5"
   },
   "engines": {
     "node": ">=18"

@@ -1,0 +1,565 @@
+:root {
+  --bg: #f5f9f7;
+  --surface: #ffffff;
+  --ink: #12262a;
+  --ink-soft: #4b6360;
+  --teal: #0c6e6b;
+  --teal-dim: #0c6e6b1a;
+  --gold: #b8892b;
+  --gold-dim: #b8892b14;
+  --line: #dce8e5;
+  --radius: 14px;
+  --mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  --sans: "Noto Sans JP", "Hiragino Sans", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.7;
+}
+
+a {
+  color: inherit;
+}
+
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+/* ---------- title banner ---------- */
+
+.title-banner {
+  display: block;
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  background: var(--line);
+}
+
+/* ---------- header ---------- */
+
+header.top {
+  margin-bottom: 36px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--teal);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 18px;
+  height: 2px;
+  background: var(--teal);
+  display: inline-block;
+}
+
+h1 {
+  margin: 10px 0 6px;
+  font-size: clamp(24px, 5vw, 32px);
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+/* ---------- hero: 検査表の一番上の行 ---------- */
+
+.hero {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--teal-dim), transparent 55%);
+  pointer-events: none;
+}
+
+.hero-label {
+  font-size: 20px;
+  color: var(--ink);
+  margin: 0 0 12px;
+  font-weight: 900;
+}
+
+.hero-price {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: clamp(52px, 12vw, 84px);
+  line-height: 1;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.hero-price .yen {
+  font-size: 0.4em;
+  color: var(--teal);
+}
+
+.hero-unit {
+  margin: 8px 0 0;
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.hero-meta {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.hero-name {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--teal-dim);
+  color: var(--teal);
+}
+
+.hero-cta {
+  margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--teal);
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+  transition: opacity 0.15s ease;
+}
+
+.hero-cta:hover {
+  opacity: 0.85;
+}
+
+/* ---------- product photos ---------- */
+
+.product-photos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.product-photos figure {
+  margin: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  text-align: center;
+}
+
+.product-photos img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  display: block;
+  background: var(--line);
+}
+
+.product-photos figcaption {
+  padding: 8px 4px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+/* ---------- shop sections ---------- */
+
+.shop-section {
+  margin-bottom: 28px;
+}
+
+.shop-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 900;
+  margin: 0 0 12px;
+}
+
+.shop-mark {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: #fff;
+}
+
+.shop-mark.rakuten {
+  background: #bf0000;
+}
+
+.shop-mark.yahoo {
+  background: #ff0033;
+}
+
+.row .thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--line);
+  flex-shrink: 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 32px 48px 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--line);
+  text-decoration: none;
+  color: inherit;
+}
+
+.row-info {
+  /* CSS Gridの既定では、中の文字が長いとこのカラム自体が広がってしまい、
+     text-overflow: ellipsis が効かなくなる。min-width: 0 で解除する */
+  min-width: 0;
+}
+
+/* ---------- ranked chart list ---------- */
+
+.chart {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px 0;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.rank {
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.row .shop-name {
+  font-weight: 900;
+  margin: 0 0 4px;
+  /* 視力検査表のように、順位が下がるほど少しずつ小さく・薄くなる */
+  font-size: var(--row-size, 18px);
+  color: var(--row-color, var(--ink));
+  overflow-wrap: break-word;
+  line-height: 1.25;
+}
+
+.row .unit-prices {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.row .unit-prices strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.row .price {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: var(--row-price-size, 18px);
+  color: var(--row-color, var(--ink));
+  white-space: nowrap;
+}
+
+.row[data-rank="1"] {
+  --row-size: 21px;
+  --row-price-size: 22px;
+  --row-color: var(--gold);
+  background: var(--gold-dim);
+}
+
+.row[data-rank="2"] { --row-size: 19px; --row-price-size: 19px; opacity: 0.94; }
+.row[data-rank="3"] { --row-size: 18px; --row-price-size: 18px; opacity: 0.86; }
+.row[data-rank="4"] { --row-size: 17px; --row-price-size: 17px; opacity: 0.78; }
+.row[data-rank="5"] { --row-size: 16px; --row-price-size: 16px; opacity: 0.68; }
+
+.row:hover {
+  background: var(--teal-dim);
+}
+
+.row[data-rank="1"]:hover {
+  background: var(--gold-dim);
+}
+
+/* ---------- value explainer ---------- */
+
+.value-explainer {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 28px;
+}
+
+.value-explainer p {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.value-explainer p:last-child {
+  margin-bottom: 0;
+}
+
+.value-explainer strong {
+  color: var(--teal);
+}
+
+/* ---------- reviews ---------- */
+
+.reviews {
+  margin: 28px 0 0;
+}
+
+.reviews-lead {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin: 0 0 12px;
+}
+
+.review-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.review-links li {
+  border-bottom: 1px solid var(--line);
+}
+
+.review-links li:last-child {
+  border-bottom: none;
+}
+
+.review-links li.empty {
+  padding: 18px 20px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.review-links a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.review-links a:hover {
+  background: var(--teal-dim);
+}
+
+.single90-intro {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+.single90-intro p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.single90-intro strong {
+  color: var(--teal);
+}
+
+/* ---------- product info ---------- */
+
+.section-heading {
+  font-size: 19px;
+  font-weight: 900;
+  margin: 0 0 16px;
+}
+
+.product-info {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  margin-bottom: 28px;
+}
+
+.product-info-body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.product-info-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: var(--radius);
+  background: var(--line);
+  position: sticky;
+  top: 20px;
+}
+
+.product-info-text h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 20px 0 6px;
+  color: var(--teal);
+}
+
+.product-info-text h3:first-child {
+  margin-top: 0;
+}
+
+.product-info-text p {
+  margin: 0 0 4px;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.product-info-text ul {
+  margin: 8px 0;
+  padding-left: 20px;
+  font-size: 14px;
+}
+
+.product-info-text li {
+  margin-bottom: 4px;
+}
+
+.product-info-text .note {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 560px) {
+  .product-info-body {
+    grid-template-columns: 1fr;
+  }
+  .product-info-image {
+    max-width: 220px;
+    margin: 0 auto;
+    position: static;
+  }
+}
+
+/* ---------- states / footer ---------- */
+
+.empty,
+.error {
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.updated {
+  margin: 0 0 12px;
+  text-align: right;
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-family: var(--mono);
+}
+
+footer.bottom {
+  margin-top: 40px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.ad-disclosure {
+  margin: 0 0 8px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+@media (max-width: 480px) {
+  .product-photos {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .row {
+    grid-template-columns: 24px 40px 1fr;
+    row-gap: 4px;
+  }
+  .row .thumb {
+    width: 40px;
+    height: 40px;
+  }
+  .row .shop-name {
+    font-size: calc(var(--row-size, 18px) * 0.82);
+  }
+  .row .price {
+    grid-column: 1 / -1;
+    font-size: calc(var(--row-price-size, 18px) * 0.9);
+  }
+}
