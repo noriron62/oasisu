@@ -93,6 +93,18 @@ async function buildOneProduct(product, template) {
       .map((i) => normalizeYahooItem(i, { valuecommerce: VALUECOMMERCE }))
   );
 
+  // 診断用ログ：ブランド判定・処方箋フィルタ後、比較単位への振り分け前の
+  // 総数と商品名サンプルを出しておく（「該当0件」の原因調査に使う）
+  console.log(
+    `  [debug] ブランド判定後の件数: 楽天${rakutenItems.length}件 / Yahoo!${yahooItems.length}件`
+  );
+  for (const item of rakutenItems.slice(0, 5)) {
+    console.log(`    [楽天] ¥${item.price} ${item.name}`);
+  }
+  for (const item of yahooItems.slice(0, 5)) {
+    console.log(`    [Yahoo!] ¥${item.price} ${item.name}`);
+  }
+
   // 商品ごとの比較単位（例: 90枚×2箱／90枚1箱）ごとにランキングを作る。
   // 単位は配列の順番に処理し、先に該当した商品は後の単位では重複して
   // 拾わないようにする（例: 「90枚×2箱セット」に該当した商品が
