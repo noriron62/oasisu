@@ -83,7 +83,7 @@ export function hasRxCode(text) {
   return /(^|[^a-z0-9])rx([^a-z0-9]|$)/i.test(text);
 }
 
-/** 楽天市場から商品を取得する（フィルタ前の生データを返す。複数ページ取得対応） */
+/** 楽天市場から商品を取得する（フィルタ前の生データを返す。複数ページ・価格帯指定に対応） */
 export async function fetchRakutenRaw({
   keyword,
   appId,
@@ -91,6 +91,8 @@ export async function fetchRakutenRaw({
   affiliateId,
   siteUrl,
   maxPages = 3, // 1ページ30件 × 3ページ = 最大90件取得する
+  minPrice, // 指定すると、この価格以上の商品だけに絞り込んで取得できる
+  maxPrice, // 指定すると、この価格以下の商品だけに絞り込んで取得できる
 }) {
   if (!appId || !accessKey) {
     return { items: [], skipped: "RAKUTEN_APP_ID または RAKUTEN_ACCESS_KEY が未設定" };
@@ -112,6 +114,8 @@ export async function fetchRakutenRaw({
     url.searchParams.set("page", String(page));
     url.searchParams.set("imageFlag", "1");
     url.searchParams.set("formatVersion", "2");
+    if (minPrice) url.searchParams.set("minPrice", String(Math.round(minPrice)));
+    if (maxPrice) url.searchParams.set("maxPrice", String(Math.round(maxPrice)));
 
     const res = await fetch(url, {
       headers: { Origin: siteUrl, Referer: siteUrl },
@@ -131,8 +135,14 @@ export async function fetchRakutenRaw({
   return { items: allItems, skipped: null };
 }
 
-/** Yahoo!ショッピングから商品を取得する（フィルタ前の生データを返す。複数ページ取得対応） */
-export async function fetchYahooRaw({ keyword, clientId, maxPages = 3 }) {
+/** Yahoo!ショッピングから商品を取得する（フィルタ前の生データを返す。複数ページ・価格帯指定に対応） */
+export async function fetchYahooRaw({
+  keyword,
+  clientId,
+  maxPages = 3,
+  minPrice,
+  maxPrice,
+}) {
   if (!clientId) {
     return { items: [], skipped: "YAHOO_CLIENT_ID が未設定" };
   }
@@ -147,6 +157,8 @@ export async function fetchYahooRaw({ keyword, clientId, maxPages = 3 }) {
     url.searchParams.set("sort", "+price");
     url.searchParams.set("results", "30");
     url.searchParams.set("start", String(page * 30 + 1));
+    if (minPrice) url.searchParams.set("price_from", String(Math.round(minPrice)));
+    if (maxPrice) url.searchParams.set("price_to", String(Math.round(maxPrice)));
 
     const res = await fetch(url);
     if (!res.ok) {
