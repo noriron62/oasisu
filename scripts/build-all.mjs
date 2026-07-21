@@ -82,13 +82,65 @@ async function buildOneProduct(product, template) {
   if (rakutenResult.skipped) console.warn(`  [skip] 楽天: ${rakutenResult.skipped}`);
   if (yahooResult.skipped) console.warn(`  [skip] Yahoo!: ${yahooResult.skipped}`);
 
+  let rakutenRawItems = rakutenResult.items;
+  let yahooRawItems = yahooResult.items;
+
+  // 比較単位に priceHint（想定価格帯）が設定されている場合、その価格帯を
+  // 直接指定した追加取得を行う。安い順の取得だけでは、単価の安い商品が
+  // 大量にあると、まとめ買い商品が取得件数の範囲外に埋もれてしまうことが
+  // あるため、価格帯を直接指定して確実に拾えるようにする。
+  const hintedUnits = product.units.filter((u) => u.priceHint);
+  if (hintedUnits.length > 0) {
+    const seenRakutenCodes = new Set(rakutenRawItems.map((i) => i.itemCode || i.itemUrl));
+    const seenYahooCodes = new Set(yahooRawItems.map((i) => i.code || i.url));
+
+    const hintedResults = await Promise.all(
+      hintedUnits.flatMap((unit) => [
+        fetchRakutenRaw({
+          keyword: product.searchKeyword,
+          appId: RAKUTEN_APP_ID,
+          accessKey: RAKUTEN_ACCESS_KEY,
+          affiliateId: RAKUTEN_AFFILIATE_ID,
+          siteUrl,
+          maxPages: 2,
+          minPrice: unit.priceHint.min,
+          maxPrice: unit.priceHint.max,
+        }).then((r) => ({ source: "rakuten", unit: unit.key, ...r })),
+        fetchYahooRaw({
+          keyword: product.searchKeyword,
+          clientId: YAHOO_CLIENT_ID,
+          maxPages: 2,
+          minPrice: unit.priceHint.min,
+          maxPrice: unit.priceHint.max,
+        }).then((r) => ({ source: "yahoo", unit: unit.key, ...r })),
+      ])
+    );
+
+    for (const result of hintedResults) {
+      if (result.source === "rakuten") {
+        const newItems = result.items.filter(
+          (i) => !seenRakutenCodes.has(i.itemCode || i.itemUrl)
+        );
+        for (const i of newItems) seenRakutenCodes.add(i.itemCode || i.itemUrl);
+        rakutenRawItems = rakutenRawItems.concat(newItems);
+      } else {
+        const newItems = result.items.filter((i) => !seenYahooCodes.has(i.code || i.url));
+        for (const i of newItems) seenYahooCodes.add(i.code || i.url);
+        yahooRawItems = yahooRawItems.concat(newItems);
+      }
+    }
+    console.log(
+      `  [debug] 価格帯指定の追加取得: 楽天+${rakutenRawItems.length - rakutenResult.items.length}件 / Yahoo!+${yahooRawItems.length - yahooResult.items.length}件`
+    );
+  }
+
   const rakutenItems = applyCommonFilters(
-    rakutenResult.items
+    rakutenRawItems
       .filter((i) => product.isCorrectProduct(i.itemName))
       .map((i) => normalizeRakutenItem(i, { affiliateId: RAKUTEN_AFFILIATE_ID, moshimo: MOSHIMO }))
   );
   const yahooItems = applyCommonFilters(
-    yahooResult.items
+    yahooRawItems
       .filter((i) => product.isCorrectProduct(i.name))
       .map((i) => normalizeYahooItem(i, { valuecommerce: VALUECOMMERCE }))
   );
