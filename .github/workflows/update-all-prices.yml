@@ -1,0 +1,53 @@
+name: Update all product prices
+
+on:
+  workflow_dispatch: {} # cron-job.org など、外部サービスからの呼び出し専用
+  # GitHub自身のスケジュール機能は信頼性の問題があるため使用しない
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build all products
+        env:
+          SITE_BASE_URL: ${{ secrets.SITE_BASE_URL }}
+          RAKUTEN_APP_ID: ${{ secrets.RAKUTEN_APP_ID }}
+          RAKUTEN_ACCESS_KEY: ${{ secrets.RAKUTEN_ACCESS_KEY }}
+          RAKUTEN_AFFILIATE_ID: ${{ secrets.RAKUTEN_AFFILIATE_ID }}
+          YAHOO_CLIENT_ID: ${{ secrets.YAHOO_CLIENT_ID }}
+          MOSHIMO_A_ID: ${{ secrets.MOSHIMO_A_ID }}
+          MOSHIMO_P_ID: ${{ secrets.MOSHIMO_P_ID }}
+          MOSHIMO_PC_ID: ${{ secrets.MOSHIMO_PC_ID }}
+          MOSHIMO_PL_ID: ${{ secrets.MOSHIMO_PL_ID }}
+          VALUECOMMERCE_SID: ${{ secrets.VALUECOMMERCE_SID }}
+          VALUECOMMERCE_PID: ${{ secrets.VALUECOMMERCE_PID }}
+        run: npm run build
+
+      - name: Commit updated data
+        run: |
+          git config user.name "price-bot"
+          git config user.email "price-bot@users.noreply.github.com"
+          git add docs docs-*
+          git diff --cached --quiet && echo "変更なし" || git commit -m "chore: update all prices $(date -u +%Y-%m-%d)"
+          git push
+
+      - name: Deploy all products via FTP
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: npm run deploy
