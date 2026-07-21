@@ -104,6 +104,15 @@ async function buildOneProduct(product, template) {
   for (const item of yahooItems.slice(0, 5)) {
     console.log(`    [Yahoo!] ¥${item.price} ${item.name}`);
   }
+  // 「〇箱」という文字列を含む商品だけをピンポイントで抽出する
+  // （全件のうち、実際にどんな箱数表記があるのか確認するため）
+  const withBoxCount = [...rakutenItems, ...yahooItems].filter((i) =>
+    /\d箱/.test((i.name || "").replace(/\s/g, ""))
+  );
+  console.log(`  [debug] 「〇箱」を含む商品: ${withBoxCount.length}件`);
+  for (const item of withBoxCount.slice(0, 15)) {
+    console.log(`    [${item.source}] ¥${item.price} ${item.name}`);
+  }
 
   // 商品ごとの比較単位（例: 90枚×2箱／90枚1箱）ごとにランキングを作る。
   // 単位は配列の順番に処理し、先に該当した商品は後の単位では重複して
