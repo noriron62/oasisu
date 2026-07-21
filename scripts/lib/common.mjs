@@ -57,6 +57,10 @@ export function renderThemeStyle(theme) {
   return `<style>${lines.join("\n")}</style>`;
 }
 
+/**
+ * 「2箱で送料無料」「2箱購入で送料無料」のような、購入数のしきい値を
+ * 示すだけの販促文言を、箱数判定の対象から取り除く。
+ */
 export function stripShippingPromoText(n) {
   // 「2箱で送料無料」「2箱購入で送料無料」「2箱でポスト便送料無料」のように、
   // 「箱」と「で」の間、「で」と「送料無料」の間、それぞれに別の単語が
@@ -79,62 +83,85 @@ export function hasRxCode(text) {
   return /(^|[^a-z0-9])rx([^a-z0-9]|$)/i.test(text);
 }
 
-/** 楽天市場から商品を取得する（フィルタ前の生データを返す） */
+/** 楽天市場から商品を取得する（フィルタ前の生データを返す。複数ページ取得対応） */
 export async function fetchRakutenRaw({
   keyword,
   appId,
   accessKey,
   affiliateId,
   siteUrl,
+  maxPages = 3, // 1ページ30件 × 3ページ = 最大90件取得する
 }) {
   if (!appId || !accessKey) {
     return { items: [], skipped: "RAKUTEN_APP_ID または RAKUTEN_ACCESS_KEY が未設定" };
   }
 
-  const url = new URL(
-    "https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601"
-  );
-  url.searchParams.set("applicationId", appId);
-  url.searchParams.set("accessKey", accessKey);
-  if (affiliateId) {
-    url.searchParams.set("affiliateId", affiliateId);
-  }
-  url.searchParams.set("keyword", keyword);
-  url.searchParams.set("sort", "+itemPrice");
-  url.searchParams.set("hits", "30");
-  url.searchParams.set("imageFlag", "1");
-  url.searchParams.set("formatVersion", "2");
+  const allItems = [];
+  for (let page = 1; page <= maxPages; page++) {
+    const url = new URL(
+      "https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601"
+    );
+    url.searchParams.set("applicationId", appId);
+    url.searchParams.set("accessKey", accessKey);
+    if (affiliateId) {
+      url.searchParams.set("affiliateId", affiliateId);
+    }
+    url.searchParams.set("keyword", keyword);
+    url.searchParams.set("sort", "+itemPrice");
+    url.searchParams.set("hits", "30");
+    url.searchParams.set("page", String(page));
+    url.searchParams.set("imageFlag", "1");
+    url.searchParams.set("formatVersion", "2");
 
-  const res = await fetch(url, {
-    headers: { Origin: siteUrl, Referer: siteUrl },
-  });
-  if (!res.ok) {
-    throw new Error(`楽天API failed: ${res.status} ${await res.text()}`);
+    const res = await fetch(url, {
+      headers: { Origin: siteUrl, Referer: siteUrl },
+    });
+    if (!res.ok) {
+      if (page === 1) {
+        throw new Error(`楽天API failed: ${res.status} ${await res.text()}`);
+      }
+      break; // 2ページ目以降の失敗は、1ページ目の結果だけ使って続行する
+    }
+    const json = await res.json();
+    const items = json.Items || [];
+    allItems.push(...items);
+    if (items.length < 30) break; // これ以上ページが無い
   }
-  const json = await res.json();
-  return { items: json.Items || [], skipped: null };
+
+  return { items: allItems, skipped: null };
 }
 
-/** Yahoo!ショッピングから商品を取得する（フィルタ前の生データを返す） */
-export async function fetchYahooRaw({ keyword, clientId }) {
+/** Yahoo!ショッピングから商品を取得する（フィルタ前の生データを返す。複数ページ取得対応） */
+export async function fetchYahooRaw({ keyword, clientId, maxPages = 3 }) {
   if (!clientId) {
     return { items: [], skipped: "YAHOO_CLIENT_ID が未設定" };
   }
 
-  const url = new URL(
-    "https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch"
-  );
-  url.searchParams.set("appid", clientId);
-  url.searchParams.set("query", keyword);
-  url.searchParams.set("sort", "+price");
-  url.searchParams.set("results", "30");
+  const allItems = [];
+  for (let page = 0; page < maxPages; page++) {
+    const url = new URL(
+      "https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch"
+    );
+    url.searchParams.set("appid", clientId);
+    url.searchParams.set("query", keyword);
+    url.searchParams.set("sort", "+price");
+    url.searchParams.set("results", "30");
+    url.searchParams.set("start", String(page * 30 + 1));
 
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`Yahoo API failed: ${res.status} ${await res.text()}`);
+    const res = await fetch(url);
+    if (!res.ok) {
+      if (page === 0) {
+        throw new Error(`Yahoo API failed: ${res.status} ${await res.text()}`);
+      }
+      break;
+    }
+    const json = await res.json();
+    const items = json.hits || [];
+    allItems.push(...items);
+    if (items.length < 30) break;
   }
-  const json = await res.json();
-  return { items: json.hits || [], skipped: null };
+
+  return { items: allItems, skipped: null };
 }
 
 /** 楽天の生アイテムを共通形式に変換する */
