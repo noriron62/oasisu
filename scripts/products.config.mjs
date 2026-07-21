@@ -157,7 +157,7 @@ export const products = [
     outputDir: "docs-toric",
     siteName: "ワンデーアキュビューオアシス乱視用最安値通販価格情報",
     theme: { accent: "#3B5BA5", gold: "#B8892B" }, // インディゴ系(通常版と見分けやすい配色)
-    searchKeyword: "ワンデーアキュビューオアシス 乱視用",
+    searchKeyword: "ワンデーアキュビューオアシス 乱視",
     metaDescription:
       "ワンデーアキュビューオアシス乱視用の楽天市場・Yahoo!ショッピングの価格を毎日自動で比較し、6箱・2箱それぞれの最安値トップ5を掲載しています。",
     subtitle:
