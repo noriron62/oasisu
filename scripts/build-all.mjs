@@ -228,11 +228,6 @@ async function buildOneProduct(product, template) {
     )
     .join("\n");
 
-  const reviewCandidates = [
-    heroCombined[0],
-    ...unitResults.flatMap((r) => [r.rakutenRanking[0], r.yahooRanking[0]]),
-  ];
-
   const html = renderTemplate(template, {
     PAGE_TITLE: escapeHtml(product.siteName),
     META_DESCRIPTION: escapeHtml(product.metaDescription),
@@ -253,7 +248,7 @@ async function buildOneProduct(product, template) {
     PRODUCT_INFO_HEADING: escapeHtml(product.productInfoHeading),
     PRODUCT_INFO_HTML: product.productInfoHtml,
     PRODUCT_INFO_IMAGE: escapeHtml(rakutenImage),
-    REVIEW_LINKS: renderReviewLinks(reviewCandidates),
+    REVIEW_LINKS: renderReviewLinks(heroUnitResult.rakutenRanking[0], heroUnitResult.yahooRanking[0]),
   });
 
   const outDir = path.join(ROOT, product.outputDir);
