@@ -41,14 +41,23 @@ async function main() {
     secure: FTP_SECURE,
   });
 
+  // ログイン直後の場所を「基準地点」として覚えておく。
+  // basic-ftpの ensureDir() は「/」始まりのパスを渡すと、FTPサーバーの
+  // 本当の一番上の階層までさかのぼってしまう仕様のため、意図した公開フォルダ
+  // （ログイン直後の場所＝public_html等）とズレてしまうことがある。
+  // そのため、商品ごとの処理の前に必ずこの基準地点へ戻ってから、
+  // 「/」を付けない相対パスでフォルダを指定するようにする。
+  const baseDir = await client.pwd();
+  console.log(`[debug] FTPログイン直後の場所（基準地点）: ${baseDir}`);
+
   const results = [];
 
   for (const product of products) {
     const localDir = path.join(ROOT, product.outputDir);
-    const remoteDir = `/${product.slug}/`;
-    console.log(`\n=== ${product.id} → ${remoteDir} ===`);
+    console.log(`\n=== ${product.id} → ${baseDir}/${product.slug}/ ===`);
     try {
-      await client.ensureDir(remoteDir);
+      await client.cd(baseDir); // 必ず基準地点に戻ってから処理する
+      await client.ensureDir(product.slug); // 相対パスで指定（先頭に「/」を付けない）
       await client.clearWorkingDir();
       await client.uploadFromDir(localDir);
       console.log(`  OK: ${localDir} をアップロードしました`);
