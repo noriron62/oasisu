@@ -81,6 +81,24 @@ export function renderThemeStyle(theme) {
 }
 
 /**
+ * 「2~12箱セット」「2箱 4箱 6箱 12箱」のように、購入時に複数の箱数から
+ * 選べるタイプの商品を判定する。この手の商品はAPIが返す価格が
+ * どの箱数に対応するものか特定できない（多くの場合、最小数量の価格）ため、
+ * どの比較単位からも除外する対象として扱う。
+ */
+export function isAmbiguousMultiBoxListing(name) {
+  if (!name) return false;
+  const n = name.replace(/\s/g, "");
+  // 「2~12箱」「2〜12箱」「2-12箱」のような範囲表記
+  if (/\d+[~〜\-]\d+箱/.test(n)) return true;
+  // 「2箱 4箱 6箱 12箱」のように、3種類以上の箱数がまとめて列挙されている場合
+  const matches = n.match(/\d+箱/g) || [];
+  const uniqueCounts = new Set(matches);
+  if (uniqueCounts.size >= 3) return true;
+  return false;
+}
+
+/**
  * 「2箱で送料無料」「2箱購入で送料無料」のような、購入数のしきい値を
  * 示すだけの販促文言を、箱数判定の対象から取り除く。
  */
@@ -274,7 +292,8 @@ export function applyCommonFilters(items) {
       isPrescriptionFree(item.caption) &&
       isPrescriptionFree(item.catchcopy) &&
       !hasRxCode(item.itemCode) &&
-      !hasRxCode(item.reviewUrl)
+      !hasRxCode(item.reviewUrl) &&
+      !isAmbiguousMultiBoxListing(item.name)
   );
 }
 
