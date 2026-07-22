@@ -203,15 +203,25 @@ async function buildOneProduct(product, template) {
     return { unit, rakutenRanking, yahooRanking };
   });
 
-  const heroUnitResult = unitResults.find((r) => r.unit.isHero) || unitResults[0];
-  const heroCombined = buildRanking(
-    [
-      ...heroUnitResult.rakutenRanking,
-      ...heroUnitResult.yahooRanking,
-    ],
-    heroUnitResult.unit.totalLenses
-  );
-  const overallBest = heroCombined[0] || null;
+  // 「総合最安値」は、特定の比較単位に固定するのではなく、
+  // 全ユニット(1箱・2箱・6箱など)の最安値候補の中から、
+  // 1枚あたり単価(unitPrice)が最も安いものを選ぶ。
+  // こうすることで、例えば6箱セットの方が1箱より1枚あたり安い場合に、
+  // きちんと6箱の方が総合最安値として表示されるようになる。
+  let overallBest = null;
+  let overallBestUnit = null;
+  let overallBestUnitResult = null;
+  for (const unitResult of unitResults) {
+    const { unit, rakutenRanking, yahooRanking } = unitResult;
+    for (const candidate of [rakutenRanking[0], yahooRanking[0]]) {
+      if (!candidate) continue;
+      if (!overallBest || candidate.unitPrice < overallBest.unitPrice) {
+        overallBest = candidate;
+        overallBestUnit = unit;
+        overallBestUnitResult = unitResult;
+      }
+    }
+  }
 
   const updatedAt = new Date().toISOString();
 
@@ -254,15 +264,18 @@ async function buildOneProduct(product, template) {
       allItems,
     }),
     UPDATED_TEXT: escapeHtml(formatUpdatedText(updatedAt)),
-    HERO_SECTION: heroUnitResult.unit.isHero
-      ? renderHeroSection(overallBest, heroUnitResult.unit.heroLabel, heroUnitResult.unit.heroName)
+    HERO_SECTION: overallBest
+      ? renderHeroSection(overallBest, overallBestUnit.heroLabel, overallBestUnit.heroName)
       : "",
     PRODUCT_INTRO: product.productIntroHtml,
     UNITS_HTML: unitsHtml,
     PRODUCT_INFO_HEADING: escapeHtml(product.productInfoHeading),
     PRODUCT_INFO_HTML: product.productInfoHtml,
     PRODUCT_INFO_IMAGE: escapeHtml(rakutenImage),
-    REVIEW_LINKS: renderReviewLinks(heroUnitResult.rakutenRanking[0], heroUnitResult.yahooRanking[0]),
+    REVIEW_LINKS: renderReviewLinks(
+      overallBestUnitResult?.rakutenRanking[0],
+      overallBestUnitResult?.yahooRanking[0]
+    ),
   });
 
   const outDir = path.join(ROOT, product.outputDir);
