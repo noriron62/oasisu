@@ -321,20 +321,29 @@ ${renderList(yahooItems)}
 `;
 }
 
-/** 口コミ情報セクションのリンクHTMLを生成する（渡された候補の中から先頭を採用） */
-export function renderReviewLinks(candidates) {
-  const top = candidates.find(Boolean);
-  if (!top) {
+/** 口コミ情報セクションのリンクHTMLを生成する（楽天・Yahoo!それぞれの最安値商品を両方表示する） */
+export function renderReviewLinks(rakutenTop, yahooTop) {
+  if (!rakutenTop && !yahooTop) {
     return '      <li class="empty">現在ご案内できる口コミリンクがありません。</li>';
   }
-  const markClass = top.source === "楽天市場" ? "rakuten" : "yahoo";
-  const markLabel = top.source === "楽天市場" ? "楽天" : "Yahoo!";
-  return `      <li>
-        <a href="${escapeHtml(top.reviewUrl || top.url)}" target="_blank" rel="noopener">
-          <span class="shop-mark ${markClass}">${markLabel}</span>
-          ${escapeHtml(top.shop)}の商品ページで口コミを見る${escapeHtml(formatReviewMeta(top))}
+  const links = [];
+  if (rakutenTop) {
+    links.push(`      <li>
+        <a href="${escapeHtml(rakutenTop.reviewUrl || rakutenTop.url)}" target="_blank" rel="noopener">
+          <span class="shop-mark rakuten">楽天</span>
+          ${escapeHtml(rakutenTop.shop)}の商品ページで口コミを見る${escapeHtml(formatReviewMeta(rakutenTop))}
         </a>
-      </li>`;
+      </li>`);
+  }
+  if (yahooTop) {
+    links.push(`      <li>
+        <a href="${escapeHtml(yahooTop.reviewUrl || yahooTop.url)}" target="_blank" rel="noopener">
+          <span class="shop-mark yahoo">Yahoo!</span>
+          ${escapeHtml(yahooTop.shop)}の商品ページで口コミを見る${escapeHtml(formatReviewMeta(yahooTop))}
+        </a>
+      </li>`);
+  }
+  return links.join("\n");
 }
 
 /** 「本日の総合最安値」セクションのHTMLを生成する（データが無ければ空文字） */
