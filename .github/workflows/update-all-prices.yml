@@ -1,8 +1,19 @@
 name: Update all product prices
 
 on:
-  workflow_dispatch: {} # cron-job.org など、外部サービスからの呼び出し専用
+  workflow_dispatch:
+    inputs:
+      product_id:
+        description: "更新する商品（未選択なら全商品）"
+        required: false
+        type: choice
+        default: all
+        options:
+          - all
+          - oasys-saiyasu
+          - oasys-ranshi-saiyasu
   # GitHub自身のスケジュール機能は信頼性の問題があるため使用しない
+  # （cron-job.org等から呼び出す場合、inputsを省略すれば自動的に"all"扱いになる）
 
 permissions:
   contents: write
@@ -22,8 +33,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build all products
+      - name: Build products
         env:
+          PRODUCT_ID: ${{ inputs.product_id }}
           SITE_BASE_URL: ${{ secrets.SITE_BASE_URL }}
           RAKUTEN_APP_ID: ${{ secrets.RAKUTEN_APP_ID }}
           RAKUTEN_ACCESS_KEY: ${{ secrets.RAKUTEN_ACCESS_KEY }}
@@ -42,11 +54,12 @@ jobs:
           git config user.name "price-bot"
           git config user.email "price-bot@users.noreply.github.com"
           git add docs docs-*
-          git diff --cached --quiet && echo "変更なし" || git commit -m "chore: update all prices $(date -u +%Y-%m-%d)"
+          git diff --cached --quiet && echo "変更なし" || git commit -m "chore: update prices $(date -u +%Y-%m-%d) (${{ inputs.product_id || 'all' }})"
           git push
 
-      - name: Deploy all products via FTP
+      - name: Deploy products via FTP
         env:
+          PRODUCT_ID: ${{ inputs.product_id }}
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
