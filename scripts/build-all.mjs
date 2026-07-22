@@ -132,6 +132,20 @@ async function buildOneProduct(product, template) {
     console.log(
       `  [debug] 価格帯指定の追加取得: 楽天+${rakutenRawItems.length - rakutenResult.items.length}件 / Yahoo!+${yahooRawItems.length - yahooResult.items.length}件`
     );
+
+    // 診断用ログ：どの比較単位の価格帯ヒントで、実際に何件見つかったか
+    // 個別に確認できるようにする（「0件」の原因調査に使う）
+    for (let i = 0; i < hintedUnits.length; i++) {
+      const unit = hintedUnits[i];
+      const rakutenHint = hintedResults[i * 2];
+      const yahooHint = hintedResults[i * 2 + 1];
+      console.log(
+        `    [debug] ${unit.label}のヒント(¥${unit.priceHint.min}〜¥${unit.priceHint.max}): 楽天${rakutenHint.items.length}件 / Yahoo!${yahooHint.items.length}件`
+      );
+      for (const item of rakutenHint.items.slice(0, 5)) {
+        console.log(`      [楽天/${unit.label}ヒント] ¥${item.itemPrice} ${item.itemName}`);
+      }
+    }
   }
 
   const rakutenItems = applyCommonFilters(
