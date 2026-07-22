@@ -34,6 +34,29 @@ export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// 楽天APIへのアクセス間隔を、全商品・全リクエストを通じて管理する。
+// 通常の安い順取得（複数ページ）に加え、価格帯を指定した追加取得も
+// 行うようになったため、商品をまたいで立て続けにリクエストが飛ぶと
+// 楽天側のレート制限（429 Too Many Requests）に引っかかることがある。
+// そのため、実際にHTTPリクエストを送る直前に必ずこの関数を呼び、
+// 前回の楽天APIリクエストから一定時間（1.1秒）空くようにする。
+// （複数のリクエストがほぼ同時に発生しても取りこぼさないよう、
+//   1本のPromiseチェーンに直列につなげて順番に処理する）
+let lastRakutenCallAt = 0;
+let rakutenChain = Promise.resolve();
+const RAKUTEN_MIN_INTERVAL_MS = 1100;
+function throttleRakuten() {
+  const next = rakutenChain.then(async () => {
+    const elapsed = Date.now() - lastRakutenCallAt;
+    if (elapsed < RAKUTEN_MIN_INTERVAL_MS) {
+      await sleep(RAKUTEN_MIN_INTERVAL_MS - elapsed);
+    }
+    lastRakutenCallAt = Date.now();
+  });
+  rakutenChain = next.catch(() => {}); // エラーが起きてもチェーンが途切れないようにする
+  return next;
+}
+
 /**
  * 商品ごとのテーマカラーを反映する<style>ブロックを生成する。
  * 共通のCSS(style.css)はそのままに、CSS変数だけを上書きする方式なので、
@@ -117,6 +140,7 @@ export async function fetchRakutenRaw({
     if (minPrice) url.searchParams.set("minPrice", String(Math.round(minPrice)));
     if (maxPrice) url.searchParams.set("maxPrice", String(Math.round(maxPrice)));
 
+    await throttleRakuten(); // 前回の楽天APIリクエストから一定時間空ける
     const res = await fetch(url, {
       headers: { Origin: siteUrl, Referer: siteUrl },
     });
