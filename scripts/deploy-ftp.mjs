@@ -59,9 +59,20 @@ async function main() {
     console.log(`[debug] FTP_BASE_DIR 未指定のため、ログイン直後の場所を使用: ${baseDir}`);
   }
 
+  // PRODUCT_ID が指定されている場合（"all" 以外）は、その商品だけをデプロイする
+  const productIdFilter = (process.env.PRODUCT_ID || "").trim();
+  const targetProducts =
+    productIdFilter && productIdFilter !== "all"
+      ? products.filter((p) => p.id === productIdFilter)
+      : products;
+
+  if (targetProducts.length !== products.length) {
+    console.log(`[info] 対象を絞り込んでデプロイします: ${targetProducts.map((p) => p.id).join(", ")}`);
+  }
+
   const results = [];
 
-  for (const product of products) {
+  for (const product of targetProducts) {
     const localDir = path.join(ROOT, product.outputDir);
     console.log(`\n=== ${product.id} → ${baseDir}/${product.slug}/ ===`);
     try {

@@ -311,9 +311,28 @@ Sitemap: ${canonicalUrl}sitemap.xml
 async function main() {
   const template = await readFile(TEMPLATE_PATH, "utf-8");
 
+  // PRODUCT_ID が指定されている場合（"all" 以外）は、その商品だけに絞り込む。
+  // 未指定・空文字・"all" の場合は、これまで通り全商品を処理する。
+  const productIdFilter = (process.env.PRODUCT_ID || "").trim();
+  const targetProducts =
+    productIdFilter && productIdFilter !== "all"
+      ? products.filter((p) => p.id === productIdFilter)
+      : products;
+
+  if (productIdFilter && productIdFilter !== "all" && targetProducts.length === 0) {
+    console.error(
+      `[error] 指定された商品ID「${productIdFilter}」が products.config.mjs に見つかりません。`
+    );
+    process.exit(1);
+  }
+
+  if (targetProducts.length !== products.length) {
+    console.log(`[info] 対象を絞り込んで実行します: ${targetProducts.map((p) => p.id).join(", ")}`);
+  }
+
   const results = [];
 
-  for (const product of products) {
+  for (const product of targetProducts) {
     console.log(`\n=== ${product.siteName} (${product.slug}) ===`);
     try {
       const result = await buildOneProduct(product, template);
