@@ -214,6 +214,24 @@ export const products = [
           return isBoxCount(name, 2);
         },
       },
+      {
+        key: "box6",
+        label: "6箱(180枚)",
+        totalLenses: 180,
+        isHero: false,
+        // 1箱・2箱の価格帯から概算した想定価格帯(19,000〜25,000円前後)を
+        // 直接指定して追加取得する
+        priceHint: { min: 15000, max: 25000 },
+        introHtml: `    <h2 class="section-heading">6箱セットも見つかった場合はこちら</h2>
+    <p>
+      6箱セット(180枚・約6ヶ月分)のまとめ買いに対応しているショップも
+      見つかった場合は、こちらに別枠で掲載しています。<strong>1箱・2箱の価格とは
+      単位が異なる</strong>ため、比較する際は1枚あたりの単価をご確認ください。
+    </p>`,
+        matches(name) {
+          return isBoxCount(name, 6) || /180枚/.test(name.replace(/\s/g, ""));
+        },
+      },
     ],
 
     productIntroHtml: `    <h2 class="section-heading">1箱(30枚)あたりの価格を中心に比較しています</h2>
@@ -224,8 +242,8 @@ export const products = [
     </p>
     <p>
       そのため当サイトでは、1箱(30枚)あたりの実勢価格を中心に比較しつつ、
-      2箱セットで販売しているショップが見つかった場合は、別枠であわせて
-      掲載しています。
+      2箱セット・6箱セットで販売しているショップが見つかった場合は、
+      それぞれ別枠であわせて掲載しています。
     </p>`,
 
     productInfoHeading: "ワンデーアキュビューオアシス乱視用とは",
