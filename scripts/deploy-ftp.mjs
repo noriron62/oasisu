@@ -8,6 +8,11 @@
 //
 // 環境変数（GitHub Actions の Secrets）:
 //   FTP_SERVER / FTP_USERNAME / FTP_PASSWORD
+//   FTP_BASE_DIR  公開フォルダ（public_html等）の絶対パス（例: /newmediagallery.org/public_html）。
+//                  Xserver等、1つのFTPアカウントで複数ドメインを管理している場合、
+//                  ログイン直後の場所が公開フォルダと異なることがあるため、
+//                  このSecretで明示的に指定する（末尾の / は有り無しどちらでもよい）。
+//                  未設定の場合は、ログイン直後の場所をそのまま使う。
 
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -22,6 +27,7 @@ const FTP_SERVER = process.env.FTP_SERVER || "";
 const FTP_USERNAME = process.env.FTP_USERNAME || "";
 const FTP_PASSWORD = process.env.FTP_PASSWORD || "";
 const FTP_SECURE = (process.env.FTP_SECURE || "true") !== "false"; // "false"を指定するとFTPS無効化
+const FTP_BASE_DIR = (process.env.FTP_BASE_DIR || "").replace(/\/+$/, ""); // 末尾のスラッシュを除去
 
 async function main() {
   if (!FTP_SERVER || !FTP_USERNAME || !FTP_PASSWORD) {
@@ -41,14 +47,17 @@ async function main() {
     secure: FTP_SECURE,
   });
 
-  // ログイン直後の場所を「基準地点」として覚えておく。
-  // basic-ftpの ensureDir() は「/」始まりのパスを渡すと、FTPサーバーの
-  // 本当の一番上の階層までさかのぼってしまう仕様のため、意図した公開フォルダ
-  // （ログイン直後の場所＝public_html等）とズレてしまうことがある。
-  // そのため、商品ごとの処理の前に必ずこの基準地点へ戻ってから、
-  // 「/」を付けない相対パスでフォルダを指定するようにする。
-  const baseDir = await client.pwd();
-  console.log(`[debug] FTPログイン直後の場所（基準地点）: ${baseDir}`);
+  // 「基準地点」を決める：FTP_BASE_DIR が指定されていればそれを使い、
+  // 無指定ならログイン直後の場所をそのまま使う。
+  let baseDir;
+  if (FTP_BASE_DIR) {
+    await client.cd(FTP_BASE_DIR);
+    baseDir = await client.pwd();
+    console.log(`[debug] FTP_BASE_DIR を指定された場所に移動しました: ${baseDir}`);
+  } else {
+    baseDir = await client.pwd();
+    console.log(`[debug] FTP_BASE_DIR 未指定のため、ログイン直後の場所を使用: ${baseDir}`);
+  }
 
   const results = [];
 
