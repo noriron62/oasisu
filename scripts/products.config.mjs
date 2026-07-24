@@ -28,6 +28,7 @@ export const products = [
     outputDir: "docs", // 生成物の出力先（既存の運用をそのまま踏襲）
     siteName: "ワンデーアキュビューオアシス最安値通販価格情報",
     theme: { accent: "#0C6E6B", gold: "#B8892B" }, // ティール系(元のデザイン)
+    historyUnitKey: "bundle", // 価格推移グラフで記録する比較単位（90枚×2箱セット）
     searchKeyword: "ワンデーアキュビューオアシス 90枚 2箱",
     metaDescription:
       "ワンデーアキュビューオアシス 90枚入り×2箱セット（180枚）の楽天市場・Yahoo!ショッピングの価格を毎日自動で比較し、それぞれの最安値トップ5を掲載しています。",
