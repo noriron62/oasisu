@@ -588,7 +588,17 @@ export function renderPriceHistorySection({ history, productName, unitLabel, box
   const boxPrice = (price) => Math.round(price / boxDivisor);
   const diffTotal = startEntry.price - todayEntry.price;
   const diffBox = boxPrice(startEntry.price) - boxPrice(todayEntry.price);
-  const diffWord = diffTotal >= 0 ? "安くなっています" : "高くなっています";
+
+  let summarySentence;
+  if (diffTotal === 0) {
+    summarySentence = `今日は${history.length}日前と比べて、価格は変わっていません(¥${yen(todayEntry.price)})。`;
+  } else {
+    const diffWord = diffTotal > 0 ? "安くなっています" : "高くなっています";
+    summarySentence =
+      `今日は${history.length}日前と比べて、全体で<strong>¥${yen(Math.abs(diffTotal))}</strong>、` +
+      `1箱(30枚)なら<strong>¥${yen(Math.abs(diffBox))}</strong>${diffWord}` +
+      `(¥${yen(startEntry.price)} → ¥${yen(todayEntry.price)})。`;
+  }
 
   const statCard = (label, entry, { clickable = false } = {}) => {
     const inner = `
@@ -629,7 +639,7 @@ export function renderPriceHistorySection({ history, productName, unitLabel, box
     <p class="history-note">↑「本日の最安値」はクリックするとショップの購入ページへ移動します</p>
 
     <p class="history-summary-text">
-      今日は${history.length}日前と比べて、全体で<strong>¥${yen(Math.abs(diffTotal))}</strong>、1箱(30枚)なら<strong>¥${yen(Math.abs(diffBox))}</strong>${diffWord}(¥${yen(startEntry.price)} → ¥${yen(todayEntry.price)})。
+      ${summarySentence}
     </p>
 
     ${renderHistoryChart(history)}
