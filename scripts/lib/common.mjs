@@ -462,3 +462,185 @@ export function buildJsonLd({ productName, siteName, allItems }) {
 
   return `<script type="application/ld+json">${JSON.stringify(json)}</script>`;
 }
+
+// ---- 価格推移（履歴）機能 ----
+
+const PRICE_HISTORY_MAX_DAYS = 30;
+
+/** JST基準の「今日の日付」文字列(YYYY-MM-DD)を取得する */
+export function todayJstDateString() {
+  return new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Tokyo" }).format(new Date());
+  // "sv-SE"(スウェーデン)ロケールはYYYY-MM-DD形式を返すのでそのまま使えるため採用
+}
+
+/**
+ * 価格履歴に、今日ぶんのレコードを追加・更新する。
+ * 同じ日付のレコードが既にある場合は、より安い方を採用する
+ * （1日2回実行されるため、片方だけ安ければそちらを残す）。
+ * 直近 PRICE_HISTORY_MAX_DAYS 日分だけを保持する。
+ */
+export function updatePriceHistory(history, todayEntry) {
+  const list = Array.isArray(history) ? [...history] : [];
+  const idx = list.findIndex((h) => h.date === todayEntry.date);
+  if (idx === -1) {
+    list.push(todayEntry);
+  } else if (todayEntry.price < list[idx].price) {
+    list[idx] = todayEntry;
+  }
+  list.sort((a, b) => (a.date < b.date ? -1 : 1));
+  return list.slice(-PRICE_HISTORY_MAX_DAYS);
+}
+
+function historyMarkClass(source) {
+  return source === "楽天市場" ? "rakuten" : "yahoo";
+}
+function historyMarkLabel(source) {
+  return source === "楽天市場" ? "楽天" : "Yahoo!";
+}
+function historyDotColor(source) {
+  // グラフ上の点は、楽天=赤・Yahoo!=青で塗り分ける
+  // （文字表記のYahoo!ブランドピンクと、赤系の楽天色が近く見分けにくいため、
+  //   点の色だけは視認性を優先して青にしている）
+  return source === "楽天市場" ? "#bf0000" : "#1D5C99";
+}
+
+/** 折れ線グラフ(SVG)を生成する */
+function renderHistoryChart(history) {
+  const W = 640;
+  const H = 220;
+  const PAD_L = 50;
+  const PAD_R = 20;
+  const PAD_T = 20;
+  const PAD_B = 30;
+  const chartW = W - PAD_L - PAD_R;
+  const chartH = H - PAD_T - PAD_B;
+
+  const prices = history.map((h) => h.price);
+  const vMin = Math.min(...prices);
+  const vMax = Math.max(...prices);
+  const vRange = vMax - vMin || 1;
+
+  const xAt = (i) => PAD_L + (chartW * i) / Math.max(history.length - 1, 1);
+  const yAt = (v) => PAD_T + chartH * (1 - (v - vMin) / vRange);
+
+  const points = history.map((h, i) => [xAt(i), yAt(h.price)]);
+  const pathD = "M " + points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" L ");
+  const areaD =
+    pathD +
+    ` L ${points[points.length - 1][0].toFixed(1)},${(PAD_T + chartH).toFixed(1)}` +
+    ` L ${points[0][0].toFixed(1)},${(PAD_T + chartH).toFixed(1)} Z`;
+
+  const minIdx = prices.indexOf(vMin);
+  const [minX, minY] = points[minIdx];
+
+  const dots = history
+    .map((h, i) => {
+      const [x, y] = points[i];
+      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5" fill="${historyDotColor(h.source)}" />`;
+    })
+    .join("\n");
+
+  // X軸ラベルは5件おき＋最終日
+  const labelIdxs = new Set();
+  for (let i = 0; i < history.length; i += 5) labelIdxs.add(i);
+  labelIdxs.add(history.length - 1);
+  const labels = [...labelIdxs]
+    .map((i) => {
+      const [x] = points[i];
+      const d = new Date(history[i].date);
+      const label = `${d.getMonth() + 1}/${d.getDate()}`;
+      return `<text x="${x.toFixed(1)}" y="${H - 8}" font-size="11" fill="var(--ink-soft)" text-anchor="middle" font-family="var(--mono)">${label}</text>`;
+    })
+    .join("\n");
+
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
+  <path d="${areaD}" fill="var(--teal-dim)" stroke="none" />
+  <path d="${pathD}" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+  ${dots}
+  <circle cx="${minX.toFixed(1)}" cy="${minY.toFixed(1)}" r="6" fill="none" stroke="var(--gold)" stroke-width="2.5" />
+  ${labels}
+</svg>`;
+}
+
+function formatHistoryDate(dateStr) {
+  const d = new Date(dateStr);
+  return `${d.getMonth() + 1}月${d.getDate()}日`;
+}
+function formatHistoryDateShort(dateStr) {
+  const d = new Date(dateStr);
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
+/**
+ * 「価格推移」セクションのHTMLを生成する。
+ * historyUnitLabel（例:「90枚×2箱セット」）を主語にした見出し・文章にする。
+ */
+export function renderPriceHistorySection({ history, productName, unitLabel, boxDivisor }) {
+  if (!history || history.length < 2) {
+    return ""; // データが少なすぎる間は非表示にする
+  }
+
+  const todayEntry = history[history.length - 1];
+  const startEntry = history[0];
+  const minEntry = history.reduce((a, b) => (b.price < a.price ? b : a));
+  const maxEntry = history.reduce((a, b) => (b.price > a.price ? b : a));
+
+  const boxPrice = (price) => Math.round(price / boxDivisor);
+  const diffTotal = startEntry.price - todayEntry.price;
+  const diffBox = boxPrice(startEntry.price) - boxPrice(todayEntry.price);
+  const diffWord = diffTotal >= 0 ? "安くなっています" : "高くなっています";
+
+  const statCard = (label, entry, { clickable = false } = {}) => {
+    const inner = `
+      <p class="label">${escapeHtml(label)}</p>
+      <p class="value">¥${yen(entry.price)}</p>
+      <p class="box-value">1箱(30枚)あたり ¥${yen(boxPrice(entry.price))}</p>
+      <p class="sub"><span class="shop-mark ${historyMarkClass(entry.source)}">${historyMarkLabel(entry.source)}</span> ${
+        clickable ? escapeHtml(entry.shop) : formatHistoryDateShort(entry.date)
+      }</p>`;
+    return clickable
+      ? `<a class="history-stat today" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener sponsored"><span class="cta-arrow">→</span>${inner}</a>`
+      : `<div class="history-stat">${inner}</div>`;
+  };
+
+  const rows = history
+    .slice()
+    .reverse()
+    .map(
+      (h) => `      <div class="history-row">
+        <span class="history-date">${formatHistoryDateShort(h.date)}</span>
+        <span class="history-shop"><span class="shop-mark ${historyMarkClass(h.source)}">${historyMarkLabel(h.source)}</span> ${escapeHtml(h.shop)}</span>
+        <span class="history-prices">
+          <span class="history-total">¥${yen(h.price)}</span>
+          <span class="history-box">(1箱¥${yen(boxPrice(h.price))})</span>
+        </span>
+      </div>`
+    )
+    .join("\n");
+
+  return `  <section class="value-explainer" aria-label="価格推移">
+    <h2 class="section-heading">${escapeHtml(productName)} ${escapeHtml(unitLabel)}の過去${history.length}日間の価格推移</h2>
+
+    <div class="history-summary">
+      ${statCard("本日の最安値", todayEntry, { clickable: true })}
+      ${statCard(`過去${history.length}日間の最安値`, minEntry)}
+      ${statCard(`過去${history.length}日間の最高値`, maxEntry)}
+    </div>
+    <p class="history-note">↑「本日の最安値」はクリックするとショップの購入ページへ移動します</p>
+
+    <p class="history-summary-text">
+      今日は${history.length}日前と比べて、全体で<strong>¥${yen(Math.abs(diffTotal))}</strong>、1箱(30枚)なら<strong>¥${yen(Math.abs(diffBox))}</strong>${diffWord}(¥${yen(startEntry.price)} → ¥${yen(todayEntry.price)})。
+    </p>
+
+    ${renderHistoryChart(history)}
+
+    <p class="history-note">
+      ○ 印は期間内の最安値のタイミングです。折れ線上の点の色は、その日最安だったモール(<span style="color:#bf0000;">●</span>楽天 / <span style="color:#1D5C99;">●</span><span style="color:#ff0033;">Yahoo!</span>)を表しています。
+    </p>
+
+    <h3 class="history-list-heading">日別の価格一覧</h3>
+    <div class="history-list">
+${rows}
+    </div>
+  </section>`;
+}
