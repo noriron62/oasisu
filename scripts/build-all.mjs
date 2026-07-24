@@ -40,6 +40,9 @@ import {
   renderHeroSection,
   formatUpdatedText,
   buildJsonLd,
+  todayJstDateString,
+  updatePriceHistory,
+  renderPriceHistorySection,
 } from "./lib/common.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -239,6 +242,50 @@ async function buildOneProduct(product, template) {
     })),
   };
 
+  const outDir = path.join(ROOT, product.outputDir);
+  await mkdir(outDir, { recursive: true });
+
+  // ---- 価格推移（履歴）の更新 ----
+  // historyUnitKey が設定されている商品のみ、その比較単位の「本日の最安値」を
+  // docs-xxx/price-history.json に追記していく（直近30日分を保持）。
+  let priceHistorySectionHtml = "";
+  if (product.historyUnitKey) {
+    const historyUnitResult = unitResults.find((r) => r.unit.key === product.historyUnitKey);
+    if (historyUnitResult) {
+      const { unit, rakutenRanking, yahooRanking } = historyUnitResult;
+      const cheapestToday = [rakutenRanking[0], yahooRanking[0]]
+        .filter(Boolean)
+        .sort((a, b) => a.price - b.price)[0];
+
+      if (cheapestToday) {
+        const historyPath = path.join(outDir, "price-history.json");
+        let history = [];
+        try {
+          history = JSON.parse(await readFile(historyPath, "utf-8"));
+        } catch {
+          history = []; // ファイルが無い（初回実行）場合は空から始める
+        }
+
+        history = updatePriceHistory(history, {
+          date: todayJstDateString(),
+          price: cheapestToday.price,
+          source: cheapestToday.source,
+          shop: cheapestToday.shop,
+          url: cheapestToday.url,
+        });
+
+        await writeFile(historyPath, JSON.stringify(history, null, 2), "utf-8");
+
+        priceHistorySectionHtml = renderPriceHistorySection({
+          history,
+          productName: product.siteName.replace(/最安値通販価格情報$/, "").trim(),
+          unitLabel: unit.label,
+          boxDivisor: unit.totalLenses / 30,
+        });
+      }
+    }
+  }
+
   // ---- HTML生成 ----
   const canonicalUrl = siteUrl;
   const allItems = unitResults.flatMap((r) => [...r.rakutenRanking, ...r.yahooRanking]);
@@ -257,6 +304,7 @@ async function buildOneProduct(product, template) {
     META_DESCRIPTION: escapeHtml(product.metaDescription),
     SUBTITLE: escapeHtml(product.subtitle),
     CANONICAL_URL: escapeHtml(canonicalUrl),
+    SEARCH_CONSOLE_VERIFICATION: product.searchConsoleVerification || "",
     THEME_STYLE: renderThemeStyle(product.theme),
     JSON_LD: buildJsonLd({
       productName: product.productSchemaName,
@@ -269,6 +317,7 @@ async function buildOneProduct(product, template) {
       : "",
     PRODUCT_INTRO: product.productIntroHtml,
     UNITS_HTML: unitsHtml,
+    PRICE_HISTORY_SECTION: priceHistorySectionHtml,
     PRODUCT_INFO_HEADING: escapeHtml(product.productInfoHeading),
     PRODUCT_INFO_HTML: product.productInfoHtml,
     PRODUCT_INFO_IMAGE: escapeHtml(rakutenImage),
@@ -278,8 +327,6 @@ async function buildOneProduct(product, template) {
     ),
   });
 
-  const outDir = path.join(ROOT, product.outputDir);
-  await mkdir(outDir, { recursive: true });
   await writeFile(path.join(outDir, "data.json"), JSON.stringify(payload, null, 2), "utf-8");
   await writeFile(path.join(outDir, "index.html"), html, "utf-8");
 
