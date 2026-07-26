@@ -29,7 +29,7 @@ export const products = [
     siteName: "ワンデーアキュビューオアシス最安値通販価格情報",
     theme: { accent: "#0C6E6B", gold: "#B8892B" }, // ティール系(元のデザイン)
     historyUnitKey: "bundle", // 価格推移グラフで記録する比較単位（90枚×2箱セット）
-    searchKeyword: "ワンデーアキュビューオアシス 90枚 2箱",
+    searchKeyword: "ワンデーアキュビューオアシス 90枚",
     metaDescription:
       "ワンデーアキュビューオアシス 90枚入り×2箱セット（180枚）の楽天市場・Yahoo!ショッピングの価格を毎日チェックし、それぞれの最安値トップ5を掲載しています。",
     subtitle:
@@ -305,7 +305,7 @@ export const products = [
     siteName: "ワンデーアキュビューモイスト最安値通販価格情報",
     theme: { accent: "#B8631D", gold: "#B8892B" }, // アンバー系(通常版・乱視用と見分けやすい配色)
     historyUnitKey: "bundle", // 価格推移グラフで記録する比較単位（90枚×2箱セット）
-    searchKeyword: "ワンデーアキュビューモイスト 90枚 2箱",
+    searchKeyword: "ワンデーアキュビューモイスト 90枚",
     metaDescription:
       "ワンデーアキュビューモイスト 90枚入り×2箱セット（180枚）の楽天市場・Yahoo!ショッピングの価格を毎日チェックし、それぞれの最安値トップ5を掲載しています。",
     subtitle:
