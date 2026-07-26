@@ -76,6 +76,10 @@ export const products = [
         totalLenses: 90,
         heroLabel: "本日の総合最安値（1枚あたり）",
         heroName: "ワンデーアキュビューオアシス 90枚1箱",
+        // 実際に確認できた1箱の価格帯(7,600円前後)をもとに、
+        // その価格帯を直接指定した追加取得を行う（postageFlag/shipping絞り込みの
+        // 影響で、通常の安い順取得だけでは埋もれてしまうことがあるため）
+        priceHint: { min: 6500, max: 10000 },
         introHtml: `    <h2 class="section-heading">90枚1箱(単品)でも比較したい方へ</h2>
     <p>
       「まずは1箱だけ試したい」という方向けに、90枚1箱(単品)の価格帯も
@@ -349,6 +353,10 @@ export const products = [
         totalLenses: 90,
         heroLabel: "本日の総合最安値（1枚あたり）",
         heroName: "ワンデーアキュビューモイスト 90枚1箱",
+        // 実際に確認できた1箱の価格帯(8,350円前後)をもとに、
+        // その価格帯を直接指定した追加取得を行う（postageFlag/shipping絞り込みの
+        // 影響で、通常の安い順取得だけでは埋もれてしまうことがあるため）
+        priceHint: { min: 7000, max: 11000 },
         introHtml: `    <h2 class="section-heading">90枚1箱(単品)でも比較したい方へ</h2>
     <p>
       「まずは1箱だけ試したい」という方向けに、90枚1箱(単品)の価格帯も
