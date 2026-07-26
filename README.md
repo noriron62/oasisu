@@ -12,7 +12,8 @@
 | 商品 | URL(サブディレクトリ) | 比較単位 |
 |---|---|---|
 | ワンデーアキュビューオアシス | `/oasys-saiyasu/` | 90枚×2箱セット(180枚) / 90枚1箱 |
-| ワンデーアキュビューオアシス乱視用 | `/oasys-ranshi-saiyasu/` | 6箱(180枚) / 2箱(60枚) |
+| ワンデーアキュビューオアシス乱視用 | `/oasys-ranshi-saiyasu/` | 6箱(180枚) / 2箱(60枚) / 1箱(30枚) |
+| ワンデーアキュビューモイスト | `/moist-saiyasu/` | 90枚×2箱セット(180枚) / 90枚1箱 |
 
 ## 全体構成
 
@@ -93,6 +94,12 @@ package.json                 basic-ftp（FTPアップロード用ライブラリ
 Actionsタブ→「Update all product prices」→「Run workflow」で実行し、
 ログに表示される実行結果サマリー（成功/失敗件数）を確認してください。
 
+「Run workflow」をクリックすると、**「更新する商品」というプルダウン**が表示されます。
+`all`（全商品）のほか、商品ごとの個別実行（例: `oasys-ranshi-saiyasu`のみ）も
+選べます。特定の商品だけ動作確認・調整したい場合に便利です
+（cron-job.org等、外部から自動で呼び出す通常運用では、この項目を指定しなければ
+自動的に`all`扱いになります）。
+
 ---
 
 ## 新しい商品を追加する手順
@@ -110,14 +117,17 @@ Actionsタブ→「Update all product prices」→「Run workflow」で実行し
      metaDescription: "検索結果に表示される説明文",
      subtitle: "ページ冒頭の説明文",
      productSchemaName: "構造化データ用の商品名",
+     theme: { accent: "#カラーコード", gold: "#カラーコード" }, // 任意（省略時は既定色）
      isCorrectProduct(name) { /* ブランド判定 */ },
      units: [
        {
          key: "unit1", label: "比較単位のラベル(例: 6箱)", totalLenses: 180,
-         isHero: true, heroLabel: "...", heroName: "...", introHtml: "",
+         heroLabel: "本日の総合最安値（1枚あたり）", heroName: "...", introHtml: "",
          matches(name) { /* この単位に該当するかの判定 */ },
        },
-       // 2つ目以降の比較単位があれば追加
+       // 2つ目以降の比較単位があれば追加。「総合最安値」は特定の単位に
+       // 固定されず、全ユニットの中で1枚あたり単価が最も安いものが
+       // 自動的に選ばれる（そのため全ユニットに heroLabel/heroName が必要）。
      ],
      productIntroHtml: "「なぜこの単位がお得か」の説明文(HTML)",
      productInfoHeading: "「〇〇とは」の見出し",
@@ -134,6 +144,11 @@ Actionsタブ→「Update all product prices」→「Run workflow」で実行し
 4. Actionsタブから「Run workflow」で実行し、ログでその商品が成功しているか確認する
 
 **新しいSecrets登録もワークフローファイルの追加も不要です。**
+
+（任意）「Run workflow」実行時に、その商品だけを個別に選んで実行できるようにしたい
+場合は、`.github/workflows/update-all-prices.yml` の `options:` の一覧に、
+追加した商品の `id` を1行追記してください（省略しても、`all`（全商品）実行では
+新しい商品もきちんと処理されます。プルダウンで個別実行したい場合だけの追加設定です）。
 
 ---
 
