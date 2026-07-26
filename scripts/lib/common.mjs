@@ -81,6 +81,21 @@ export function renderThemeStyle(theme) {
 }
 
 /**
+ * 「送料別」「送料別途」のように、送料が商品価格に含まれていないことを
+ * 明示している商品を判定する。楽天APIには postageFlag（送料込み限定）で
+ * 対応できるが、Yahoo!側には同等の確実な絞り込み条件が見当たらないため、
+ * 商品名・説明文のテキストから明示的な「送料別」表記を検出して除外する
+ * （「送料無料」の記載が無いだけでは判定しない。無料と明記されていない
+ * 商品の中には送料込みのものも多く、除外しすぎると該当件数が
+ * 極端に減ってしまうため、あくまで明示的な「送料別」表記のみを対象にする）。
+ */
+export function hasSeparateShipping(text) {
+  if (!text) return false;
+  const n = text.replace(/\s/g, "");
+  return /(送料別|送料別途|送料は別途|\+送料|送料が別途|別途送料)/.test(n);
+}
+
+/**
  * 「2~12箱セット」「2箱 4箱 6箱 12箱」のように、購入時に複数の箱数から
  * 選べるタイプの商品を判定する。この手の商品はAPIが返す価格が
  * どの箱数に対応するものか特定できない（多くの場合、最小数量の価格）ため、
@@ -154,6 +169,7 @@ export async function fetchRakutenRaw({
     url.searchParams.set("hits", "30");
     url.searchParams.set("page", String(page));
     url.searchParams.set("imageFlag", "1");
+    url.searchParams.set("postageFlag", "1"); // 送料込みの商品だけに絞り込む
     url.searchParams.set("formatVersion", "2");
     if (minPrice) url.searchParams.set("minPrice", String(Math.round(minPrice)));
     if (maxPrice) url.searchParams.set("maxPrice", String(Math.round(maxPrice)));
@@ -293,7 +309,10 @@ export function applyCommonFilters(items) {
       isPrescriptionFree(item.catchcopy) &&
       !hasRxCode(item.itemCode) &&
       !hasRxCode(item.reviewUrl) &&
-      !isAmbiguousMultiBoxListing(item.name)
+      !isAmbiguousMultiBoxListing(item.name) &&
+      !hasSeparateShipping(item.name) &&
+      !hasSeparateShipping(item.caption) &&
+      !hasSeparateShipping(item.catchcopy)
   );
 }
 
