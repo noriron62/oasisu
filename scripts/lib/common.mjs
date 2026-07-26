@@ -215,6 +215,7 @@ export async function fetchYahooRaw({
     url.searchParams.set("sort", "+price");
     url.searchParams.set("results", "30");
     url.searchParams.set("start", String(page * 30 + 1));
+    url.searchParams.set("shipping", "free"); // 送料無料の商品だけに絞り込む
     if (minPrice) url.searchParams.set("price_from", String(Math.round(minPrice)));
     if (maxPrice) url.searchParams.set("price_to", String(Math.round(maxPrice)));
 
