@@ -1,0 +1,36 @@
+{
+  "siteName": "プロクリアワンデー最安値通販価格情報",
+  "keyword": "プロクリアワンデー",
+  "updatedAt": null,
+  "overallBest": null,
+  "units": [
+    {
+      "key": "bundle",
+      "label": "90枚×2箱セット",
+      "totalLenses": 180,
+      "rakuten": [],
+      "yahoo": []
+    },
+    {
+      "key": "single90",
+      "label": "90枚1箱",
+      "totalLenses": 90,
+      "rakuten": [],
+      "yahoo": []
+    },
+    {
+      "key": "box2",
+      "label": "2箱(標準サイズ・60枚)",
+      "totalLenses": 60,
+      "rakuten": [],
+      "yahoo": []
+    },
+    {
+      "key": "box1",
+      "label": "1箱(標準サイズ・30枚)",
+      "totalLenses": 30,
+      "rakuten": [],
+      "yahoo": []
+    }
+  ]
+}
