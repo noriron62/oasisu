@@ -14,6 +14,7 @@ on:
           - oasys-ranshi-saiyasu
           - moist-saiyasu
           - moist-ranshi-saiyasu
+          - proclear-saiyasu
   # GitHub自身のスケジュール機能は信頼性の問題があるため使用しない
   # （cron-job.org等から呼び出す場合、inputsを省略すれば自動的に"all"扱いになる）
 
