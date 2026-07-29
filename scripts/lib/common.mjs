@@ -193,6 +193,25 @@ export async function fetchRakutenRaw({
   return { items: allItems, skipped: null };
 }
 
+/**
+ * Yahoo!ショッピングAPIへのfetchを行う。429（Too Many Requests）が返ってきた場合、
+ * Yahoo側の「1アプリケーションIDにつき1分間30リクエスト」という利用制限に
+ * 一時的に達しただけの可能性が高いため、少し待ってから自動的に再試行する。
+ * （商品数が増え、複数商品ぶんのリクエストが累積すると起きやすくなる）
+ */
+async function fetchYahooWithRetry(url, retriesLeft = 3) {
+  const res = await fetch(url);
+  if (res.status === 429 && retriesLeft > 0) {
+    const waitMs = 20000; // 20秒待つ（1分間のリクエストカウントがリセットされるのを待つ）
+    console.warn(
+      `  [warn] Yahoo API 429（利用制限）を検知。${waitMs / 1000}秒待って再試行します（残り${retriesLeft}回）`
+    );
+    await sleep(waitMs);
+    return fetchYahooWithRetry(url, retriesLeft - 1);
+  }
+  return res;
+}
+
 /** Yahoo!ショッピングから商品を取得する（フィルタ前の生データを返す。複数ページ・価格帯指定に対応） */
 export async function fetchYahooRaw({
   keyword,
@@ -219,7 +238,7 @@ export async function fetchYahooRaw({
     if (minPrice) url.searchParams.set("price_from", String(Math.round(minPrice)));
     if (maxPrice) url.searchParams.set("price_to", String(Math.round(maxPrice)));
 
-    const res = await fetch(url);
+    const res = await fetchYahooWithRetry(url);
     if (!res.ok) {
       if (page === 0) {
         throw new Error(`Yahoo API failed: ${res.status} ${await res.text()}`);
@@ -438,7 +457,7 @@ export function formatUpdatedText(updatedAt) {
 }
 
 /** 構造化データ（JSON-LD, schema.org Product）を生成する */
-export function buildJsonLd({ productName, siteName, allItems }) {
+export function buildJsonLd({ productName, siteName, allItems, brandName }) {
   if (allItems.length === 0) return "";
 
   const offers = allItems.map((item) => ({
@@ -468,7 +487,7 @@ export function buildJsonLd({ productName, siteName, allItems }) {
     "@type": "Product",
     name: productName,
     description: siteName,
-    brand: { "@type": "Brand", name: "ACUVUE" },
+    brand: { "@type": "Brand", name: brandName || "ACUVUE" },
     ...(aggregateRating ? { aggregateRating } : {}),
     offers: {
       "@type": "AggregateOffer",
