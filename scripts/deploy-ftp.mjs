@@ -89,6 +89,22 @@ async function main() {
     }
   }
 
+  // ルート用ファイル（sitemap_index.xml / robots.txt）は、サブフォルダを作らず
+  // FTPベースディレクトリの直下に直接アップロードする。
+  // PRODUCT_ID による絞り込みに関わらず常に実行する
+  // （軽量なファイルなので、商品を絞った実行のたびに更新しても問題ない）。
+  const rootLocalDir = path.join(ROOT, "docs-root");
+  console.log(`\n=== docs-root → ${baseDir}/ ===`);
+  try {
+    await client.cd(baseDir);
+    await client.uploadFromDir(rootLocalDir);
+    console.log(`  OK: ${rootLocalDir} をルート直下にアップロードしました`);
+    results.push({ id: "docs-root", ok: true });
+  } catch (err) {
+    console.error(`  [error] docs-root のアップロードに失敗しました: ${err.message}`);
+    results.push({ id: "docs-root", ok: false, detail: err.message });
+  }
+
   client.close();
 
   console.log("\n=== デプロイ結果サマリー ===");
