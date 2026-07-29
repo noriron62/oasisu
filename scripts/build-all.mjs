@@ -24,6 +24,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { products } from "./products.config.mjs";
+import { generateRootFiles } from "./generate-root-files.mjs";
 import {
   escapeHtml,
   renderTemplate,
@@ -406,6 +407,11 @@ async function main() {
       "一部の商品でエラーが発生しましたが、成功した商品のファイルは正常に更新されています。"
     );
   }
+
+  // ルート用ファイル（sitemap_index.xml / robots.txt）は、PRODUCT_ID による
+  // 絞り込みに関わらず、常に全商品分を対象に再生成する
+  // （商品を1つ追加しただけでも索引に反映されるようにするため）。
+  await generateRootFiles();
 }
 
 main().catch((err) => {
