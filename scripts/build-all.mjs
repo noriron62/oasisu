@@ -195,10 +195,10 @@ async function buildOneProduct(product, template) {
 
   const unitResults = product.units.map((unit) => {
     const rakutenCandidates = rakutenItems.filter(
-      (i) => !claimedRakuten.has(itemKey(i)) && unit.matches(i.name)
+      (i) => !claimedRakuten.has(itemKey(i)) && unit.matches(i.name, i.price)
     );
     const yahooCandidates = yahooItems.filter(
-      (i) => !claimedYahoo.has(itemKey(i)) && unit.matches(i.name)
+      (i) => !claimedYahoo.has(itemKey(i)) && unit.matches(i.name, i.price)
     );
     for (const i of rakutenCandidates) claimedRakuten.add(itemKey(i));
     for (const i of yahooCandidates) claimedYahoo.add(itemKey(i));
