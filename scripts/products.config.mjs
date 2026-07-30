@@ -793,8 +793,8 @@ export const products = [
     slug: "seed-saiyasu",
     outputDir: "docs-seed",
     siteName: "シードワンデーピュアうるおいプラス最安値通販価格情報",
-    theme: { accent: "#1B7FA5", gold: "#B8892B" }, // スカイブルー系(他5サイトと見分けやすい配色)
-    historyUnitKey: "box2_32", // 価格推移グラフで記録する比較単位（32枚×2箱セットが基準のため）
+    theme: { accent: "#159FD1", gold: "#E8C94A" }, // 明るいスカイブルー×薄い黄色系
+    historyUnitKey: "box96x2", // 価格推移グラフで記録する比較単位（96枚×2箱セットが実勢価格でも最安のため）
     searchKeyword: "ワンデーピュアうるおいプラス",
     metaDescription:
       "シードワンデーピュアうるおいプラスの楽天市場・Yahoo!ショッピングの価格を毎日チェックし、32枚×2箱・96枚1箱・96枚×2箱それぞれの最安値トップ5を掲載しています。",
@@ -813,22 +813,23 @@ export const products = [
 
     units: [
       {
-        key: "box2_32",
-        label: "32枚×2箱セット(64枚)",
-        totalLenses: 64,
+        key: "box96x2",
+        label: "96枚×2箱セット(192枚)",
+        totalLenses: 192,
         heroLabel: "本日の総合最安値（1枚あたり）",
-        heroName: "シードワンデーピュアうるおいプラス 32枚×2箱セット(64枚)",
-        // 参考価格(32枚×2箱3,280円)をもとに、価格帯を直接指定して追加取得する
-        priceHint: { min: 2500, max: 4300 },
+        heroName: "シードワンデーピュアうるおいプラス 96枚×2箱セット(192枚)",
+        // 参考価格(96枚×2箱8,960円)をもとに、価格帯を直接指定して追加取得する
+        priceHint: { min: 7000, max: 11000 },
         introHtml: "",
-        /** 「32枚×2箱(64枚)」らしきものだけを判定する。96枚系(別ラインナップ)との混同を避ける */
+        /** 「96枚×2箱(192枚)」らしきものだけを判定する。「2箱」という漢字表記が
+         *  無く「96枚×2」のような記号表記のみのショップも拾えるよう、判定を広めにしている */
         matches(name) {
           if (!name) return false;
           const n = stripShippingPromoText(name.replace(/\s/g, ""));
           if (/単品/.test(n)) return false;
-          if (/96/.test(n)) return false; // 96枚系(大容量パック)は別ユニットで扱う
-          if (/64枚/.test(n)) return true;
-          return isBoxCount(n, 2);
+          if (/192枚/.test(n)) return true;
+          if (!/96/.test(n)) return false;
+          return /(2箱|×2箱|ｘ2箱|x2箱|2箱セット|96.{0,4}×2|96.{0,4}x2|96.{0,4}ｘ2)/i.test(n);
         },
       },
       {
@@ -839,42 +840,48 @@ export const products = [
         heroName: "シードワンデーピュアうるおいプラス 96枚1箱",
         // 参考価格(96枚1箱4,700円)をもとに、価格帯を直接指定して追加取得する
         priceHint: { min: 3800, max: 6000 },
-        introHtml: `    <h2 class="section-heading">96枚入り(大容量パック)でも比較したい方へ</h2>
+        introHtml: `    <h2 class="section-heading">96枚1箱(単品)でも比較したい方へ</h2>
     <p>
-      通常の32枚×2箱セットとは別に、96枚入りの大容量パックを1箱で
-      販売しているショップも見つかった場合は、こちらに別枠で掲載しています。
-      <strong>32枚×2箱セットとは金額の単位が異なる</strong>ため、比較する際は
-      1枚あたりの単価をご確認ください。
+      「まずは1箱だけ試したい」という方向けに、96枚入り1箱(単品)の価格帯も
+      別枠で掲載しています。<strong>96枚×2箱セットとは金額の単位が異なる</strong>ため、
+      混同しないようご注意ください(こちらは96枚1箱分の価格です)。
     </p>`,
-        /** 「96枚1箱」らしきものだけを判定する（192枚・2箱表記は除外） */
+        /** 「96枚1箱」らしきものだけを判定する（192枚・2箱を示す表記は上のbox96x2側で
+         *  処理済みのため、ここでは明示的にそれらを除外する） */
         matches(name) {
           if (!name) return false;
           const n = stripShippingPromoText(name.replace(/\s/g, ""));
           if (/単品/.test(n)) return false;
           if (/192枚/.test(n)) return false;
-          if (/96/.test(n) && isBoxCount(n, 2)) return false; // 96枚×2箱は別ユニットで扱う
-          return /96/.test(n);
+          if (!/96/.test(n)) return false;
+          const mentions2Box =
+            /(2箱|×2箱|ｘ2箱|x2箱|2箱セット|96.{0,4}×2|96.{0,4}x2|96.{0,4}ｘ2)/i.test(n);
+          return !mentions2Box;
         },
       },
       {
-        key: "box96x2",
-        label: "96枚×2箱セット(192枚)",
-        totalLenses: 192,
+        key: "box2_32",
+        label: "32枚×2箱セット(64枚)",
+        totalLenses: 64,
         heroLabel: "本日の総合最安値（1枚あたり）",
-        heroName: "シードワンデーピュアうるおいプラス 96枚×2箱セット(192枚)",
-        // 参考価格(96枚×2箱8,960円)をもとに、価格帯を直接指定して追加取得する
-        priceHint: { min: 7000, max: 11000 },
-        introHtml: `    <h2 class="section-heading">96枚×2箱セット(192枚・最大容量)でも比較したい方へ</h2>
+        heroName: "シードワンデーピュアうるおいプラス 32枚×2箱セット(64枚)",
+        // 参考価格(32枚×2箱3,280円)をもとに、価格帯を直接指定して追加取得する
+        priceHint: { min: 2500, max: 4300 },
+        introHtml: `    <h2 class="section-heading">32枚×2箱セット(64枚・通常サイズ)でも比較したい方へ</h2>
     <p>
-      96枚入りパックを2箱セットで販売しているショップも見つかった場合は、
-      こちらに別枠で掲載しています。<strong>32枚×2箱セット・96枚1箱とは
-      金額の単位が異なる</strong>ため、比較する際は1枚あたりの単価をご確認ください。
+      96枚入りの大容量パックとは別に、通常サイズ(32枚入り)を2箱セットで
+      販売しているショップも見つかった場合は、こちらに別枠で掲載しています。
+      <strong>96枚パックとは金額の単位が異なる</strong>ため、比較する際は
+      1枚あたりの単価をご確認ください。
     </p>`,
+        /** 「32枚×2箱(64枚)」らしきものだけを判定する。96枚系(別ラインナップ)との混同を避ける */
         matches(name) {
           if (!name) return false;
           const n = stripShippingPromoText(name.replace(/\s/g, ""));
-          if (/192枚/.test(n)) return true;
-          return /96/.test(n) && isBoxCount(n, 2);
+          if (/単品/.test(n)) return false;
+          if (/96/.test(n)) return false; // 96枚系(大容量パック)は別ユニットで扱う
+          if (/64枚/.test(n)) return true;
+          return isBoxCount(n, 2);
         },
       },
     ],
