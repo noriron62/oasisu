@@ -102,7 +102,11 @@ async function buildOneProduct(product, template) {
     const hintedResults = await Promise.all(
       hintedUnits.flatMap((unit) => [
         fetchRakutenRaw({
-          keyword: product.searchKeyword,
+          // 比較単位ごとに unit.hintedKeyword を指定した場合、価格帯指定の
+          // 追加取得だけそのキーワードで検索する。同じ価格帯に類似の
+          //他ユニット商品が大量にあり、通常のキーワードでは埋もれてしまう
+          // ケース（例: 96枚×2箱が32枚×4箱セットに埋もれる）向けの仕組み。
+          keyword: unit.hintedKeyword || product.searchKeyword,
           appId: RAKUTEN_APP_ID,
           accessKey: RAKUTEN_ACCESS_KEY,
           affiliateId: RAKUTEN_AFFILIATE_ID,
@@ -112,7 +116,7 @@ async function buildOneProduct(product, template) {
           maxPrice: unit.priceHint.max,
         }).then((r) => ({ source: "rakuten", unit: unit.key, ...r })),
         fetchYahooRaw({
-          keyword: product.searchKeyword,
+          keyword: unit.hintedKeyword || product.searchKeyword,
           clientId: YAHOO_CLIENT_ID,
           maxPages: 3,
           minPrice: unit.priceHint.min,
