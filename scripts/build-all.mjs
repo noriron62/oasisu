@@ -19,7 +19,7 @@
 //   VALUECOMMERCE_SID / VALUECOMMERCE_PID
 // （すべて商品共通。商品ごとに変える必要はない）
 
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir, copyFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -49,6 +49,7 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
 const TEMPLATE_PATH = path.join(ROOT, "docs-template", "site.template.html");
+const STYLE_CSS_PATH = path.join(ROOT, "docs-template", "style.css");
 
 const SITE_BASE_URL = (process.env.SITE_BASE_URL || "https://example.com").replace(/\/+$/, "");
 const DELAY_BETWEEN_PRODUCTS_MS = 1500; // 商品間の待ち時間（API負荷対策）
@@ -246,6 +247,10 @@ async function buildOneProduct(product, template) {
   const outDir = path.join(ROOT, product.outputDir);
   await mkdir(outDir, { recursive: true });
 
+  // style.cssは全商品共通のため、docs-template/style.css を正本として
+  // 毎回自動的にコピーする（商品ごとに手動で置く必要をなくすため）。
+  await copyFile(STYLE_CSS_PATH, path.join(outDir, "style.css"));
+
   // ---- 価格推移（履歴）の更新 ----
   // historyUnitKey が設定されている商品のみ、その比較単位の「本日の最安値」を
   // docs-xxx/price-history.json に追記していく（直近30日分を保持）。
@@ -311,6 +316,7 @@ async function buildOneProduct(product, template) {
       productName: product.productSchemaName,
       siteName: product.siteName,
       allItems,
+      brandName: product.brandName,
     }),
     UPDATED_TEXT: escapeHtml(formatUpdatedText(updatedAt)),
     HERO_SECTION: overallBest
