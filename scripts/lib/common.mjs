@@ -96,6 +96,18 @@ export function hasSeparateShipping(text) {
 }
 
 /**
+ * 商品名・説明文等に「送料無料」「送料込み」が明記されているかを判定する。
+ * 楽天APIの postageFlag（常に無条件で送料無料の商品だけに1が立つ構造化データ）
+ * による絞り込みをやめ、「3,000円以上で送料無料」のような条件付き送料無料の
+ * ショップも取りこぼさないよう、テキストベースの判定に切り替えるために追加した。
+ */
+export function mentionsFreeShipping(text) {
+  if (!text) return false;
+  const n = text.replace(/\s/g, "");
+  return /(送料無料|送料込み|送料こみ|送料込)/.test(n);
+}
+
+/**
  * 「2~12箱セット」「2箱 4箱 6箱 12箱」のように、購入時に複数の箱数から
  * 選べるタイプの商品を判定する。この手の商品はAPIが返す価格が
  * どの箱数に対応するものか特定できない（多くの場合、最小数量の価格）ため、
@@ -178,7 +190,11 @@ export async function fetchRakutenRaw({
     url.searchParams.set("hits", "30");
     url.searchParams.set("page", String(page));
     url.searchParams.set("imageFlag", "1");
-    url.searchParams.set("postageFlag", "1"); // 送料込みの商品だけに絞り込む
+    // postageFlag=1（常に無条件で送料無料の商品だけに絞り込む）は廃止した。
+    // 「3,000円以上で送料無料」のような条件付き送料無料のショップが軒並み
+    // 除外されてしまっていたため、代わりに applyCommonFilters 側の
+    // テキストベースの判定（mentionsFreeShipping / hasSeparateShipping）で
+    // 絞り込むようにしている。
     url.searchParams.set("formatVersion", "2");
     if (minPrice) url.searchParams.set("minPrice", String(Math.round(minPrice)));
     if (maxPrice) url.searchParams.set("maxPrice", String(Math.round(maxPrice)));
@@ -341,7 +357,10 @@ export function applyCommonFilters(items) {
       !isAmbiguousMultiBoxListing(item.name) &&
       !hasSeparateShipping(item.name) &&
       !hasSeparateShipping(item.caption) &&
-      !hasSeparateShipping(item.catchcopy)
+      !hasSeparateShipping(item.catchcopy) &&
+      (mentionsFreeShipping(item.name) ||
+        mentionsFreeShipping(item.caption) ||
+        mentionsFreeShipping(item.catchcopy))
   );
 }
 
