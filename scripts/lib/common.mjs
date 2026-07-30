@@ -117,11 +117,20 @@ export function isAmbiguousMultiBoxListing(name) {
  * 「2箱で送料無料」「2箱購入で送料無料」のような、購入数のしきい値を
  * 示すだけの販促文言を、箱数判定の対象から取り除く。
  */
+/** 全角数字(０-９)を半角に変換する。ショップによっては商品名の数字を
+ *  全角で表記していることがあり(例:「２箱」)、半角前提の正規表現では
+ *  拾えなくなってしまうため、判定処理の入り口でまとめて変換しておく。 */
+function normalizeFullWidthDigits(n) {
+  if (!n) return n;
+  return n.replace(/[０-９]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0xfee0));
+}
+
 export function stripShippingPromoText(n) {
+  const normalized = normalizeFullWidthDigits(n);
   // 「2箱で送料無料」「2箱購入で送料無料」「2箱でポスト便送料無料」のように、
   // 「箱」と「で」の間、「で」と「送料無料」の間、それぞれに別の単語が
   // 挟まる表記ゆれがあるため、どちらの間にも短い語句が入ってよいようにする
-  return n.replace(/\d箱.{0,10}?で.{0,10}?送料無料/g, "");
+  return normalized.replace(/\d箱.{0,10}?で.{0,10}?送料無料/g, "");
 }
 
 /** 処方箋の提出が必要な商品を除外する */
