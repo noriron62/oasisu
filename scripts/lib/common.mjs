@@ -358,7 +358,12 @@ export function applyCommonFilters(items) {
       !hasSeparateShipping(item.name) &&
       !hasSeparateShipping(item.caption) &&
       !hasSeparateShipping(item.catchcopy) &&
-      (mentionsFreeShipping(item.name) ||
+      // Yahoo!ショッピングはAPI自体が shipping=free で送料無料の商品だけに
+      // 絞り込み済みのため、テキストでの「送料無料」明記チェックは
+      // 楽天市場の商品にのみ課す（楽天は postageFlag=1 を廃止したため、
+      // 代わりにテキストで判定している）
+      (item.source !== "楽天市場" ||
+        mentionsFreeShipping(item.name) ||
         mentionsFreeShipping(item.caption) ||
         mentionsFreeShipping(item.catchcopy))
   );
