@@ -822,14 +822,29 @@ export const products = [
         priceHint: { min: 7000, max: 11000 },
         introHtml: "",
         /** 「96枚×2箱(192枚)」らしきものだけを判定する。「2箱」という漢字表記が
-         *  無く「96枚×2」のような記号表記のみのショップも拾えるよう、判定を広めにしている */
-        matches(name) {
+         *  無く「96枚×2」のような記号表記のみのショップも拾えるよう、判定を広めにしている。
+         *  さらに、postageFlag(送料込み限定)の関係でAPI取得結果自体に含まれない
+         *  ショップ(例:楽天市場「まえだ」)を救済するため、以下の条件を満たす場合も
+         *  96枚×2箱とみなす:
+         *    ・価格が8,000円以上(このタイプが実勢価格として8,960円前後のため)
+         *    ・商品名に「96」という数字を含む
+         *    ・かつ「32枚」「4箱」など、明らかに別の単位を示す表記がない
+         *  （この救済条件はseed-saiyasuのbox96x2にのみ適用され、他商品には影響しない） */
+        matches(name, price) {
           if (!name) return false;
           const n = stripShippingPromoText(name.replace(/\s/g, ""));
           if (/単品/.test(n)) return false;
           if (/192枚/.test(n)) return true;
-          if (!/96/.test(n)) return false;
-          return /(2箱|×2箱|ｘ2箱|x2箱|2箱セット|96.{0,4}×2|96.{0,4}x2|96.{0,4}ｘ2)/i.test(n);
+          if (/96/.test(n)) {
+            const mentions2Box =
+              /(2箱|×2箱|ｘ2箱|x2箱|2箱セット|96.{0,4}×2|96.{0,4}x2|96.{0,4}ｘ2)/i.test(n);
+            if (mentions2Box) return true;
+          }
+          // 価格ベースの救済条件（postageFlagの都合でAPI結果自体から漏れるショップ向け）
+          if (typeof price === "number" && price >= 8000) {
+            if (/96/.test(n) && !/(32枚|4箱|5箱|6箱|7箱|8箱)/.test(n)) return true;
+          }
+          return false;
         },
       },
       {
