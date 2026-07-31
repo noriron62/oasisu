@@ -154,6 +154,9 @@ async function buildOneProduct(product, template) {
       for (const item of rakutenHint.items.slice(0, 5)) {
         console.log(`      [楽天/${unit.label}ヒント] ¥${item.itemPrice} ${item.itemName}`);
       }
+      for (const item of yahooHint.items.slice(0, 5)) {
+        console.log(`      [Yahoo!/${unit.label}ヒント] ¥${item.price} ${item.name}`);
+      }
     }
   }
 
