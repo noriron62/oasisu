@@ -107,6 +107,14 @@ export function mentionsFreeShipping(text) {
   return /(送料無料|送料込み|送料こみ|送料込)/.test(n);
 }
 
+/** 全角数字(０-９)を半角に変換する。ショップによっては商品名の数字を
+ *  全角で表記していることがあり(例:「２箱」)、半角前提の正規表現では
+ *  拾えなくなってしまうため、判定処理の入り口でまとめて変換しておく。 */
+function normalizeFullWidthDigits(n) {
+  if (!n) return n;
+  return n.replace(/[０-９]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0xfee0));
+}
+
 /**
  * 「2~12箱セット」「2箱 4箱 6箱 12箱」のように、購入時に複数の箱数から
  * 選べるタイプの商品を判定する。この手の商品はAPIが返す価格が
@@ -115,9 +123,13 @@ export function mentionsFreeShipping(text) {
  */
 export function isAmbiguousMultiBoxListing(name) {
   if (!name) return false;
-  const n = name.replace(/\s/g, "");
+  const n = normalizeFullWidthDigits(name.replace(/\s/g, ""));
   // 「2~12箱」「2〜12箱」「2-12箱」のような範囲表記
   if (/\d+[~〜\-]\d+箱/.test(n)) return true;
+  // 「2箱以上」のように、購入時の最低数量条件を示しているだけで、
+  // この商品自体の内容量（何箱・何枚入りか）を表しているわけではない表記
+  // （例:「受付条件2箱以上」）
+  if (/\d+箱以上/.test(n)) return true;
   // 「2箱 4箱 6箱 12箱」のように、3種類以上の箱数がまとめて列挙されている場合
   const matches = n.match(/\d+箱/g) || [];
   const uniqueCounts = new Set(matches);
@@ -129,14 +141,6 @@ export function isAmbiguousMultiBoxListing(name) {
  * 「2箱で送料無料」「2箱購入で送料無料」のような、購入数のしきい値を
  * 示すだけの販促文言を、箱数判定の対象から取り除く。
  */
-/** 全角数字(０-９)を半角に変換する。ショップによっては商品名の数字を
- *  全角で表記していることがあり(例:「２箱」)、半角前提の正規表現では
- *  拾えなくなってしまうため、判定処理の入り口でまとめて変換しておく。 */
-function normalizeFullWidthDigits(n) {
-  if (!n) return n;
-  return n.replace(/[０-９]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0xfee0));
-}
-
 export function stripShippingPromoText(n) {
   const normalized = normalizeFullWidthDigits(n);
   // 「2箱で送料無料」「2箱購入で送料無料」「2箱でポスト便送料無料」のように、
