@@ -1385,12 +1385,14 @@ export const products = [
       見つかった場合は、こちらに別枠で掲載しています。<strong>90枚パックとは
       金額の単位が異なる</strong>ため、比較する際は1枚あたりの単価をご確認ください。
     </p>`,
-        // 90枚パック系(box2_90/box1_90)との混同を防ぐため、「マキシ」「90枚パック」を含む商品は除外する
+        // 90枚パック系(box2_90/box1_90)との混同を防ぐため、「マキシ」を含む商品は除外する。
+        // 「90枚パック」「90枚入」は、この商品のように参考情報として括弧内に
+        // 書かれているだけのケースがあり、除外条件に使うと誤爆するため対象外にした。
         matches(name) {
           if (!name) return false;
           const n = stripShippingPromoText(name.replace(/\s/g, ""));
           if (/単品/.test(n)) return false;
-          if (/(マキシ|90枚パック|90枚入)/.test(n)) return false;
+          if (/マキシ/.test(n)) return false;
           return isBoxCount(n, 6) || /180枚/.test(n);
         },
       },
@@ -1435,12 +1437,14 @@ export const products = [
       見つかった場合は、こちらに別枠で掲載しています。<strong>90枚パックとは
       金額の単位が異なる</strong>ため、比較する際は1枚あたりの単価をご確認ください。
     </p>`,
-        // 90枚パック系との混同を防ぐため、「マキシ」「90枚パック」を含む商品は除外する
+        // 90枚パック系との混同を防ぐため、「マキシ」を含む商品は除外する。
+        // 「90枚パック」「90枚入」は参考情報として括弧内に書かれているだけの
+        // ケースがあり、除外条件に使うと誤爆するため対象外にした。
         matches(name) {
           if (!name) return false;
           const n = stripShippingPromoText(name.replace(/\s/g, ""));
           if (/単品/.test(n)) return false;
-          if (/(マキシ|90枚パック|90枚入)/.test(n)) return false;
+          if (/マキシ/.test(n)) return false;
           if (/(3箱|4箱|5箱|6箱)/.test(n)) return false;
           return isBoxCount(n, 2) || /60枚/.test(n);
         },
