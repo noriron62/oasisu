@@ -260,45 +260,44 @@ async function buildOneProduct(product, template) {
   await copyFile(STYLE_CSS_PATH, path.join(outDir, "style.css"));
 
   // ---- 価格推移（履歴）の更新 ----
-  // historyUnitKey が設定されている商品のみ、その比較単位の「本日の最安値」を
-  // docs-xxx/price-history.json に追記していく（直近30日分を保持）。
+  // 箱数によって日ごとに「一番お得な単位」が入れ替わりうるため、固定の
+  // 比較単位を追い続けるのではなく、その日の総合最安値(overallBest)を
+  // 1箱換算した価格を docs-xxx/price-history.json に記録していく
+  // （直近30日分を保持）。
   let priceHistorySectionHtml = "";
-  if (product.historyUnitKey) {
-    const historyUnitResult = unitResults.find((r) => r.unit.key === product.historyUnitKey);
-    if (historyUnitResult) {
-      const { unit, rakutenRanking, yahooRanking } = historyUnitResult;
-      const cheapestToday = [rakutenRanking[0], yahooRanking[0]]
-        .filter(Boolean)
-        .sort((a, b) => a.price - b.price)[0];
+  if (overallBest && overallBestUnit) {
+    const lensesPerBox = product.lensesPerBox || 30;
+    const perBoxPrice = Math.round(overallBest.rawUnitPrice * lensesPerBox);
 
-      if (cheapestToday) {
-        const historyPath = path.join(outDir, "price-history.json");
-        let history = [];
-        try {
-          history = JSON.parse(await readFile(historyPath, "utf-8"));
-        } catch {
-          history = []; // ファイルが無い（初回実行）場合は空から始める
-        }
-
-        history = updatePriceHistory(history, {
-          date: todayJstDateString(),
-          price: cheapestToday.price,
-          source: cheapestToday.source,
-          shop: cheapestToday.shop,
-          url: cheapestToday.url,
-        });
-
-        await writeFile(historyPath, JSON.stringify(history, null, 2), "utf-8");
-
-        priceHistorySectionHtml = renderPriceHistorySection({
-          history,
-          productName: product.siteName.replace(/最安値通販価格情報$/, "").trim(),
-          unitLabel: unit.label,
-          boxDivisor: unit.totalLenses / (product.lensesPerBox || 30),
-          lensesPerBox: product.lensesPerBox || 30,
-        });
+    const historyPath = path.join(outDir, "price-history.json");
+    let history = [];
+    try {
+      history = JSON.parse(await readFile(historyPath, "utf-8"));
+      // 旧形式（固定の比較単位の合計金額を記録していた形式）のデータが
+      // 残っていた場合、今回の設計変更に伴いリセットして新形式で貯め直す
+      if (history.some((h) => !h.unitLabel)) {
+        history = [];
       }
+    } catch {
+      history = []; // ファイルが無い（初回実行）場合は空から始める
     }
+
+    history = updatePriceHistory(history, {
+      date: todayJstDateString(),
+      price: perBoxPrice,
+      unitLabel: overallBestUnit.label,
+      source: overallBest.source,
+      shop: overallBest.shop,
+      url: overallBest.url,
+    });
+
+    await writeFile(historyPath, JSON.stringify(history, null, 2), "utf-8");
+
+    priceHistorySectionHtml = renderPriceHistorySection({
+      history,
+      productName: product.siteName.replace(/最安値通販価格情報$/, "").trim(),
+      lensesPerBox,
+    });
   }
 
   // ---- HTML生成 ----
