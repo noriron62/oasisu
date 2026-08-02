@@ -217,9 +217,10 @@ async function buildOneProduct(product, template) {
 
   // 「総合最安値」は、特定の比較単位に固定するのではなく、
   // 全ユニット(1箱・2箱・6箱など)の最安値候補の中から、
-  // 1枚あたり単価(unitPrice)が最も安いものを選ぶ。
-  // こうすることで、例えば6箱セットの方が1箱より1枚あたり安い場合に、
-  // きちんと6箱の方が総合最安値として表示されるようになる。
+  // 1枚あたり単価(rawUnitPrice、四捨五入前の値)が最も安いものを選ぶ。
+  // 四捨五入後のunitPriceで比較すると、同額になった際に配列内で先に
+  // 出てくるユニットが残ってしまい、実際にはわずかに安い方を見逃す
+  // ことがあるため、必ず四捨五入前の値で比較する。
   let overallBest = null;
   let overallBestUnit = null;
   let overallBestUnitResult = null;
@@ -227,7 +228,7 @@ async function buildOneProduct(product, template) {
     const { unit, rakutenRanking, yahooRanking } = unitResult;
     for (const candidate of [rakutenRanking[0], yahooRanking[0]]) {
       if (!candidate) continue;
-      if (!overallBest || candidate.unitPrice < overallBest.unitPrice) {
+      if (!overallBest || candidate.rawUnitPrice < overallBest.rawUnitPrice) {
         overallBest = candidate;
         overallBestUnit = unit;
         overallBestUnitResult = unitResult;
