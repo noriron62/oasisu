@@ -1350,7 +1350,7 @@ export const products = [
         // 標準箱の6箱(180枚)と実勢価格がほぼ同額のため、価格帯だけでは
         // 区別できず、検索キーワード自体も絞り込んでいる。
         priceHint: { min: 4800, max: 6800 },
-        hintedKeyword: "メダリストワンデープラス 90枚パック 2箱",
+        hintedKeyword: "メダリストワンデープラス マキシボックス 2箱",
         introHtml: "",
         /** 「90枚パック(マキシ)を2箱」らしきものだけを判定する */
         matches(name) {
@@ -1366,32 +1366,6 @@ export const products = [
             return has2Box;
           }
           return false;
-        },
-      },
-      {
-        key: "box1_90",
-        label: "90枚パック1箱(90枚)",
-        totalLenses: 90,
-        heroLabel: "本日の総合最安値（1枚あたり）",
-        heroName: "メダリストワンデープラス 90枚パック(マキシ)1箱(90枚)",
-        // 参考価格(90枚パック1箱3,840円)をもとに、価格帯を直接指定して追加取得する
-        priceHint: { min: 3200, max: 4600 },
-        hintedKeyword: "メダリストワンデープラス 90枚パック",
-        introHtml: `    <h2 class="section-heading">90枚パック(マキシ)1箱(単品)でも比較したい方へ</h2>
-    <p>
-      「まずは1箱だけ試したい」という方向けに、90枚パック(マキシ)1箱(単品)の
-      価格帯も別枠で掲載しています。<strong>2箱セットとは金額の単位が異なる</strong>
-      ため、混同しないようご注意ください(こちらは90枚1箱分の価格です)。
-    </p>`,
-        /** 「90枚パック(マキシ)を1箱」らしきものだけを判定する（2箱以上を示す表記は除外） */
-        matches(name) {
-          if (!name) return false;
-          const n = stripShippingPromoText(name.replace(/\s/g, ""));
-          if (/単品/.test(n)) return false;
-          if (!/(マキシ|90枚パック|90枚入)/.test(n)) return false;
-          if (/180枚/.test(n)) return false;
-          if (/(2箱|3箱|4箱|5箱|6箱|×2|ｘ2|x2)/i.test(n)) return false;
-          return true;
         },
       },
       {
@@ -1418,6 +1392,32 @@ export const products = [
           if (/単品/.test(n)) return false;
           if (/(マキシ|90枚パック|90枚入)/.test(n)) return false;
           return isBoxCount(n, 6) || /180枚/.test(n);
+        },
+      },
+      {
+        key: "box1_90",
+        label: "90枚パック1箱(90枚)",
+        totalLenses: 90,
+        heroLabel: "本日の総合最安値（1枚あたり）",
+        heroName: "メダリストワンデープラス 90枚パック(マキシ)1箱(90枚)",
+        // 参考価格(90枚パック1箱3,840円)をもとに、価格帯を直接指定して追加取得する
+        priceHint: { min: 3200, max: 4600 },
+        hintedKeyword: "メダリストワンデープラス マキシボックス",
+        introHtml: `    <h2 class="section-heading">90枚パック(マキシ)1箱(単品)でも比較したい方へ</h2>
+    <p>
+      「まずは1箱だけ試したい」という方向けに、90枚パック(マキシ)1箱(単品)の
+      価格帯も別枠で掲載しています。<strong>2箱セットとは金額の単位が異なる</strong>
+      ため、混同しないようご注意ください(こちらは90枚1箱分の価格です)。
+    </p>`,
+        /** 「90枚パック(マキシ)を1箱」らしきものだけを判定する（2箱以上を示す表記は除外） */
+        matches(name) {
+          if (!name) return false;
+          const n = stripShippingPromoText(name.replace(/\s/g, ""));
+          if (/単品/.test(n)) return false;
+          if (!/(マキシ|90枚パック|90枚入)/.test(n)) return false;
+          if (/180枚/.test(n)) return false;
+          if (/(2箱|3箱|4箱|5箱|6箱|×2|ｘ2|x2)/i.test(n)) return false;
+          return true;
         },
       },
       {
