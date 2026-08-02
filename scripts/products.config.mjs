@@ -822,7 +822,7 @@ export const products = [
       // 「ワンデーピュアうるおいプラス」という競合製品名を含めているだけの
       // 別ブランド商品を除外する
       if (/(プライムワンデー|アイレ|AIRE)/i.test(n)) return false;
-      return /ピュア/.test(n) && /うるおいプラス/.test(n);
+      return /(ピュア|1?daypure)/i.test(n) && /うるおいプラス/.test(n);
     },
 
     units: [
@@ -1156,7 +1156,7 @@ export const products = [
       // 別ブランド商品を除外する
       if (/(プライムワンデー|アイレ|AIRE)/i.test(n)) return false;
       if (!/(乱視|トーリック|toric)/i.test(n)) return false;
-      return /ピュア/.test(n) && /うるおいプラス/.test(n);
+      return /(ピュア|1?daypure)/i.test(n) && /うるおいプラス/.test(n);
     },
 
     units: [
@@ -1168,6 +1168,10 @@ export const products = [
         heroName: "シードワンデーピュアうるおいプラス 乱視用 6箱セット(192枚)",
         // 参考価格(6箱10,956円)をもとに、価格帯を直接指定して追加取得する
         priceHint: { min: 9500, max: 12500 },
+        // 通常の検索キーワードのままだと、同じ価格帯にある「4箱セット」等の
+        // 商品が多く、6箱セットが埋もれやすいため、検索キーワード自体を
+        // 絞り込む。
+        hintedKeyword: "ワンデーピュアうるおいプラス 乱視用 6箱",
         introHtml: "",
         matches(name) {
           return isBoxCount(name, 6) || /192枚/.test(name.replace(/\s/g, ""));
@@ -1199,6 +1203,10 @@ export const products = [
         heroName: "シードワンデーピュアうるおいプラス 乱視用 2箱セット(64枚)",
         // 参考価格(2箱3,895円)をもとに、価格帯を直接指定して追加取得する
         priceHint: { min: 3200, max: 4700 },
+        // 通常の検索キーワードのままだと、「32枚入り」とだけ書かれた箱数
+        // 表記が曖昧な商品や、実際は1箱の商品が同じ価格帯に多く、本来の
+        // 2箱商品が埋もれてしまうため、検索キーワード自体を絞り込む。
+        hintedKeyword: "ワンデーピュアうるおいプラス 乱視用 2箱",
         introHtml: `    <h2 class="section-heading">2箱(単品)でも比較したい方へ</h2>
     <p>
       2箱セット(64枚)で販売しているショップも見つかった場合は、
