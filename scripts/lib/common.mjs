@@ -658,9 +658,12 @@ function formatHistoryDateShort(dateStr) {
 
 /**
  * 「価格推移」セクションのHTMLを生成する。
- * historyUnitLabel（例:「90枚×2箱セット」）を主語にした見出し・文章にする。
+ * history[].price は、その日の総合最安値を1箱(lensesPerBox枚)換算した
+ * 価格として記録されている（箱数によって日ごとに一番お得な単位が
+ * 入れ替わりうるため、固定の単位ではなく「実質的に一番お得だった
+ * 1箱あたりの価格」を追いかける設計になっている）。
  */
-export function renderPriceHistorySection({ history, productName, unitLabel, boxDivisor, lensesPerBox = 30 }) {
+export function renderPriceHistorySection({ history, productName, boxDivisor, lensesPerBox = 30 }) {
   if (!history || history.length < 2) {
     return ""; // データが少なすぎる間は非表示にする
   }
@@ -670,29 +673,27 @@ export function renderPriceHistorySection({ history, productName, unitLabel, box
   const minEntry = history.reduce((a, b) => (b.price < a.price ? b : a));
   const maxEntry = history.reduce((a, b) => (b.price > a.price ? b : a));
 
-  const boxPrice = (price) => Math.round(price / boxDivisor);
-  const diffTotal = startEntry.price - todayEntry.price;
-  const diffBox = boxPrice(startEntry.price) - boxPrice(todayEntry.price);
+  const diffBox = startEntry.price - todayEntry.price;
 
   let summarySentence;
-  if (diffTotal === 0) {
-    summarySentence = `今日は${history.length}日前と比べて、価格は変わっていません(¥${yen(todayEntry.price)})。`;
+  if (diffBox === 0) {
+    summarySentence = `今日は${history.length}日前と比べて、1箱(${lensesPerBox}枚)あたりの価格は変わっていません(¥${yen(todayEntry.price)})。`;
   } else {
-    const diffWord = diffTotal > 0 ? "安くなっています" : "高くなっています";
+    const diffWord = diffBox > 0 ? "安くなっています" : "高くなっています";
     summarySentence =
-      `今日は${history.length}日前と比べて、全体で<strong>¥${yen(Math.abs(diffTotal))}</strong>、` +
-      `1箱(${lensesPerBox}枚)なら<strong>¥${yen(Math.abs(diffBox))}</strong>${diffWord}` +
+      `今日は${history.length}日前と比べて、1箱(${lensesPerBox}枚)あたり<strong>¥${yen(Math.abs(diffBox))}</strong>${diffWord}` +
       `(¥${yen(startEntry.price)} → ¥${yen(todayEntry.price)})。`;
   }
+
+  const unitNote = (entry) => (entry.unitLabel ? `<span class="history-unit-note">(${escapeHtml(entry.unitLabel)}が最安)</span>` : "");
 
   const statCard = (label, entry, { clickable = false } = {}) => {
     const inner = `
       <p class="label">${escapeHtml(label)}</p>
-      <p class="value">¥${yen(entry.price)}</p>
-      <p class="box-value">1箱(${lensesPerBox}枚)あたり ¥${yen(boxPrice(entry.price))}</p>
+      <p class="value">¥${yen(entry.price)} <span class="unit-suffix">/ 1箱(${lensesPerBox}枚)</span></p>
       <p class="sub"><span class="shop-mark ${historyMarkClass(entry.source)}">${historyMarkLabel(entry.source)}</span> ${
         clickable ? escapeHtml(entry.shop) : formatHistoryDateShort(entry.date)
-      }</p>`;
+      } ${unitNote(entry)}</p>`;
     return clickable
       ? `<a class="history-stat today" href="${escapeHtml(entry.url)}" target="_blank" rel="noopener sponsored"><span class="cta-arrow">→</span>${inner}</a>`
       : `<div class="history-stat">${inner}</div>`;
@@ -706,15 +707,15 @@ export function renderPriceHistorySection({ history, productName, unitLabel, box
         <span class="history-date">${formatHistoryDateShort(h.date)}</span>
         <span class="history-shop"><span class="shop-mark ${historyMarkClass(h.source)}">${historyMarkLabel(h.source)}</span> ${escapeHtml(h.shop)}</span>
         <span class="history-prices">
-          <span class="history-total">¥${yen(h.price)}</span>
-          <span class="history-box">(1箱¥${yen(boxPrice(h.price))})</span>
+          <span class="history-total">¥${yen(h.price)}<span class="unit-suffix">/1箱</span></span>
+          ${unitNote(h)}
         </span>
       </div>`
     )
     .join("\n");
 
   return `  <section class="value-explainer" aria-label="価格推移">
-    <h2 class="section-heading">${escapeHtml(productName)} ${escapeHtml(unitLabel)}の過去${history.length}日間の価格推移</h2>
+    <h2 class="section-heading">${escapeHtml(productName)} 1箱(${lensesPerBox}枚)あたり実質最安値の過去${history.length}日間の推移</h2>
 
     <div class="history-summary">
       ${statCard("本日の最安値", todayEntry, { clickable: true })}
@@ -730,7 +731,7 @@ export function renderPriceHistorySection({ history, productName, unitLabel, box
     ${renderHistoryChart(history)}
 
     <p class="history-note">
-      ○ 印は期間内の最安値のタイミングです。折れ線上の点の色は、その日最安だったモール(<span style="color:#bf0000;">●</span>楽天 / <span style="color:#1D5C99;">●</span><span style="color:#ff0033;">Yahoo!</span>)を表しています。
+      ○ 印は期間内の最安値のタイミングです。折れ線上の点の色は、その日最安だったモール(<span style="color:#bf0000;">●</span>楽天 / <span style="color:#1D5C99;">●</span><span style="color:#ff0033;">Yahoo!</span>)を表しています。価格は、その日もっともお得だった購入単位を1箱(${lensesPerBox}枚)あたりに換算した金額です(購入単位はカッコ内に表示しています)。
     </p>
 
     <h3 class="history-list-heading">日別の価格一覧</h3>
