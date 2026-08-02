@@ -210,8 +210,8 @@ async function buildOneProduct(product, template) {
     for (const i of rakutenCandidates) claimedRakuten.add(itemKey(i));
     for (const i of yahooCandidates) claimedYahoo.add(itemKey(i));
 
-    const rakutenRanking = buildRanking(rakutenCandidates, unit.totalLenses);
-    const yahooRanking = buildRanking(yahooCandidates, unit.totalLenses);
+    const rakutenRanking = buildRanking(rakutenCandidates, unit.totalLenses, 5, product.lensesPerBox || 30);
+    const yahooRanking = buildRanking(yahooCandidates, unit.totalLenses, 5, product.lensesPerBox || 30);
     return { unit, rakutenRanking, yahooRanking };
   });
 
@@ -293,7 +293,8 @@ async function buildOneProduct(product, template) {
           history,
           productName: product.siteName.replace(/最安値通販価格情報$/, "").trim(),
           unitLabel: unit.label,
-          boxDivisor: unit.totalLenses / 30,
+          boxDivisor: unit.totalLenses / (product.lensesPerBox || 30),
+          lensesPerBox: product.lensesPerBox || 30,
         });
       }
     }
