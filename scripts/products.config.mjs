@@ -1352,12 +1352,14 @@ export const products = [
         priceHint: { min: 4800, max: 6800 },
         hintedKeyword: "メダリストワンデープラス マキシボックス 2箱",
         introHtml: "",
-        /** 「90枚パック(マキシ)を2箱」らしきものだけを判定する */
+        /** 「90枚パック(マキシ)を2箱」らしきものだけを判定する。
+         *  「90枚パック」「90枚入」は、他商品の説明文中に参考情報として
+         *  登場することがあり、判定基準に使うと誤爆するため対象外にした。 */
         matches(name) {
           if (!name) return false;
           const n = stripShippingPromoText(name.replace(/\s/g, ""));
           if (/単品/.test(n)) return false;
-          if (/(マキシ|90枚パック|90枚入)/.test(n)) {
+          if (/マキシ/.test(n)) {
             const mentions1Box = /1箱/.test(n) && !/2箱/.test(n);
             if (mentions1Box) return false;
             if (/180枚/.test(n)) return true;
@@ -1411,12 +1413,14 @@ export const products = [
       価格帯も別枠で掲載しています。<strong>2箱セットとは金額の単位が異なる</strong>
       ため、混同しないようご注意ください(こちらは90枚1箱分の価格です)。
     </p>`,
-        /** 「90枚パック(マキシ)を1箱」らしきものだけを判定する（2箱以上を示す表記は除外） */
+        /** 「90枚パック(マキシ)を1箱」らしきものだけを判定する（2箱以上を示す表記は除外）。
+         *  「90枚パック」「90枚入」は、他商品の説明文中に参考情報として
+         *  登場することがあり、判定基準に使うと誤爆するため対象外にした。 */
         matches(name) {
           if (!name) return false;
           const n = stripShippingPromoText(name.replace(/\s/g, ""));
           if (/単品/.test(n)) return false;
-          if (!/(マキシ|90枚パック|90枚入)/.test(n)) return false;
+          if (!/マキシ/.test(n)) return false;
           if (/180枚/.test(n)) return false;
           if (/(2箱|3箱|4箱|5箱|6箱|×2|ｘ2|x2)/i.test(n)) return false;
           return true;
