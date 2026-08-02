@@ -373,9 +373,11 @@ export function applyCommonFilters(items) {
   );
 }
 
-/** 価格の安い順に並べ替え、単価を付与して上位N件を作る */
-export function buildRanking(items, totalLenses, topN = 5) {
-  const boxesOf30 = totalLenses / 30;
+/** 価格の安い順に並べ替え、単価を付与して上位N件を作る
+ *  lensesPerBox: 「1箱あたり」表示の基準となる、実際の1箱の枚数
+ *  （デフォルト30枚。シードのように1箱32枚の商品は呼び出し側で指定する） */
+export function buildRanking(items, totalLenses, topN = 5, lensesPerBox = 30) {
+  const boxesOfStandard = totalLenses / lensesPerBox;
   return items
     .filter((i) => typeof i.price === "number" && i.price > 0)
     .sort((a, b) => a.price - b.price)
@@ -384,7 +386,8 @@ export function buildRanking(items, totalLenses, topN = 5) {
       rank: index + 1,
       ...item,
       unitPrice: Math.round(item.price / totalLenses),
-      boxUnitPrice: Math.round(item.price / boxesOf30),
+      boxUnitPrice: Math.round(item.price / boxesOfStandard),
+      lensesPerBox,
     }));
 }
 
@@ -399,13 +402,14 @@ function formatReviewMeta(item) {
 /** 1件分のランキング行のHTMLを生成する */
 export function renderRow(item) {
   const img = item.image || PLACEHOLDER_IMG;
+  const lensesPerBox = item.lensesPerBox || 30;
   return `      <a class="row" href="${escapeHtml(item.url)}" target="_blank" rel="noopener sponsored" data-rank="${item.rank}">
         <span class="rank">${String(item.rank).padStart(2, "0")}</span>
         <img class="thumb" src="${escapeHtml(img)}" alt="" loading="lazy" />
         <span class="row-info">
           <p class="shop-name">${escapeHtml(item.shop)}</p>
           <p class="unit-prices">
-            1箱(30枚)あたり <strong>¥${yen(item.boxUnitPrice)}</strong>
+            1箱(${lensesPerBox}枚)あたり <strong>¥${yen(item.boxUnitPrice)}</strong>
             ・ 1枚あたり <strong>¥${yen(item.unitPrice)}</strong>
           </p>
         </span>
@@ -468,10 +472,11 @@ export function renderReviewLinks(rakutenTop, yahooTop) {
 /** 「本日の総合最安値」セクションのHTMLを生成する（データが無ければ空文字） */
 export function renderHeroSection(item, heroLabel, heroName) {
   if (!item) return "";
+  const lensesPerBox = item.lensesPerBox || 30;
   return `  <section class="hero">
     <p class="hero-label">${escapeHtml(heroLabel)}</p>
     <p class="hero-price"><span class="yen">¥</span><span>${yen(item.price)}</span></p>
-    <p class="hero-unit">1箱(30枚)あたり ${yen(item.boxUnitPrice)}円 ・ 1枚あたり ${yen(item.unitPrice)}円</p>
+    <p class="hero-unit">1箱(${lensesPerBox}枚)あたり ${yen(item.boxUnitPrice)}円 ・ 1枚あたり ${yen(item.unitPrice)}円</p>
     <div class="hero-meta">
       <span class="hero-name">${escapeHtml(heroName)}</span>
       <span class="badge">${escapeHtml(item.source)} ・ ${escapeHtml(item.shop)}</span>
@@ -651,7 +656,7 @@ function formatHistoryDateShort(dateStr) {
  * 「価格推移」セクションのHTMLを生成する。
  * historyUnitLabel（例:「90枚×2箱セット」）を主語にした見出し・文章にする。
  */
-export function renderPriceHistorySection({ history, productName, unitLabel, boxDivisor }) {
+export function renderPriceHistorySection({ history, productName, unitLabel, boxDivisor, lensesPerBox = 30 }) {
   if (!history || history.length < 2) {
     return ""; // データが少なすぎる間は非表示にする
   }
@@ -672,7 +677,7 @@ export function renderPriceHistorySection({ history, productName, unitLabel, box
     const diffWord = diffTotal > 0 ? "安くなっています" : "高くなっています";
     summarySentence =
       `今日は${history.length}日前と比べて、全体で<strong>¥${yen(Math.abs(diffTotal))}</strong>、` +
-      `1箱(30枚)なら<strong>¥${yen(Math.abs(diffBox))}</strong>${diffWord}` +
+      `1箱(${lensesPerBox}枚)なら<strong>¥${yen(Math.abs(diffBox))}</strong>${diffWord}` +
       `(¥${yen(startEntry.price)} → ¥${yen(todayEntry.price)})。`;
   }
 
@@ -680,7 +685,7 @@ export function renderPriceHistorySection({ history, productName, unitLabel, box
     const inner = `
       <p class="label">${escapeHtml(label)}</p>
       <p class="value">¥${yen(entry.price)}</p>
-      <p class="box-value">1箱(30枚)あたり ¥${yen(boxPrice(entry.price))}</p>
+      <p class="box-value">1箱(${lensesPerBox}枚)あたり ¥${yen(boxPrice(entry.price))}</p>
       <p class="sub"><span class="shop-mark ${historyMarkClass(entry.source)}">${historyMarkLabel(entry.source)}</span> ${
         clickable ? escapeHtml(entry.shop) : formatHistoryDateShort(entry.date)
       }</p>`;
