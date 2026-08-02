@@ -386,6 +386,10 @@ export function buildRanking(items, totalLenses, topN = 5, lensesPerBox = 30) {
       rank: index + 1,
       ...item,
       unitPrice: Math.round(item.price / totalLenses),
+      // 総合最安値の判定には、四捨五入後の値ではなくこちらを使う
+      // （四捨五入すると同額になり、比較の順序次第で本来より高い方が
+      // 「最安値」として選ばれてしまうことがあるため）
+      rawUnitPrice: item.price / totalLenses,
       boxUnitPrice: Math.round(item.price / boxesOfStandard),
       lensesPerBox,
     }));
