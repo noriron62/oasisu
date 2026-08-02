@@ -1,7 +1,7 @@
 {
   "siteName": "ワンデーアキュビューオアシス乱視用最安値通販価格情報",
   "keyword": "ワンデーアキュビューオアシス 乱視",
-  "updatedAt": "2026-08-02T01:04:40.576Z",
+  "updatedAt": "2026-08-02T06:07:07.545Z",
   "overallBest": {
     "rank": 1,
     "source": "Yahoo!ショッピング",
@@ -17,7 +17,9 @@
     "reviewAverage": 5,
     "image": "https://item-shopping.c.yimg.jp/i/g/tokaicontact_k-y-01-1d-trc-2286-6-set-06-001",
     "unitPrice": 111,
-    "boxUnitPrice": 3320
+    "rawUnitPrice": 110.66666666666667,
+    "boxUnitPrice": 3320,
+    "lensesPerBox": 30
   },
   "units": [
     {
@@ -40,7 +42,9 @@
           "reviewAverage": 4.57,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/lensawesome/cabinet/item/jj/1davoafa/1davoafa-06p-m400.jpg?_ex=128x128",
           "unitPrice": 112,
-          "boxUnitPrice": 3372
+          "rawUnitPrice": 112.38888888888889,
+          "boxUnitPrice": 3372,
+          "lensesPerBox": 30
         },
         {
           "rank": 2,
@@ -57,7 +61,9 @@
           "reviewAverage": 0,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/lensrewards/cabinet/item/jj/1davoafa/1davoafa-06p-m400.jpg?_ex=128x128",
           "unitPrice": 112,
-          "boxUnitPrice": 3373
+          "rawUnitPrice": 112.44444444444444,
+          "boxUnitPrice": 3373,
+          "lensesPerBox": 30
         },
         {
           "rank": 3,
@@ -74,7 +80,9 @@
           "reviewAverage": 0,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/measis/cabinet/400c/1daoat_06_400c.jpg?_ex=128x128",
           "unitPrice": 113,
-          "boxUnitPrice": 3390
+          "rawUnitPrice": 113,
+          "boxUnitPrice": 3390,
+          "lensesPerBox": 30
         },
         {
           "rank": 4,
@@ -91,7 +99,9 @@
           "reviewAverage": 5,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/quick-contact-r/cabinet/item_main/jj/1d_acuvue_oasys_trc/jj-17-06-e.jpg?_ex=128x128",
           "unitPrice": 113,
-          "boxUnitPrice": 3397
+          "rawUnitPrice": 113.21666666666667,
+          "boxUnitPrice": 3397,
+          "lensesPerBox": 30
         },
         {
           "rank": 5,
@@ -108,7 +118,9 @@
           "reviewAverage": 4.79,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/appeal/cabinet/item_main/jj/1d_acuvue_oasys_trc/jj-17-06-e.jpg?_ex=128x128",
           "unitPrice": 113,
-          "boxUnitPrice": 3397
+          "rawUnitPrice": 113.21666666666667,
+          "boxUnitPrice": 3397,
+          "lensesPerBox": 30
         }
       ],
       "yahoo": [
@@ -127,7 +139,9 @@
           "reviewAverage": 5,
           "image": "https://item-shopping.c.yimg.jp/i/g/tokaicontact_k-y-01-1d-trc-2286-6-set-06-001",
           "unitPrice": 111,
-          "boxUnitPrice": 3320
+          "rawUnitPrice": 110.66666666666667,
+          "boxUnitPrice": 3320,
+          "lensesPerBox": 30
         },
         {
           "rank": 2,
@@ -144,7 +158,9 @@
           "reviewAverage": 0,
           "image": "https://item-shopping.c.yimg.jp/i/g/tokaimegane_oatc006",
           "unitPrice": 111,
-          "boxUnitPrice": 3323
+          "rawUnitPrice": 110.77777777777777,
+          "boxUnitPrice": 3323,
+          "lensesPerBox": 30
         },
         {
           "rank": 3,
@@ -161,7 +177,9 @@
           "reviewAverage": 5,
           "image": "https://item-shopping.c.yimg.jp/i/g/grin-contactlens2222_jj-1dtc-oa-06p",
           "unitPrice": 111,
-          "boxUnitPrice": 3325
+          "rawUnitPrice": 110.82777777777778,
+          "boxUnitPrice": 3325,
+          "lensesPerBox": 30
         },
         {
           "rank": 4,
@@ -178,24 +196,28 @@
           "reviewAverage": 0,
           "image": "https://item-shopping.c.yimg.jp/i/g/lensrewards_1davoafa-06p",
           "unitPrice": 111,
-          "boxUnitPrice": 3328
+          "rawUnitPrice": 110.94444444444444,
+          "boxUnitPrice": 3328,
+          "lensesPerBox": 30
         },
         {
           "rank": 5,
           "source": "Yahoo!ショッピング",
           "name": "ワンデーアキュビューオアシス乱視用 30枚入 6箱 ジョンソン・エンド・ジョンソン 左右各3箱 1日使い捨て乱視用 1day コンタクトレンズ 送料無料",
           "caption": null,
-          "catchcopy": "JOHNSON &amp; JOHNSON 1day乱視用レンズ",
-          "itemCode": "measis_0888290076680-6",
-          "shop": "メアシス",
+          "catchcopy": "ジョンソン・エンド・ジョンソンの1day乱視用レンズ",
+          "itemCode": "hitominity_0888290076680-6",
+          "shop": "ヒトミニティ",
           "price": 19980,
-          "url": "https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3306714&pid=892662190&vc_url=https%3A%2F%2Fstore.shopping.yahoo.co.jp%2Fmeasis%2F0888290076680-6.html",
-          "reviewUrl": "https://store.shopping.yahoo.co.jp/measis/0888290076680-6.html",
+          "url": "https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3306714&pid=892662190&vc_url=https%3A%2F%2Fstore.shopping.yahoo.co.jp%2Fhitominity%2F0888290076680-6.html",
+          "reviewUrl": "https://store.shopping.yahoo.co.jp/hitominity/0888290076680-6.html",
           "reviewCount": 0,
           "reviewAverage": 0,
-          "image": "https://item-shopping.c.yimg.jp/i/g/measis_0888290076680-6",
+          "image": "https://item-shopping.c.yimg.jp/i/g/hitominity_0888290076680-6",
           "unitPrice": 111,
-          "boxUnitPrice": 3330
+          "rawUnitPrice": 111,
+          "boxUnitPrice": 3330,
+          "lensesPerBox": 30
         }
       ]
     },
@@ -219,7 +241,9 @@
           "reviewAverage": 4.73,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/lensrewards/cabinet/item/jj/1davoafa/1davoafa-02p-m400.jpg?_ex=128x128",
           "unitPrice": 113,
-          "boxUnitPrice": 3380
+          "rawUnitPrice": 112.66666666666667,
+          "boxUnitPrice": 3380,
+          "lensesPerBox": 30
         },
         {
           "rank": 2,
@@ -236,7 +260,9 @@
           "reviewAverage": 4.75,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/doctorlens/cabinet/jj/j1otor_set2p.jpg?_ex=128x128",
           "unitPrice": 113,
-          "boxUnitPrice": 3395
+          "rawUnitPrice": 113.16666666666667,
+          "boxUnitPrice": 3395,
+          "lensesPerBox": 30
         },
         {
           "rank": 3,
@@ -253,7 +279,9 @@
           "reviewAverage": 5,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/measis/cabinet/400c/1daoat_02_400c.jpg?_ex=128x128",
           "unitPrice": 113,
-          "boxUnitPrice": 3395
+          "rawUnitPrice": 113.16666666666667,
+          "boxUnitPrice": 3395,
+          "lensesPerBox": 30
         },
         {
           "rank": 4,
@@ -270,7 +298,9 @@
           "reviewAverage": 4.73,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/lensawesome/cabinet/item/jj/1davoafa/1davoafa-02p-m400.jpg?_ex=128x128",
           "unitPrice": 115,
-          "boxUnitPrice": 3435
+          "rawUnitPrice": 114.5,
+          "boxUnitPrice": 3435,
+          "lensesPerBox": 30
         },
         {
           "rank": 5,
@@ -287,7 +317,9 @@
           "reviewAverage": 4.73,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/lensbox/cabinet/jj/j1otor_set2p.jpg?_ex=128x128",
           "unitPrice": 115,
-          "boxUnitPrice": 3440
+          "rawUnitPrice": 114.66666666666667,
+          "boxUnitPrice": 3440,
+          "lensesPerBox": 30
         }
       ],
       "yahoo": [
@@ -306,7 +338,9 @@
           "reviewAverage": 4.68,
           "image": "https://item-shopping.c.yimg.jp/i/g/grin-contactlens2222_jj-1dtc-oa-02p",
           "unitPrice": 114,
-          "boxUnitPrice": 3435
+          "rawUnitPrice": 114.48333333333333,
+          "boxUnitPrice": 3435,
+          "lensesPerBox": 30
         },
         {
           "rank": 2,
@@ -323,7 +357,9 @@
           "reviewAverage": 4.76,
           "image": "https://item-shopping.c.yimg.jp/i/g/atcontact_k-jj-1otcz0-02-h",
           "unitPrice": 115,
-          "boxUnitPrice": 3435
+          "rawUnitPrice": 114.5,
+          "boxUnitPrice": 3435,
+          "lensesPerBox": 30
         },
         {
           "rank": 3,
@@ -340,7 +376,9 @@
           "reviewAverage": 4.5,
           "image": "https://item-shopping.c.yimg.jp/i/g/atlens_k-jj-1otcz0-02-h",
           "unitPrice": 115,
-          "boxUnitPrice": 3435
+          "rawUnitPrice": 114.5,
+          "boxUnitPrice": 3435,
+          "lensesPerBox": 30
         },
         {
           "rank": 4,
@@ -357,7 +395,9 @@
           "reviewAverage": 4.67,
           "image": "https://item-shopping.c.yimg.jp/i/g/lensrewards_1davoafa-02p",
           "unitPrice": 115,
-          "boxUnitPrice": 3435
+          "rawUnitPrice": 114.5,
+          "boxUnitPrice": 3435,
+          "lensesPerBox": 30
         },
         {
           "rank": 5,
@@ -374,7 +414,9 @@
           "reviewAverage": 4.4,
           "image": "https://item-shopping.c.yimg.jp/i/g/firstcontact_586",
           "unitPrice": 115,
-          "boxUnitPrice": 3438
+          "rawUnitPrice": 114.58333333333333,
+          "boxUnitPrice": 3438,
+          "lensesPerBox": 30
         }
       ]
     },
@@ -398,7 +440,9 @@
           "reviewAverage": 0,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/lensrewards/cabinet/item/jj/1davoafa/1davoafa-01p-m400.jpg?_ex=128x128",
           "unitPrice": 113,
-          "boxUnitPrice": 3380
+          "rawUnitPrice": 112.66666666666667,
+          "boxUnitPrice": 3380,
+          "lensesPerBox": 30
         },
         {
           "rank": 2,
@@ -415,7 +459,9 @@
           "reviewAverage": 4.67,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/lala/cabinet/shouhin/imgrc0095854467.jpg?_ex=128x128",
           "unitPrice": 113,
-          "boxUnitPrice": 3389
+          "rawUnitPrice": 112.96666666666667,
+          "boxUnitPrice": 3389,
+          "lensesPerBox": 30
         },
         {
           "rank": 3,
@@ -432,7 +478,9 @@
           "reviewAverage": 5,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/lensawesome/cabinet/item/jj/1davoafa/1davoafa-01p-m400.jpg?_ex=128x128",
           "unitPrice": 115,
-          "boxUnitPrice": 3440
+          "rawUnitPrice": 114.66666666666667,
+          "boxUnitPrice": 3440,
+          "lensesPerBox": 30
         },
         {
           "rank": 4,
@@ -449,7 +497,9 @@
           "reviewAverage": 4.62,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/lensamigo/cabinet/johnson/1davoafa-01p-m400.jpg?_ex=128x128",
           "unitPrice": 122,
-          "boxUnitPrice": 3660
+          "rawUnitPrice": 122,
+          "boxUnitPrice": 3660,
+          "lensesPerBox": 30
         },
         {
           "rank": 5,
@@ -466,7 +516,9 @@
           "reviewAverage": 0,
           "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/itsumono/cabinet/jj/j1otor.jpg?_ex=128x128",
           "unitPrice": 123,
-          "boxUnitPrice": 3680
+          "rawUnitPrice": 122.66666666666667,
+          "boxUnitPrice": 3680,
+          "lensesPerBox": 30
         }
       ],
       "yahoo": [
@@ -485,7 +537,9 @@
           "reviewAverage": 4.67,
           "image": "https://item-shopping.c.yimg.jp/i/g/grin-contactlens2222_jj-1dtc-oa-01p",
           "unitPrice": 123,
-          "boxUnitPrice": 3699
+          "rawUnitPrice": 123.3,
+          "boxUnitPrice": 3699,
+          "lensesPerBox": 30
         },
         {
           "rank": 2,
@@ -502,7 +556,9 @@
           "reviewAverage": 0,
           "image": "https://item-shopping.c.yimg.jp/i/g/tokaicontact_k-r-01-1d-trc-2286-6-one-01-001",
           "unitPrice": 123,
-          "boxUnitPrice": 3700
+          "rawUnitPrice": 123.33333333333333,
+          "boxUnitPrice": 3700,
+          "lensesPerBox": 30
         },
         {
           "rank": 3,
@@ -519,7 +575,9 @@
           "reviewAverage": 5,
           "image": "https://item-shopping.c.yimg.jp/i/g/atcontact_k-jj-1otcz0-01-h",
           "unitPrice": 123,
-          "boxUnitPrice": 3700
+          "rawUnitPrice": 123.33333333333333,
+          "boxUnitPrice": 3700,
+          "lensesPerBox": 30
         },
         {
           "rank": 4,
@@ -536,7 +594,9 @@
           "reviewAverage": 0,
           "image": "https://item-shopping.c.yimg.jp/i/g/atlens_k-jj-1otcz0-01-h",
           "unitPrice": 123,
-          "boxUnitPrice": 3700
+          "rawUnitPrice": 123.33333333333333,
+          "boxUnitPrice": 3700,
+          "lensesPerBox": 30
         },
         {
           "rank": 5,
@@ -553,7 +613,9 @@
           "reviewAverage": 4.74,
           "image": "https://item-shopping.c.yimg.jp/i/g/lensamigo_1davoafa-01p",
           "unitPrice": 123,
-          "boxUnitPrice": 3700
+          "rawUnitPrice": 123.33333333333333,
+          "boxUnitPrice": 3700,
+          "lensesPerBox": 30
         }
       ]
     }
