@@ -1,1 +1,43 @@
+# ------------------------------------------------------------------
+# 旧サイト(シード関連の静的ページ・モイスト関連の旧バージョンページ)から
+# 現行システムの各商品ページへの301リダイレクト設定。
+#
+# これらの旧ページはGit管理外(サーバーに直接置かれた静的ファイル)のため、
+# このファイルだけがそれらのURLの「行き先」を制御している。
+# ------------------------------------------------------------------
+
+RewriteEngine On
+
+# ---- シード関連(通常用): 箱数・モール別ページ ----
+RewriteRule ^1hako/?$ /seed-saiyasu/ [R=301,L]
+RewriteRule ^2hako/?$ /seed-saiyasu/ [R=301,L]
+RewriteRule ^3hako/?$ /seed-saiyasu/ [R=301,L]
+RewriteRule ^6hako/?$ /seed-saiyasu/ [R=301,L]
+RewriteRule ^rakuten/?$ /seed-saiyasu/ [R=301,L]
+RewriteRule ^yahoo/?$ /seed-saiyasu/ [R=301,L]
+RewriteRule ^amazon/?$ /seed-saiyasu/ [R=301,L]
+RewriteRule ^ippan/?$ /seed-saiyasu/ [R=301,L]
+RewriteRule ^kutikomi/?$ /seed-saiyasu/ [R=301,L]
+
+# ---- シード関連(乱視用) ----
+RewriteRule ^ranshi/?$ /seed-ranshi-saiyasu/ [R=301,L]
+RewriteRule ^ranshi1hako/?$ /seed-ranshi-saiyasu/ [R=301,L]
+RewriteRule ^ranshi2hako/?$ /seed-ranshi-saiyasu/ [R=301,L]
+RewriteRule ^ranshi6hako/?$ /seed-ranshi-saiyasu/ [R=301,L]
+
+# ---- 誤って紛れ込んでいた、モイスト関連の旧バージョンページ ----
+# index2: モイスト乱視用
+RewriteRule ^index2/?$ /moist-ranshi-saiyasu/ [R=301,L]
+# index3〜9・11〜15: モイスト(通常)関連(口コミ・処方箋不要等の切り口違い)
+RewriteRule ^index[3-9]/?$ /moist-saiyasu/ [R=301,L]
+RewriteRule ^index1[1-5]/?$ /moist-saiyasu/ [R=301,L]
+# index10: シードワンデーピュアうるおいプラス
+RewriteRule ^index10/?$ /seed-saiyasu/ [R=301,L]
+# index16: モイストマルチフォーカル
+RewriteRule ^index16/?$ /moist-multifocal-saiyasu/ [R=301,L]
+
+# ---- ドメイン直下(トップページ完成までの暫定措置) ----
+# トップページが完成したら、この2行は削除する
+RewriteRule ^$ /seed-saiyasu/ [R=301,L]
+RewriteRule ^index\.html?$ /seed-saiyasu/ [R=301,L]
 
