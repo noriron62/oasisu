@@ -42,6 +42,7 @@ import {
   renderHeroSection,
   formatUpdatedText,
   buildJsonLd,
+  buildBreadcrumbJsonLd,
   todayJstDateString,
   updatePriceHistory,
   renderPriceHistorySection,
@@ -323,12 +324,28 @@ async function buildOneProduct(product, template) {
     CANONICAL_URL: escapeHtml(canonicalUrl),
     SEARCH_CONSOLE_VERIFICATION: product.searchConsoleVerification || "",
     THEME_STYLE: renderThemeStyle(product.theme),
-    JSON_LD: buildJsonLd({
-      productName: product.productSchemaName,
-      siteName: product.siteName,
-      allItems,
-      brandName: product.brandName,
-    }),
+    JSON_LD:
+      buildJsonLd({
+        productName: product.productSchemaName,
+        siteName: product.siteName,
+        allItems,
+        brandName: product.brandName,
+      }) +
+      "\n" +
+      buildBreadcrumbJsonLd({
+        siteBaseUrl: SITE_BASE_URL,
+        productName: product.shortName || product.siteName,
+        productUrl: canonicalUrl,
+      }),
+    BREADCRUMB_HTML: `  <nav class="breadcrumb" aria-label="パンくずリスト">
+    <a href="/">ホーム</a><span class="sep">&gt;</span><span>${escapeHtml(product.shortName || product.siteName)}</span>
+  </nav>`,
+    PRODUCT_LIST_FOOTER_HTML: products
+      .map(
+        (p) =>
+          `        <a href="/${p.slug}/">${escapeHtml(p.shortName || p.siteName)}</a>`
+      )
+      .join("\n"),
     UPDATED_TEXT: escapeHtml(formatUpdatedText(updatedAt)),
     HERO_SECTION: overallBest
       ? renderHeroSection(overallBest, overallBestUnit.heroLabel, overallBestUnit.heroName)
