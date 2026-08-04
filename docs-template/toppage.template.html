@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+{{SEARCH_CONSOLE_VERIFICATION}}
+<title>{{PAGE_TITLE}}</title>
+<meta name="description" content="{{META_DESCRIPTION}}" />
+<link rel="canonical" href="{{CANONICAL_URL}}" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="{{PAGE_TITLE}}" />
+<meta property="og:description" content="{{META_DESCRIPTION}}" />
+<meta property="og:url" content="{{CANONICAL_URL}}" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+{{JSON_LD}}
+</head>
+<body>
+
+<!-- トップ画像：ご自身で用意した画像に差し替える場合は images/hero.jpg を配置してください -->
+{{HERO_IMAGE_HTML}}
+
+<div class="wrap">
+
+  <header class="top">
+    <span class="eyebrow">Daily Price Check</span>
+    <h1>{{PAGE_TITLE}}</h1>
+    <p class="subtitle">{{SUBTITLE}}</p>
+    <div class="trust-strip">
+      <span class="trust-pill">毎日更新！</span>
+      <span class="trust-pill">楽天市場 × Yahoo!ショッピング</span>
+      <span class="trust-pill">{{PRODUCT_COUNT}}商品を比較中</span>
+    </div>
+    <div class="jump-nav">
+{{JUMP_NAV_HTML}}
+    </div>
+  </header>
+
+  <div class="value-explainer about-box">
+    <h2 class="section-heading">このサイトについて</h2>
+    <p>
+      当サイトでは、人気の1日使い捨てコンタクトレンズについて、楽天市場・Yahoo!ショッピング両方の価格を毎日チェックし、ショップ別の最安値ランキングを掲載しています。
+    </p>
+    <ul>
+      <li>商品ごとに複数の購入単位(箱数・パック)で比較</li>
+      <li>1枚あたりの単価で、本当にお得な買い方が分かる</li>
+      <li>価格推移グラフで、値上がり・値下がりの傾向も確認できる</li>
+    </ul>
+    <p>あなたの使用しているコンタクトレンズの最安値がきっと見つかりますよ。</p>
+  </div>
+
+  <div class="today-banner">{{TODAY_TEXT}}現在の最安値はこちら！</div>
+
+{{BRAND_SECTIONS_HTML}}
+
+  <section class="column-section" aria-label="コンタクトレンズ選びのコラム">
+    <h2 class="section-heading">コンタクトレンズ選びのコラム</h2>
+    <p class="column-sub">購入前に知っておきたい、よくある疑問をまとめました</p>
+    <div class="column-grid">
+{{COLUMN_HTML}}
+    </div>
+  </section>
+
+  <footer class="sitemap">
+    <div>
+      <h3>商品一覧</h3>
+      <div class="links">
+{{FOOTER_LINKS_HTML}}
+      </div>
+    </div>
+    <a class="op-link" href="/about/">運営者情報 →</a>
+  </footer>
+
+</div>
+</body>
+</html>
