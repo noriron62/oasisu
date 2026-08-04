@@ -35,9 +35,3 @@ RewriteRule ^index1[1-5]/?$ /moist-saiyasu/ [R=301,L]
 RewriteRule ^index10/?$ /seed-saiyasu/ [R=301,L]
 # index16: モイストマルチフォーカル
 RewriteRule ^index16/?$ /moist-multifocal-saiyasu/ [R=301,L]
-
-# ---- ドメイン直下(トップページ完成までの暫定措置) ----
-# トップページが完成したら、この2行は削除する
-RewriteRule ^$ /seed-saiyasu/ [R=301,L]
-RewriteRule ^index\.html?$ /seed-saiyasu/ [R=301,L]
-
