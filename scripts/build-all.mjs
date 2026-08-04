@@ -25,6 +25,7 @@ import { fileURLToPath } from "node:url";
 
 import { products } from "./products.config.mjs";
 import { generateRootFiles } from "./generate-root-files.mjs";
+import { generateTopPage } from "./generate-top-page.mjs";
 import {
   escapeHtml,
   renderTemplate,
@@ -243,6 +244,8 @@ async function buildOneProduct(product, template) {
     keyword: product.searchKeyword,
     updatedAt,
     overallBest,
+    // トップページのカード表示で「(6箱換算)」のように単位を出すために保持しておく
+    overallBestUnitLabel: overallBestUnit ? overallBestUnit.label : null,
     units: unitResults.map(({ unit, rakutenRanking, yahooRanking }) => ({
       key: unit.key,
       label: unit.label,
@@ -367,7 +370,19 @@ Sitemap: ${canonicalUrl}sitemap.xml
     ({ unit, rakutenRanking, yahooRanking }) =>
       `${unit.label}: 楽天${rakutenRanking.length}件/Yahoo!${yahooRanking.length}件`
   );
-  return { ok: true, summary: summaryParts.join(" / ") };
+
+  // トップページの商品カードで使う「本日の総合最安値」情報。
+  // overallBestが無い(該当商品が1件も見つからなかった)場合はnullを返す。
+  const topPageCard = overallBest
+    ? {
+        perBoxPrice: Math.round(overallBest.rawUnitPrice * (product.lensesPerBox || 30)),
+        lensesPerBox: product.lensesPerBox || 30,
+        unitPrice: overallBest.unitPrice,
+        unitLabel: overallBestUnit.label,
+      }
+    : null;
+
+  return { ok: true, summary: summaryParts.join(" / "), topPageCard };
 }
 
 async function main() {
@@ -426,6 +441,12 @@ async function main() {
   // 絞り込みに関わらず、常に全商品分を対象に再生成する
   // （商品を1つ追加しただけでも索引に反映されるようにするため）。
   await generateRootFiles();
+
+  // トップページも同様に、PRODUCT_ID の絞り込みに関わらず常に全商品分を
+  // 対象に再生成する（各商品の最新 data.json から値を読み込むため、
+  // 一部商品だけをビルドした場合でも他商品のカードは前回分の値のまま
+  // 正しく表示される）。
+  await generateTopPage();
 }
 
 main().catch((err) => {
