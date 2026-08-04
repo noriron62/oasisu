@@ -899,3 +899,12 @@ footer.sitemap h3 { font-size: 13px; color: var(--ink-soft); margin: 0 0 10px; }
 footer.sitemap .links { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
 footer.sitemap .links a { color: var(--ink-soft); }
 footer.sitemap .op-link { font-size: 12px; color: var(--teal); font-weight: 700; white-space: nowrap; }
+
+/* ---------- パンくずリスト ---------- */
+.breadcrumb {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin: -8px 0 20px;
+}
+.breadcrumb a { color: var(--teal); }
+.breadcrumb .sep { margin: 0 6px; color: var(--line); }
