@@ -1,7 +1,7 @@
 {
   "siteName": "シードワンデーピュアうるおいプラス最安値通販価格情報",
   "keyword": "ワンデーピュアうるおいプラス",
-  "updatedAt": "2026-08-04T12:06:15.246Z",
+  "updatedAt": "2026-08-04T13:14:25.912Z",
   "overallBest": {
     "rank": 1,
     "source": "Yahoo!ショッピング",
@@ -21,6 +21,7 @@
     "boxUnitPrice": 1463,
     "lensesPerBox": 32
   },
+  "overallBestUnitLabel": "96枚×2箱セット(192枚)",
   "units": [
     {
       "key": "box96x2",
@@ -383,25 +384,6 @@
         {
           "rank": 4,
           "source": "Yahoo!ショッピング",
-          "name": "ワンデーピュア うるおいプラス 96枚 1箱 送料無料 ソフトコンタクトレンズ コンタクトレンズ 1DAY",
-          "caption": null,
-          "catchcopy": "ワンデーピュア うるおいプラス 96枚入り 1day ワンデー",
-          "itemCode": "lensget_sd1dpup96",
-          "shop": "コンタクト通販 レンズゲット",
-          "price": 4950,
-          "url": "https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3306714&pid=892662190&vc_url=https%3A%2F%2Fstore.shopping.yahoo.co.jp%2Flensget%2Fsd1dpup96.html",
-          "reviewUrl": "https://store.shopping.yahoo.co.jp/lensget/sd1dpup96.html",
-          "reviewCount": 12,
-          "reviewAverage": 4.67,
-          "image": "https://item-shopping.c.yimg.jp/i/g/lensget_sd1dpup96",
-          "unitPrice": 52,
-          "rawUnitPrice": 51.5625,
-          "boxUnitPrice": 1650,
-          "lensesPerBox": 32
-        },
-        {
-          "rank": 5,
-          "source": "Yahoo!ショッピング",
           "name": "ワンデーピュア うるおいプラス 96枚 1箱 ソフトコンタクトレンズ コンタクトレンズ 1DAY",
           "caption": null,
           "catchcopy": "ワンデーピュア うるおいプラス 96枚入り 1day ワンデー",
@@ -413,6 +395,25 @@
           "reviewCount": 13,
           "reviewAverage": 4.46,
           "image": "https://item-shopping.c.yimg.jp/i/g/lens-apple_sd1dpup96",
+          "unitPrice": 52,
+          "rawUnitPrice": 51.5625,
+          "boxUnitPrice": 1650,
+          "lensesPerBox": 32
+        },
+        {
+          "rank": 5,
+          "source": "Yahoo!ショッピング",
+          "name": "ワンデーピュア うるおいプラス 96枚 1箱 送料無料 ソフトコンタクトレンズ コンタクトレンズ 1DAY",
+          "caption": null,
+          "catchcopy": "ワンデーピュア うるおいプラス 96枚入り 1day ワンデー",
+          "itemCode": "lensget_sd1dpup96",
+          "shop": "コンタクト通販 レンズゲット",
+          "price": 4950,
+          "url": "https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3306714&pid=892662190&vc_url=https%3A%2F%2Fstore.shopping.yahoo.co.jp%2Flensget%2Fsd1dpup96.html",
+          "reviewUrl": "https://store.shopping.yahoo.co.jp/lensget/sd1dpup96.html",
+          "reviewCount": 12,
+          "reviewAverage": 4.67,
+          "image": "https://item-shopping.c.yimg.jp/i/g/lensget_sd1dpup96",
           "unitPrice": 52,
           "rawUnitPrice": 51.5625,
           "boxUnitPrice": 1650,
