@@ -502,6 +502,19 @@ export function formatUpdatedText(updatedAt) {
   return `最終更新: ${formatted}`;
 }
 
+/** パンくずリストの構造化データ（BreadcrumbList）を生成する */
+export function buildBreadcrumbJsonLd({ siteBaseUrl, productName, productUrl }) {
+  const json = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "ホーム", item: `${siteBaseUrl}/` },
+      { "@type": "ListItem", position: 2, name: productName, item: productUrl },
+    ],
+  };
+  return `<script type="application/ld+json">${JSON.stringify(json)}</script>`;
+}
+
 /** 構造化データ（JSON-LD, schema.org Product）を生成する */
 export function buildJsonLd({ productName, siteName, allItems, brandName }) {
   if (allItems.length === 0) return "";
