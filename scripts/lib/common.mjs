@@ -605,17 +605,24 @@ function historyDotColor(source) {
 /** 折れ線グラフ(SVG)を生成する */
 function renderHistoryChart(history) {
   const W = 640;
-  const H = 220;
-  const PAD_L = 50;
+  const H = 240;
+  const PAD_L = 40;
   const PAD_R = 20;
-  const PAD_T = 20;
+  const PAD_T = 36; // 点の上に金額ラベルを出すため、上の余白を広めに取る
   const PAD_B = 30;
   const chartW = W - PAD_L - PAD_R;
   const chartH = H - PAD_T - PAD_B;
 
   const prices = history.map((h) => h.price);
-  const vMin = Math.min(...prices);
-  const vMax = Math.max(...prices);
+  const rawMin = Math.min(...prices);
+  const rawMax = Math.max(...prices);
+  const rawRange = rawMax - rawMin;
+  // 期間中まったく価格が変わらない（または変動がごくわずかな）場合、
+  // そのままだと計算上すべての点が最下段に張り付いてしまうため、
+  // 上下に一定の余白（パディング）を設けて、見やすい高さに表示する。
+  const padding = rawRange > 0 ? rawRange * 0.25 : Math.max(rawMax * 0.03, 5);
+  const vMin = rawMin - padding;
+  const vMax = rawMax + padding;
   const vRange = vMax - vMin || 1;
 
   const xAt = (i) => PAD_L + (chartW * i) / Math.max(history.length - 1, 1);
@@ -623,26 +630,41 @@ function renderHistoryChart(history) {
 
   const points = history.map((h, i) => [xAt(i), yAt(h.price)]);
   const pathD = "M " + points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" L ");
-  const areaD =
-    pathD +
-    ` L ${points[points.length - 1][0].toFixed(1)},${(PAD_T + chartH).toFixed(1)}` +
-    ` L ${points[0][0].toFixed(1)},${(PAD_T + chartH).toFixed(1)} Z`;
 
-  const minIdx = prices.indexOf(vMin);
-  const [minX, minY] = points[minIdx];
+  // 点が多いと金額ラベルが重なって読めなくなるため、件数が少ない時は
+  // 全点に、多い時は「最初・最後・最安値・最高値」だけに絞ってラベルを出す
+  const labelIdxs = new Set();
+  if (history.length <= 12) {
+    history.forEach((_, i) => labelIdxs.add(i));
+  } else {
+    labelIdxs.add(0);
+    labelIdxs.add(history.length - 1);
+    labelIdxs.add(prices.indexOf(rawMin));
+    labelIdxs.add(prices.lastIndexOf(rawMax));
+  }
 
   const dots = history
     .map((h, i) => {
       const [x, y] = points[i];
-      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5" fill="${historyDotColor(h.source)}" />`;
+      const r = 7;
+      let labelSvg = "";
+      if (labelIdxs.has(i)) {
+        // 山（周りより高い）の点はラベルを下に、それ以外は上に出して重なりを減らす
+        const prevY = i > 0 ? points[i - 1][1] : y;
+        const nextY = i < points.length - 1 ? points[i + 1][1] : y;
+        const isPeak = y <= prevY && y <= nextY;
+        const labelY = isPeak ? y + r + 16 : y - r - 8;
+        labelSvg = `<text x="${x.toFixed(1)}" y="${labelY.toFixed(1)}" font-size="13" font-weight="700" fill="var(--ink)" text-anchor="middle" font-family="var(--mono)">${h.price.toLocaleString("ja-JP")}</text>`;
+      }
+      return `${labelSvg}\n  <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${historyDotColor(h.source)}" />`;
     })
     .join("\n");
 
   // X軸ラベルは5件おき＋最終日
-  const labelIdxs = new Set();
-  for (let i = 0; i < history.length; i += 5) labelIdxs.add(i);
-  labelIdxs.add(history.length - 1);
-  const labels = [...labelIdxs]
+  const xLabelIdxs = new Set();
+  for (let i = 0; i < history.length; i += 5) xLabelIdxs.add(i);
+  xLabelIdxs.add(history.length - 1);
+  const xLabels = [...xLabelIdxs]
     .map((i) => {
       const [x] = points[i];
       const d = new Date(history[i].date);
@@ -652,11 +674,11 @@ function renderHistoryChart(history) {
     .join("\n");
 
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
-  <path d="${areaD}" fill="var(--teal-dim)" stroke="none" />
-  <path d="${pathD}" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+  <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${PAD_T + chartH}" stroke="var(--line)" stroke-width="1.5" />
+  <line x1="${PAD_L}" y1="${PAD_T + chartH}" x2="${W - PAD_R}" y2="${PAD_T + chartH}" stroke="var(--line)" stroke-width="1.5" />
+  <path d="${pathD}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" />
   ${dots}
-  <circle cx="${minX.toFixed(1)}" cy="${minY.toFixed(1)}" r="6" fill="none" stroke="var(--gold)" stroke-width="2.5" />
-  ${labels}
+  ${xLabels}
 </svg>`;
 }
 
