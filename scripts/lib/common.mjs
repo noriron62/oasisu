@@ -165,6 +165,24 @@ export function hasRxCode(text) {
 }
 
 /** 楽天市場から商品を取得する（フィルタ前の生データを返す。複数ページ・価格帯指定に対応） */
+/**
+ * 楽天APIへのfetchを行う。429（利用制限）が返ってきた場合、一時的な
+ * 制限に達しただけの可能性が高いため、少し待ってから自動的に再試行する
+ * （Yahoo!側に追加した仕組みと同じ考え方）。
+ */
+async function fetchRakutenWithRetry(url, options, retriesLeft = 3) {
+  const res = await fetch(url, options);
+  if (res.status === 429 && retriesLeft > 0) {
+    const waitMs = 5000; // 楽天は「1秒後に再試行してください」と言われることが多いため、余裕を見て5秒待つ
+    console.warn(
+      `  [warn] 楽天API 429（利用制限）を検知。${waitMs / 1000}秒待って再試行します（残り${retriesLeft}回）`
+    );
+    await sleep(waitMs);
+    return fetchRakutenWithRetry(url, options, retriesLeft - 1);
+  }
+  return res;
+}
+
 export async function fetchRakutenRaw({
   keyword,
   appId,
@@ -204,7 +222,7 @@ export async function fetchRakutenRaw({
     if (maxPrice) url.searchParams.set("maxPrice", String(Math.round(maxPrice)));
 
     await throttleRakuten(); // 前回の楽天APIリクエストから一定時間空ける
-    const res = await fetch(url, {
+    const res = await fetchRakutenWithRetry(url, {
       headers: { Origin: siteUrl, Referer: siteUrl },
     });
     if (!res.ok) {
