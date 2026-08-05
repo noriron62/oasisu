@@ -844,8 +844,8 @@ footer.bottom {
   scroll-margin-top: 20px;
 }
 .top-product-card .thumb {
-  width: 64px;
-  height: 64px;
+  width: 92px;
+  height: 92px;
   border-radius: 10px;
   background: #fff;
   flex-shrink: 0;
@@ -864,7 +864,7 @@ footer.bottom {
 .top-product-card .price-main {
   font-family: var(--mono);
   font-weight: 700;
-  font-size: 22px;
+  font-size: 30px;
   color: var(--card-c, var(--teal));
   line-height: 1;
 }
