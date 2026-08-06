@@ -24,13 +24,27 @@ function parseYen(text) {
 
 /**
  * HTML中から価格らしき数値を、複数の方法を順番に試して抽出する。
- * 1. schema.org の JSON-LD（"price":1234 のような構造化データ）
- * 2. schema.org の itemprop="price" 属性（<span itemprop="price" content="1234">）
- * 3. OGP系の価格メタタグ（<meta property="product:price:amount" content="1234">）
- * 4. 「販売価格」「税込価格」等のラベル直後に出てくる¥表記（最終手段・やや大雑把）
+ * expectedQty を渡すと、「1箱あたり」表記しか見つからないサイト
+ * （例: レンズラボ）でも、単価×箱数で合計金額を計算できる。
+ *
+ * 1. 「1箱あたり」直後の¥表記 × 箱数（最も信頼できる。サイトによっては
+ *    構造化データが箱数に関わらず固定値を返すことがあるため、これを優先する）
+ * 2. schema.org の JSON-LD
+ * 3. schema.org の itemprop="price" 属性
+ * 4. OGP系の価格メタタグ
+ * 5. 「販売価格」「税込価格」等のラベル直後に出てくる¥表記（最終手段）
  */
-export function extractPrice(html) {
-  // 1. JSON-LD
+export function extractPrice(html, { expectedQty } = {}) {
+  // 1. 「1箱あたり」直後の¥表記（単価）× 箱数
+  if (expectedQty) {
+    const perBoxMatch = html.match(/1箱あたり[^\d¥￥]{0,5}[¥￥]\s*([\d,，]{3,8})/);
+    if (perBoxMatch) {
+      const perBox = parseYen(perBoxMatch[1]);
+      if (perBox) return { price: perBox * expectedQty, method: `1箱あたり×${expectedQty}` };
+    }
+  }
+
+  // 2. JSON-LD
   const jsonLdBlocks = [...html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
   for (const block of jsonLdBlocks) {
     try {
@@ -47,7 +61,7 @@ export function extractPrice(html) {
     }
   }
 
-  // 2. schema.orgのitemprop="price"属性
+  // 3. schema.orgのitemprop="price"属性
   const itempropMatch = html.match(
     /itemprop=["']price["'][^>]*(?:content=["']([\d.,]+)["']|>([\s\d,，円¥]{1,12}))/i
   );
@@ -56,7 +70,7 @@ export function extractPrice(html) {
     if (price) return { price, method: "itemprop" };
   }
 
-  // 3. OGPの価格メタタグ
+  // 4. OGPの価格メタタグ
   const metaMatch = html.match(
     /<meta[^>]*property=["']product:price:amount["'][^>]*content=["']([\d.,]+)["']/i
   );
@@ -65,7 +79,7 @@ export function extractPrice(html) {
     if (price) return { price, method: "OGPメタタグ" };
   }
 
-  // 4. 「販売価格」「税込価格」等のラベル直後の¥表記（最終手段）
+  // 5. 「販売価格」「税込価格」等のラベル直後の¥表記（最終手段）
   const labelMatch = html.match(
     /(?:販売価格|税込価格|税込|通常価格|商品価格|価格)[^\d¥￥]{0,20}[¥￥]?\s*([\d,，]{3,8})\s*円?/
   );
@@ -88,8 +102,9 @@ function debugYenCandidates(html) {
   return matches.slice(0, 5).map((m) => m[0].trim());
 }
 
-/** 指定URLのページを取得し、価格を抽出する。取得・抽出に失敗した場合は null を返す */
-export async function scrapeShopPrice(url) {
+/** 指定URLのページを取得し、価格を抽出する。取得・抽出に失敗した場合は null を返す。
+ *  expectedQty を渡すと、「1箱あたり」表記から合計金額を計算できる。 */
+export async function scrapeShopPrice(url, expectedQty) {
   try {
     const res = await fetch(url, {
       headers: { "User-Agent": USER_AGENT },
@@ -99,7 +114,7 @@ export async function scrapeShopPrice(url) {
       return null;
     }
     const html = await res.text();
-    const { price, method } = extractPrice(html);
+    const { price, method } = extractPrice(html, { expectedQty });
 
     // 常に候補を表示しておく（成功時も、想定と違う値を拾っていないか
     // 目視確認できるようにするため）
