@@ -533,6 +533,101 @@ export function buildBreadcrumbJsonLd({ siteBaseUrl, productName, productUrl }) 
   return `<script type="application/ld+json">${JSON.stringify(json)}</script>`;
 }
 
+/**
+ * 「処方箋不要」専門ショップ(レンズモード・レンズラボ等)の比較セクションを
+ * 生成する。shopResults は [{ name, shippingFor, quantities: [{ qty, productPrice, affiliateUrl }] }] の形。
+ * 価格が取得できなかった(productPriceがnull)組み合わせはセルごと非表示にする。
+ */
+export function renderRxFreeSection({ productName, quantities, shopResults }) {
+  // 全ショップ×全数量の中から、1枚あたり単価が最も安い組み合わせを探す
+  // （標準サイズ=1箱30枚として計算）
+  let best = null;
+  for (const shop of shopResults) {
+    for (const q of shop.quantities) {
+      if (q.productPrice === null) continue;
+      const total = q.productPrice + shop.shippingFor(q.qty);
+      const unitPrice = total / (q.qty * 30);
+      if (!best || unitPrice < best.unitPrice) {
+        best = { shopName: shop.name, qty: q.qty, total, unitPrice, affiliateUrl: q.affiliateUrl };
+      }
+    }
+  }
+
+  const heroHtml = best
+    ? `  <section class="hero" style="margin-bottom:20px;">
+    <p class="hero-label">本日の処方箋不要 総合最安値（1枚あたり）</p>
+    <p class="hero-price"><span class="yen">¥</span><span>${yen(best.total)}</span></p>
+    <p class="hero-unit">1箱(30枚)あたり ¥${yen(Math.round(best.total / best.qty))} ・ 1枚あたり ¥${Math.round(best.unitPrice)}</p>
+    <div class="hero-meta">
+      <span class="hero-name">${escapeHtml(productName)} ${best.qty}箱セット(${best.qty * 30}枚・送料込み)</span>
+      <span class="badge">${escapeHtml(best.shopName)}</span>
+    </div>
+    <a class="hero-cta" href="${escapeHtml(best.affiliateUrl)}" target="_blank" rel="noopener sponsored">
+      このショップで見る →
+    </a>
+  </section>`
+    : "";
+
+  // 数量ごとに、どのショップが最安かを求める(「最安」バッジ用)
+  const bestShopByQty = {};
+  for (const qty of quantities) {
+    let cheapest = null;
+    for (const shop of shopResults) {
+      const q = shop.quantities.find((x) => x.qty === qty);
+      if (!q || q.productPrice === null) continue;
+      const total = q.productPrice + shop.shippingFor(qty);
+      if (!cheapest || total < cheapest.total) cheapest = { shopName: shop.name, total };
+    }
+    if (cheapest) bestShopByQty[qty] = cheapest.shopName;
+  }
+
+  const shopCardsHtml = shopResults
+    .map((shop) => {
+      const cellsHtml = quantities
+        .map((qty) => {
+          const q = shop.quantities.find((x) => x.qty === qty);
+          if (!q || q.productPrice === null) {
+            return `        <div class="rx-price-cell" style="opacity:.5;">
+          <div class="unit">${qty}箱(送料込み)</div><div class="unit-note">現在取得できません</div>
+        </div>`;
+          }
+          const shipping = shop.shippingFor(qty);
+          const total = q.productPrice + shipping;
+          const perBox = Math.round(total / qty);
+          const isBest = bestShopByQty[qty] === shop.name;
+          return `        <a class="rx-price-cell${isBest ? " best" : ""}" href="${escapeHtml(q.affiliateUrl)}" target="_blank" rel="noopener sponsored">
+          <div class="unit">${qty}箱(送料込み)</div><div class="price">¥${yen(total)}</div><div class="unit-note">1箱あたり¥${yen(perBox)}</div><div class="per-box">商品¥${yen(q.productPrice)}+送料¥${yen(shipping)}</div>
+        </a>`;
+        })
+        .join("\n");
+      return `    <div class="rx-shop-card">
+      <p class="shop-title">🟢 ${escapeHtml(shop.name)}</p>
+      <div class="rx-price-grid">
+${cellsHtml}
+      </div>
+    </div>`;
+    })
+    .join("\n\n");
+
+  return `${heroHtml}
+
+  <section class="value-explainer" aria-label="処方箋不要ショップの箱数別価格">
+    <span class="rx-free-badge">処方箋不要で購入できるショップ</span>
+    <p>
+      下記2ショップは、商品ページ上で明確に「処方箋不要」と案内している専門ショップです。
+      <strong>確実に処方箋なしで購入したい方</strong>には、こちらがおすすめです。
+      価格は送料込みで比較しています。
+    </p>
+
+${shopCardsHtml}
+
+    <p class="note">
+      ※ 上記は標準サイズ(30枚入り)1箱あたりの価格です。送料が別途かかる場合、商品ページに記載の送料を含めた金額を掲載しています。
+      表示価格は取得時点のものであり、実際のご購入時点の価格とは異なる場合があります。
+    </p>
+  </section>`;
+}
+
 /** 構造化データ（JSON-LD, schema.org Product）を生成する */
 export function buildJsonLd({ productName, siteName, allItems, brandName }) {
   if (allItems.length === 0) return "";
