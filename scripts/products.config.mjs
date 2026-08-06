@@ -629,6 +629,72 @@ export const products = [
     brand: "クーパービジョン", // トップページのブランド別グルーピングに使用
     brandKey: "coopervision",
     shortName: "プロクリアワンデー", // トップページの商品カード・フッターで使う短い正式名称
+    // 処方箋不要ショップのセクションを新設した分、ページが長くなりすぎない
+    // よう、楽天/Yahoo!ランキングは各ベスト3に絞る
+    rankingTopN: 3,
+
+    // 「処方箋不要」を明言している専門ショップ（楽天/Yahoo!とは別に、
+    // HTMLスクレイピングで価格を取得する）。1/2/4/6箱それぞれの
+    // 商品ページURLと、A8.net経由のアフィリエイトリンクを保持する。
+    rxFreeShops: {
+      quantities: [1, 2, 4, 6],
+      shops: [
+        {
+          name: "レンズモード",
+          // 送料: 300円×箱数（最低1,000円）
+          shippingFor: (boxes) => Math.max(300 * boxes, 1000),
+          pages: {
+            1: {
+              scrapeUrl: "https://www.lensmode.com/goods/index/gc/CP1/",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FCP1%2F",
+            },
+            2: {
+              scrapeUrl: "https://www.lensmode.com/goods/index/gc/CP1!2/",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FCP1%212%2F",
+            },
+            4: {
+              scrapeUrl: "https://www.lensmode.com/goods/index/gc/CP1!4/",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FCP1%214%2F",
+            },
+            6: {
+              scrapeUrl: "https://www.lensmode.com/goods/index/gc/CP1!6/",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FCP1%216%2F",
+            },
+          },
+        },
+        {
+          name: "レンズラボ",
+          // 送料: 全国一律700円
+          shippingFor: () => 700,
+          pages: {
+            1: {
+              scrapeUrl: "https://www.lens-labo.com/item/detail?itemcd=L0012-1",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=2ZH1FY+BRCL9U+3SZ4+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lens-labo.com%2Fitem%2Fdetail%3Fitemcd%3DL0012-1",
+            },
+            2: {
+              scrapeUrl: "https://www.lens-labo.com/item/detail?itemcd=L0012-2",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=2ZH1FY+BRCL9U+3SZ4+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lens-labo.com%2Fitem%2Fdetail%3Fitemcd%3DL0012-2",
+            },
+            4: {
+              scrapeUrl: "https://www.lens-labo.com/item/detail?itemcd=L0012-4",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=2ZH1FY+BRCL9U+3SZ4+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lens-labo.com%2Fitem%2Fdetail%3Fitemcd%3DL0012-4",
+            },
+            6: {
+              scrapeUrl: "https://www.lens-labo.com/item/detail?itemcd=L0012-6",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=2ZH1FY+BRCL9U+3SZ4+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lens-labo.com%2Fitem%2Fdetail%3Fitemcd%3DL0012-6",
+            },
+          },
+        },
+      ],
+    },
 
     /** 商品名が「プロクリアワンデー」（マルチフォーカル・乱視用ではない）であることを確認する */
     isCorrectProduct(name) {
@@ -750,15 +816,21 @@ export const products = [
 
     productIntroHtml: `    <h2 class="section-heading">処方箋不要で購入できるショップを中心に比較しています</h2>
     <p>
-      プロクリアワンデーは、コンタクトレンズの中でも「処方箋の提示が不要」な
+      プロクリアワンデーは、コンタクトレンズの中でも「処方箋の提示が必要」な
       ショップで取り扱われることが多い商品です。当サイトでは、商品名や説明文に
-      「処方箋あり」「要処方箋」などと明記された商品はあらかじめ除外しており、
-      <strong>処方箋不要で購入できるショップを中心に</strong>価格を比較しています。
+      「処方箋あり」「処方箋必要」などと明記された商品はあらかじめ除外していて、
+      処方箋不要で購入できるショップを中心に価格を比較しています。
+    </p>
+    <p>
+      楽天・Yahooで扱っているお店は処方箋が必要です。でも店頭で購入するよりは
+      安いので処方箋を用意できる方は、ぜひ利用したいですね！
+      処方箋が不要というと一般激安サイトで手にすることになりますが、安いサイトも
+      ありますので、参考にしてくださいね。掲載金額はもちろん送料無料（又は込み）です。
     </p>
     <p>
       あわせて、購入する数量によって1枚あたりの単価が変わる点にも注目しています。
-      1箱(30枚)だけの購入は単価が割高になりがちですが、<strong>90枚入り×2箱セット
-      (180枚)</strong>は、まとめ買い向けに価格設定しているショップが多く、
+      1箱(30枚)だけの購入は単価が割高になりがちですが、90枚入り×2箱セット
+      (180枚)は、まとめ買い向けに価格設定しているショップが多く、
       1枚あたりの単価がもっとも下がりやすい傾向があります。そのため当サイトでは、
       90枚×2箱セットを中心に比較しつつ、90枚1箱・標準サイズの2箱・1箱で
       見つかった場合も、それぞれ別枠であわせて掲載しています。
@@ -767,7 +839,10 @@ export const products = [
       ※ 「処方箋不要」とは、購入時に処方箋の提示を求めないショップがある、という
       販売形態の説明であり、眼科での検査が不要という意味ではありません。
       コンタクトレンズは高度管理医療機器です。目の健康のため、定期的に眼科での
-      検査を受けたうえでご購入・ご使用ください。
+      検査を受けたうえでご購入・ご使用くださいね。
+    </p>
+    <p style="text-align:center; font-weight:700; color:var(--teal); margin-top:16px;">
+      瞳を美しく維持するためにも…..
     </p>`,
 
     productInfoHeading: "プロクリアワンデーとは",

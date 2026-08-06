@@ -26,6 +26,7 @@ import { fileURLToPath } from "node:url";
 import { products } from "./products.config.mjs";
 import { generateRootFiles } from "./generate-root-files.mjs";
 import { generateTopPage } from "./generate-top-page.mjs";
+import { scrapeShopPrice } from "./lib/scrape-rx-free.mjs";
 import {
   escapeHtml,
   renderTemplate,
@@ -46,6 +47,7 @@ import {
   todayJstDateString,
   updatePriceHistory,
   renderPriceHistorySection,
+  renderRxFreeSection,
 } from "./lib/common.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -212,8 +214,9 @@ async function buildOneProduct(product, template) {
     for (const i of rakutenCandidates) claimedRakuten.add(itemKey(i));
     for (const i of yahooCandidates) claimedYahoo.add(itemKey(i));
 
-    const rakutenRanking = buildRanking(rakutenCandidates, unit.totalLenses, 5, product.lensesPerBox || 30);
-    const yahooRanking = buildRanking(yahooCandidates, unit.totalLenses, 5, product.lensesPerBox || 30);
+    const topN = product.rankingTopN || 5;
+    const rakutenRanking = buildRanking(rakutenCandidates, unit.totalLenses, topN, product.lensesPerBox || 30);
+    const yahooRanking = buildRanking(yahooCandidates, unit.totalLenses, topN, product.lensesPerBox || 30);
     return { unit, rakutenRanking, yahooRanking };
   });
 
@@ -239,6 +242,92 @@ async function buildOneProduct(product, template) {
   }
 
   const updatedAt = new Date().toISOString();
+
+  // ---- 処方箋不要ショップ(レンズモード・レンズラボ等)の価格取得 ----
+  // rxFreeShops が設定されている商品(今のところプロクリアワンデーのみ)だけ
+  // 対象にする。公式APIが無いため、商品ページを直接取得して価格を読み取る。
+  let rxFreeSectionHtml = "";
+  let rxFreeBestForHistory = null; // 価格推移データ用（別枠で記録する）
+  if (product.rxFreeShops) {
+    const { quantities, shops } = product.rxFreeShops;
+    const shopResults = [];
+    for (const shop of shops) {
+      const shopQuantities = [];
+      for (const qty of quantities) {
+        const page = shop.pages[qty];
+        if (!page) continue;
+        const price = await scrapeShopPrice(page.scrapeUrl);
+        console.log(
+          price !== null
+            ? `  [処方箋不要] ${shop.name} ${qty}箱: ¥${price}`
+            : `  [処方箋不要] ${shop.name} ${qty}箱: 取得失敗`
+        );
+        shopQuantities.push({ qty, productPrice: price, affiliateUrl: page.affiliateUrl });
+      }
+      shopResults.push({ name: shop.name, shippingFor: shop.shippingFor, quantities: shopQuantities });
+    }
+
+    // 総合最安値(処方箋不要側)を、価格推移グラフ用に先に控えておく
+    for (const shop of shopResults) {
+      for (const q of shop.quantities) {
+        if (q.productPrice === null) continue;
+        const total = q.productPrice + shop.shippingFor(q.qty);
+        const rawUnitPrice = total / (q.qty * 30);
+        if (!rxFreeBestForHistory || rawUnitPrice < rxFreeBestForHistory.rawUnitPrice) {
+          rxFreeBestForHistory = {
+            rawUnitPrice,
+            unitPrice: Math.round(rawUnitPrice),
+            price: total,
+            shop: shop.name,
+            source: shop.name,
+            url: q.affiliateUrl,
+            unitLabel: `${q.qty}箱`,
+          };
+        }
+      }
+    }
+
+    const sectionHtml = renderRxFreeSection({
+      productName: product.shortName || product.siteName,
+      quantities,
+      shopResults,
+    });
+
+    // 処方箋不要ショップの価格推移も、処方箋あり側とは別ファイルで
+    // 独立して記録する（両者は買い方の体験が異なるため、あえて1つの
+    // グラフにまとめず、別々のグラフとして持たせる）。
+    let rxFreePriceHistoryHtml = "";
+    if (rxFreeBestForHistory) {
+      const rxHistoryPath = path.join(outDir, "price-history-rxfree.json");
+      let rxHistory = [];
+      try {
+        rxHistory = JSON.parse(await readFile(rxHistoryPath, "utf-8"));
+        if (rxHistory.some((h) => !h.unitLabel)) rxHistory = [];
+      } catch {
+        rxHistory = [];
+      }
+      rxHistory = updatePriceHistory(rxHistory, {
+        date: todayJstDateString(),
+        price: rxFreeBestForHistory.price,
+        unitLabel: rxFreeBestForHistory.unitLabel,
+        source: rxFreeBestForHistory.source,
+        shop: rxFreeBestForHistory.shop,
+        url: rxFreeBestForHistory.url,
+      });
+      await writeFile(rxHistoryPath, JSON.stringify(rxHistory, null, 2), "utf-8");
+      rxFreePriceHistoryHtml = renderPriceHistorySection({
+        history: rxHistory,
+        productName: `${product.shortName || product.siteName}（処方箋不要ショップ）`,
+        lensesPerBox: 30,
+      });
+    }
+
+    rxFreeSectionHtml =
+      sectionHtml +
+      (rxFreePriceHistoryHtml ? `\n\n${rxFreePriceHistoryHtml}` : "") +
+      `\n\n  <hr style="border:none; border-top:1px solid var(--line); margin:32px 0;" />\n\n  <h2 class="section-heading" style="margin-bottom:4px;">処方箋ありでも良ければこちら</h2>`;
+
+  }
 
   const payload = {
     siteName: product.siteName,
@@ -350,6 +439,7 @@ async function buildOneProduct(product, template) {
     HERO_SECTION: overallBest
       ? renderHeroSection(overallBest, overallBestUnit.heroLabel, overallBestUnit.heroName)
       : "",
+    RX_FREE_SECTION: rxFreeSectionHtml,
     PRODUCT_INTRO: product.productIntroHtml,
     UNITS_HTML: unitsHtml,
     PRICE_HISTORY_SECTION: priceHistorySectionHtml,
