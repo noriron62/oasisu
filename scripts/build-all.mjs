@@ -242,6 +242,8 @@ async function buildOneProduct(product, template) {
   }
 
   const updatedAt = new Date().toISOString();
+  const outDir = path.join(ROOT, product.outputDir);
+  await mkdir(outDir, { recursive: true });
 
   // ---- 処方箋不要ショップ(レンズモード・レンズラボ等)の価格取得 ----
   // rxFreeShops が設定されている商品(今のところプロクリアワンデーのみ)だけ
@@ -344,9 +346,6 @@ async function buildOneProduct(product, template) {
       yahoo: yahooRanking,
     })),
   };
-
-  const outDir = path.join(ROOT, product.outputDir);
-  await mkdir(outDir, { recursive: true });
 
   // style.cssは全商品共通のため、docs-template/style.css を正本として
   // 毎回自動的にコピーする（商品ごとに手動で置く必要をなくすため）。
