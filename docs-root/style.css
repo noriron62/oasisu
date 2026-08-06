@@ -911,3 +911,87 @@ footer.sitemap .op-link { font-size: 12px; color: var(--teal); font-weight: 700;
 }
 .breadcrumb a { color: var(--teal); }
 .breadcrumb .sep { margin: 0 6px; color: var(--ink-soft); }
+
+/* ---------- 処方箋不要ショップ(レンズモード/レンズラボ等)セクション ---------- */
+
+.rx-free-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: #1a8a5f;
+  border-radius: 999px;
+  padding: 3px 12px;
+  margin-bottom: 10px;
+}
+.rx-shop-card {
+  background: var(--surface);
+  border: 1.5px solid #1a8a5f;
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 12px;
+}
+.rx-shop-card .shop-title {
+  font-size: 16px;
+  font-weight: 900;
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rx-price-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.rx-price-cell {
+  text-align: center;
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 10px 6px;
+  position: relative;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.rx-price-cell.best {
+  background: #fff6da;
+  border: 2px solid var(--gold);
+}
+.rx-price-cell.best::before {
+  content: "最安";
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gold);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+.rx-price-cell .unit {
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-bottom: 2px;
+}
+.rx-price-cell .price {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 26px;
+  color: #1a8a5f;
+}
+.rx-price-cell .unit-note {
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+.rx-price-cell .per-box {
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+@media (max-width: 480px) {
+  .rx-price-grid { grid-template-columns: repeat(2, 1fr); }
+}
