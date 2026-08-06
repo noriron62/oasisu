@@ -643,24 +643,27 @@ export const products = [
           name: "レンズモード",
           // 送料: 300円×箱数（最低1,000円）
           shippingFor: (boxes) => Math.max(300 * boxes, 1000),
+          // レンズモードはJavaScriptで価格を表示する作りのため、自動取得ができない。
+          // そのため商品価格は固定値（staticPrice）で運用し、運営者が定期的に
+          // （目安2週間ごと）手動で最新価格に更新する方針とする。
           pages: {
             1: {
-              scrapeUrl: "https://www.lensmode.com/goods/index/gc/CP1/",
+              staticPrice: 2230,
               affiliateUrl:
                 "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FCP1%2F",
             },
             2: {
-              scrapeUrl: "https://www.lensmode.com/goods/index/gc/CP1!2/",
+              staticPrice: 4456,
               affiliateUrl:
                 "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FCP1%212%2F",
             },
             4: {
-              scrapeUrl: "https://www.lensmode.com/goods/index/gc/CP1!4/",
+              staticPrice: 8900,
               affiliateUrl:
                 "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FCP1%214%2F",
             },
             6: {
-              scrapeUrl: "https://www.lensmode.com/goods/index/gc/CP1!6/",
+              staticPrice: 13344,
               affiliateUrl:
                 "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FCP1%216%2F",
             },

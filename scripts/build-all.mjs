@@ -258,10 +258,13 @@ async function buildOneProduct(product, template) {
       for (const qty of quantities) {
         const page = shop.pages[qty];
         if (!page) continue;
-        const price = await scrapeShopPrice(page.scrapeUrl);
+        // staticPrice（手動固定値）が設定されているページは、スクレイピングせず
+        // その値をそのまま使う（JavaScript描画等でスクレイピングできないショップ向け）
+        const price =
+          typeof page.staticPrice === "number" ? page.staticPrice : await scrapeShopPrice(page.scrapeUrl, qty);
         console.log(
           price !== null
-            ? `  [処方箋不要] ${shop.name} ${qty}箱: ¥${price}`
+            ? `  [処方箋不要] ${shop.name} ${qty}箱: ¥${price}${typeof page.staticPrice === "number" ? "（固定値）" : ""}`
             : `  [処方箋不要] ${shop.name} ${qty}箱: 取得失敗`
         );
         shopQuantities.push({ qty, productPrice: price, affiliateUrl: page.affiliateUrl });
