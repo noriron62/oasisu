@@ -21,8 +21,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="コンタクトレンズ最安値通販価格情報 毎日更新中！" />
-<meta property="og:description" content="{{META_DESCRIPTION}}" />
-<meta property="og:url" content="{{CANONICAL_URL}}" />
+<meta property="og:description" content="楽天市場・Yahoo!ショッピングの価格を毎日チェックし、人気コンタクトレンズブランドの最安値をショップ別にまとめています。" />
+<meta property="og:url" content="https://newmediagallery.org/" />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -228,6 +228,116 @@
       </a>
     </div>
   </section>
+
+  <section class="spec-compare" aria-label="商品スペック比較表">
+    <h2 class="section-heading">商品スペック比較表</h2>
+    <p class="section-sub">列の見出しをクリックすると並び替え、プルダウンで絞り込みができます</p>
+
+    <div class="spec-controls">
+      <label>タイプで絞り込む:
+        <select id="spec-filter-type"><option value="">すべて</option><option value="標準（近視）">標準（近視）</option><option value="乱視用">乱視用</option><option value="遠近両用">遠近両用</option></select>
+      </label>
+      <label>素材で絞り込む:
+        <select id="spec-filter-material"><option value="">すべて</option><option value="senofilcon A(シリコーンハイドロゲル)">senofilcon A(シリコーンハイドロゲル)</option><option value="etafilcon A">etafilcon A</option><option value="omafilcon A">omafilcon A</option><option value="SIB(国産独自素材)">SIB(国産独自素材)</option><option value="非イオン性素材">非イオン性素材</option><option value="PVA">PVA</option><option value="verofilcon A(シリコーンハイドロゲル)">verofilcon A(シリコーンハイドロゲル)</option></select>
+      </label>
+      <label>UVカットで絞り込む:
+        <select id="spec-filter-uv"><option value="">すべて</option><option value="あり">あり</option><option value="なし">なし</option></select>
+      </label>
+      <label>産地で絞り込む:
+        <select id="spec-filter-origin"><option value="">すべて</option><option value="国産">国産</option><option value="海外">海外</option></select>
+      </label>
+    </div>
+
+    <div class="spec-table-scroll">
+      <table id="spec-table">
+        <thead>
+          <tr>
+            <th class="spec-name-col">商品名</th>
+            <th data-key="price" class="spec-sortable">最安値(1枚あたり) <span class="spec-arrow">▼</span></th>
+            <th data-key="material" class="spec-sortable">素材</th>
+            <th data-key="water" class="spec-sortable">含水率 <span class="spec-arrow">▼</span></th>
+            <th data-key="dk" class="spec-sortable">酸素透過率(Dk/t) <span class="spec-arrow">▼</span></th>
+            <th data-key="uv" class="spec-sortable">UVカット</th>
+            <th data-key="origin" class="spec-sortable">産地</th>
+          </tr>
+        </thead>
+        <tbody id="spec-body"></tbody>
+      </table>
+    </div>
+
+    <div class="spec-note-box">
+      <h3>数値の見方について</h3>
+      <p><strong>含水率</strong>とは、レンズに含まれる水分の割合です。一般的に含水率が高いほど、装用時のうるおいを感じやすい傾向があるとされていますが、周囲の乾燥した環境では水分が蒸発しやすくなり、逆に乾燥を感じやすくなる場合もあるとされています。</p>
+      <p><strong>酸素透過率(Dk/t)</strong>は、レンズがどれだけ酸素を通しやすいかを示す数値です。数値が高いほど角膜に酸素が届きやすく、長時間の装用でも負担を感じにくい傾向があるとされています。シリコーンハイドロゲル素材は、従来素材と比べて酸素透過率が高い傾向があります。</p>
+      <p><strong>素材</strong>は大きく「シリコーンハイドロゲル系」と「従来素材(HEMA系等)」に分かれます。シリコーンハイドロゲル系は高い酸素透過率が特徴とされる一方、従来素材はやわらかい装用感が特徴とされています。どちらが合うかは個人差があるため、実際に試して確かめることをおすすめします。</p>
+    </div>
+  </section>
+
+  <script>
+  (function () {
+    var products = [{"name":"ワンデーアキュビューオアシス","url":"/oasys-saiyasu/","type":"標準（近視）","material":"senofilcon A(シリコーンハイドロゲル)","water":38,"dk":121,"uv":"あり","origin":"海外","price":82},{"name":"ワンデーアキュビューオアシス 乱視用","url":"/oasys-ranshi-saiyasu/","type":"乱視用","material":"senofilcon A(シリコーンハイドロゲル)","water":38,"dk":121,"uv":"あり","origin":"海外","price":111},{"name":"ワンデーアキュビューモイスト","url":"/moist-saiyasu/","type":"標準（近視）","material":"etafilcon A","water":58,"dk":33.3,"uv":"あり","origin":"海外","price":75},{"name":"ワンデーアキュビューモイスト 乱視用","url":"/moist-ranshi-saiyasu/","type":"乱視用","material":"etafilcon A","water":58,"dk":33.3,"uv":"あり","origin":"海外","price":93},{"name":"プロクリアワンデー","url":"/proclear-saiyasu/","type":"標準（近視）","material":"omafilcon A","water":60,"dk":22.8,"uv":"なし","origin":"海外","price":71},{"name":"シードワンデーピュアうるおいプラス","url":"/seed-saiyasu/","type":"標準（近視）","material":"SIB(国産独自素材)","water":58,"dk":42.9,"uv":"あり","origin":"国産","price":46},{"name":"ワンデーアキュビューモイスト マルチフォーカル 遠近両用","url":"/moist-multifocal-saiyasu/","type":"遠近両用","material":"etafilcon A","water":58,"dk":33.3,"uv":"あり","origin":"海外","price":96},{"name":"シードワンデーピュアうるおいプラス 乱視用","url":"/seed-ranshi-saiyasu/","type":"乱視用","material":"SIB(国産独自素材)","water":58,"dk":42.9,"uv":"あり","origin":"国産","price":55},{"name":"メダリストワンデープラス","url":"/medalist-saiyasu/","type":"標準（近視）","material":"非イオン性素材","water":59,"dk":24.4,"uv":"なし","origin":"海外","price":32},{"name":"メダリストワンデープラス 乱視用","url":"/medalist-ranshi-saiyasu/","type":"乱視用","material":"非イオン性素材","water":59,"dk":17.6,"uv":"なし","origin":"海外","price":64},{"name":"プロクリアワンデー マルチフォーカル(遠近両用)","url":"/proclear-multifocal-saiyasu/","type":"遠近両用","material":"omafilcon A","water":60,"dk":22.8,"uv":"なし","origin":"海外","price":82},{"name":"デイリーズアクティブ","url":"/dailies-active-saiyasu/","type":"標準（近視）","material":"PVA","water":69,"dk":26,"uv":"なし","origin":"海外","price":32},{"name":"プレシジョンワン","url":"/precision1-saiyasu/","type":"標準（近視）","material":"verofilcon A(シリコーンハイドロゲル)","water":51,"dk":100,"uv":"あり","origin":"海外","price":79}];
+    var sortKey = "water";
+    var sortDir = -1;
+
+    function render() {
+      var fType = document.getElementById("spec-filter-type").value;
+      var fMaterial = document.getElementById("spec-filter-material").value;
+      var fUv = document.getElementById("spec-filter-uv").value;
+      var fOrigin = document.getElementById("spec-filter-origin").value;
+
+      var rows = products.filter(function (p) {
+        return (!fType || p.type === fType) &&
+          (!fMaterial || p.material === fMaterial) &&
+          (!fUv || p.uv === fUv) &&
+          (!fOrigin || p.origin === fOrigin);
+      });
+
+      if (sortKey) {
+        rows = rows.slice().sort(function (a, b) {
+          var av = a[sortKey], bv = b[sortKey];
+          if (av === null) return 1;
+          if (bv === null) return -1;
+          if (typeof av === "number") return (av - bv) * sortDir;
+          return String(av).localeCompare(String(bv), "ja") * sortDir;
+        });
+      }
+
+      document.querySelectorAll("#spec-table thead th.spec-sortable").forEach(function (th) {
+        th.classList.toggle("spec-sorted", th.dataset.key === sortKey);
+        var arrow = th.querySelector(".spec-arrow");
+        if (arrow) arrow.textContent = sortDir === 1 ? "▲" : "▼";
+      });
+
+      var tbody = document.getElementById("spec-body");
+      tbody.innerHTML = rows.map(function (p) {
+        var priceText = p.price !== null ? "¥" + p.price : "ー";
+        return "<tr>" +
+          "<td class=\"spec-name-col\"><a href=\"" + p.url + "\">" + p.name + "</a></td>" +
+          "<td class=\"spec-price\">" + priceText + "</td>" +
+          "<td>" + p.material + "</td>" +
+          "<td>" + p.water + "%</td>" +
+          "<td>" + p.dk + "</td>" +
+          "<td>" + p.uv + "</td>" +
+          "<td>" + p.origin + "</td>" +
+        "</tr>";
+      }).join("");
+    }
+
+    document.querySelectorAll("#spec-table thead th.spec-sortable").forEach(function (th) {
+      th.addEventListener("click", function () {
+        var key = th.dataset.key;
+        if (sortKey === key) { sortDir *= -1; } else { sortKey = key; sortDir = -1; }
+        render();
+      });
+    });
+
+    ["spec-filter-type", "spec-filter-material", "spec-filter-uv", "spec-filter-origin"].forEach(function (id) {
+      document.getElementById(id).addEventListener("change", render);
+    });
+
+    render();
+  })();
+  </script>
 
   <section class="column-section" aria-label="コンタクトレンズ選びのコラム">
     <h2 class="section-heading">コンタクトレンズ選びのコラム</h2>
