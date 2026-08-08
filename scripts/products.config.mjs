@@ -2426,24 +2426,28 @@ export const products = [
           name: "レンズゼロ",
           // 送料無料（商品ページに明記）
           shippingFor: () => 0,
+          // レンズモードと同じグループのサイトのためかJavaScriptで価格を
+          // 表示する作りで自動取得ができない。商品価格は固定値
+          // （staticPrice）で運用し、運営者が定期的に（目安2週間ごと）
+          // 手動で最新価格に更新する方針とする。
           pages: {
             1: {
-              scrapeUrl: "https://www.lenszero.com/goods/index/gc/C1O/",
+              staticPrice: 3320,
               affiliateUrl:
                 "https://px.a8.net/svt/ejp?a8mat=2ZU4AP+2ZSUNM+76W+TR13N&a8ejpredirect=https%3A%2F%2Fwww.lenszero.com%2Fgoods%2Findex%2Fgc%2FC1O%2F",
             },
             2: {
-              scrapeUrl: "https://www.lenszero.com/goods/index/gc/C1O!2/",
+              staticPrice: 6400,
               affiliateUrl:
                 "https://px.a8.net/svt/ejp?a8mat=2ZU4AP+2ZSUNM+76W+TR13N&a8ejpredirect=https%3A%2F%2Fwww.lenszero.com%2Fgoods%2Findex%2Fgc%2FC1O%212%2F",
             },
             4: {
-              scrapeUrl: "https://www.lenszero.com/goods/index/gc/C1O!4/",
+              staticPrice: 12740,
               affiliateUrl:
                 "https://px.a8.net/svt/ejp?a8mat=2ZU4AP+2ZSUNM+76W+TR13N&a8ejpredirect=https%3A%2F%2Fwww.lenszero.com%2Fgoods%2Findex%2Fgc%2FC1O%214%2F",
             },
             6: {
-              scrapeUrl: "https://www.lenszero.com/goods/index/gc/C1O!6/",
+              staticPrice: 19080,
               affiliateUrl:
                 "https://px.a8.net/svt/ejp?a8mat=2ZU4AP+2ZSUNM+76W+TR13N&a8ejpredirect=https%3A%2F%2Fwww.lenszero.com%2Fgoods%2Findex%2Fgc%2FC1O%216%2F",
             },
