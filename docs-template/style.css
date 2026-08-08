@@ -5,6 +5,7 @@
   --ink-soft: #4b6360;
   --teal: #0c6e6b;
   --teal-dim: #0c6e6b1a;
+  --teal-dim-solid: #e3efed; /* teal-dimの不透明版(固定列の背景など、透過だと重なって見える箇所に使用) */
   --gold: #b8892b;
   --gold-dim: #b8892b14;
   --line: #dce8e5;
@@ -1045,9 +1046,16 @@ footer.sitemap .op-link { font-size: 12px; color: var(--teal); font-weight: 700;
   font-weight: 700;
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.04);
 }
-#spec-table thead th.spec-name-col { background: var(--teal-dim); z-index: 2; }
+#spec-table thead th.spec-name-col { background: var(--teal-dim-solid); z-index: 3; }
 #spec-table td.spec-name-col a { color: var(--teal); text-decoration: none; }
 #spec-table td.spec-price { font-family: var(--mono); font-weight: 700; }
+
+.spec-scroll-hint {
+  font-size: 11px;
+  color: var(--ink-soft);
+  text-align: center;
+  margin: 8px 0 0;
+}
 
 .spec-note-box {
   background: var(--surface);
