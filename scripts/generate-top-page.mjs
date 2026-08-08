@@ -210,6 +210,155 @@ function renderColumnHtml() {
   ).join("\n");
 }
 
+/**
+ * 商品スペック比較表を生成する。素材・含水率・酸素透過率・UVカット等の
+ * 固定スペック(product.specs)と、その日の実勢価格(overallBest)を
+ * 組み合わせて1つの表にする。並び替え・絞り込みはブラウザ側のJSで行う
+ * ため、ここでは全データをJSONとして埋め込むだけにする。
+ */
+function renderSpecCompareTable(productsWithData) {
+  const rows = productsWithData
+    .filter(({ product }) => product.specs)
+    .map(({ product, overallBest }) => {
+      const lensesPerBox = product.lensesPerBox || 30;
+      const price =
+        overallBest && typeof overallBest.rawUnitPrice === "number"
+          ? Math.round(overallBest.rawUnitPrice)
+          : null;
+      return {
+        name: product.shortName,
+        url: `/${product.slug}/`,
+        type: product.specs.type,
+        material: product.specs.material,
+        water: product.specs.water,
+        dk: product.specs.dk,
+        uv: product.specs.uv ? "あり" : "なし",
+        origin: product.specs.origin,
+        price,
+      };
+    });
+
+  const typeOptions = [...new Set(rows.map((r) => r.type))];
+  const materialOptions = [...new Set(rows.map((r) => r.material))];
+
+  const typeOptionsHtml = typeOptions
+    .map((t) => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`)
+    .join("");
+  const materialOptionsHtml = materialOptions
+    .map((m) => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`)
+    .join("");
+
+  return `  <section class="spec-compare" aria-label="商品スペック比較表">
+    <h2 class="section-heading">商品スペック比較表</h2>
+    <p class="section-sub">列の見出しをクリックすると並び替え、プルダウンで絞り込みができます</p>
+
+    <div class="spec-controls">
+      <label>タイプで絞り込む:
+        <select id="spec-filter-type"><option value="">すべて</option>${typeOptionsHtml}</select>
+      </label>
+      <label>素材で絞り込む:
+        <select id="spec-filter-material"><option value="">すべて</option>${materialOptionsHtml}</select>
+      </label>
+      <label>UVカットで絞り込む:
+        <select id="spec-filter-uv"><option value="">すべて</option><option value="あり">あり</option><option value="なし">なし</option></select>
+      </label>
+      <label>産地で絞り込む:
+        <select id="spec-filter-origin"><option value="">すべて</option><option value="国産">国産</option><option value="海外">海外</option></select>
+      </label>
+    </div>
+
+    <div class="spec-table-scroll">
+      <table id="spec-table">
+        <thead>
+          <tr>
+            <th class="spec-name-col">商品名</th>
+            <th data-key="price" class="spec-sortable">最安値(1枚あたり) <span class="spec-arrow">▼</span></th>
+            <th data-key="material" class="spec-sortable">素材</th>
+            <th data-key="water" class="spec-sortable">含水率 <span class="spec-arrow">▼</span></th>
+            <th data-key="dk" class="spec-sortable">酸素透過率(Dk/t) <span class="spec-arrow">▼</span></th>
+            <th data-key="uv" class="spec-sortable">UVカット</th>
+            <th data-key="origin" class="spec-sortable">産地</th>
+          </tr>
+        </thead>
+        <tbody id="spec-body"></tbody>
+      </table>
+    </div>
+
+    <div class="spec-note-box">
+      <h3>数値の見方について</h3>
+      <p><strong>含水率</strong>とは、レンズに含まれる水分の割合です。一般的に含水率が高いほど、装用時のうるおいを感じやすい傾向があるとされていますが、周囲の乾燥した環境では水分が蒸発しやすくなり、逆に乾燥を感じやすくなる場合もあるとされています。</p>
+      <p><strong>酸素透過率(Dk/t)</strong>は、レンズがどれだけ酸素を通しやすいかを示す数値です。数値が高いほど角膜に酸素が届きやすく、長時間の装用でも負担を感じにくい傾向があるとされています。シリコーンハイドロゲル素材は、従来素材と比べて酸素透過率が高い傾向があります。</p>
+      <p><strong>素材</strong>は大きく「シリコーンハイドロゲル系」と「従来素材(HEMA系等)」に分かれます。シリコーンハイドロゲル系は高い酸素透過率が特徴とされる一方、従来素材はやわらかい装用感が特徴とされています。どちらが合うかは個人差があるため、実際に試して確かめることをおすすめします。</p>
+    </div>
+  </section>
+
+  <script>
+  (function () {
+    var products = ${JSON.stringify(rows)};
+    var sortKey = "water";
+    var sortDir = -1;
+
+    function render() {
+      var fType = document.getElementById("spec-filter-type").value;
+      var fMaterial = document.getElementById("spec-filter-material").value;
+      var fUv = document.getElementById("spec-filter-uv").value;
+      var fOrigin = document.getElementById("spec-filter-origin").value;
+
+      var rows = products.filter(function (p) {
+        return (!fType || p.type === fType) &&
+          (!fMaterial || p.material === fMaterial) &&
+          (!fUv || p.uv === fUv) &&
+          (!fOrigin || p.origin === fOrigin);
+      });
+
+      if (sortKey) {
+        rows = rows.slice().sort(function (a, b) {
+          var av = a[sortKey], bv = b[sortKey];
+          if (av === null) return 1;
+          if (bv === null) return -1;
+          if (typeof av === "number") return (av - bv) * sortDir;
+          return String(av).localeCompare(String(bv), "ja") * sortDir;
+        });
+      }
+
+      document.querySelectorAll("#spec-table thead th.spec-sortable").forEach(function (th) {
+        th.classList.toggle("spec-sorted", th.dataset.key === sortKey);
+        var arrow = th.querySelector(".spec-arrow");
+        if (arrow) arrow.textContent = sortDir === 1 ? "▲" : "▼";
+      });
+
+      var tbody = document.getElementById("spec-body");
+      tbody.innerHTML = rows.map(function (p) {
+        var priceText = p.price !== null ? "¥" + p.price : "ー";
+        return "<tr>" +
+          "<td class=\\"spec-name-col\\"><a href=\\"" + p.url + "\\">" + p.name + "</a></td>" +
+          "<td class=\\"spec-price\\">" + priceText + "</td>" +
+          "<td>" + p.material + "</td>" +
+          "<td>" + p.water + "%</td>" +
+          "<td>" + p.dk + "</td>" +
+          "<td>" + p.uv + "</td>" +
+          "<td>" + p.origin + "</td>" +
+        "</tr>";
+      }).join("");
+    }
+
+    document.querySelectorAll("#spec-table thead th.spec-sortable").forEach(function (th) {
+      th.addEventListener("click", function () {
+        var key = th.dataset.key;
+        if (sortKey === key) { sortDir *= -1; } else { sortKey = key; sortDir = -1; }
+        render();
+      });
+    });
+
+    ["spec-filter-type", "spec-filter-material", "spec-filter-uv", "spec-filter-origin"].forEach(function (id) {
+      document.getElementById(id).addEventListener("change", render);
+    });
+
+    render();
+  })();
+  </script>`;
+}
+
 function buildJsonLd(productsWithData) {
   const itemList = {
     "@context": "https://schema.org",
@@ -266,12 +415,12 @@ export async function generateTopPage() {
     .replace("{{SEARCH_CONSOLE_VERIFICATION}}", "")
     .replace(/{{PAGE_TITLE}}/g, escapeHtml("コンタクトレンズ最安値通販価格情報 毎日更新中！"))
     .replace(
-      "{{META_DESCRIPTION}}",
+      /{{META_DESCRIPTION}}/g,
       escapeHtml(
         "楽天市場・Yahoo!ショッピングの価格を毎日チェックし、人気コンタクトレンズブランドの最安値をショップ別にまとめています。"
       )
     )
-    .replace("{{CANONICAL_URL}}", escapeHtml(`${SITE_BASE_URL}/`))
+    .replace(/{{CANONICAL_URL}}/g, escapeHtml(`${SITE_BASE_URL}/`))
     .replace("{{HERO_IMAGE_HTML}}", heroImageHtml)
     .replace(
       "{{SUBTITLE}}",
@@ -283,6 +432,7 @@ export async function generateTopPage() {
     .replace("{{JUMP_NAV_HTML}}", renderJumpNav(productsWithData))
     .replace("{{TODAY_TEXT}}", formatTodayText(new Date()))
     .replace("{{BRAND_SECTIONS_HTML}}", renderBrandSections(productsWithData))
+    .replace("{{SPEC_COMPARE_TABLE}}", renderSpecCompareTable(productsWithData))
     .replace("{{COLUMN_HTML}}", renderColumnHtml())
     .replace("{{FOOTER_LINKS_HTML}}", renderFooterLinks(productsWithData))
     .replace("{{JSON_LD}}", buildJsonLd(productsWithData));
