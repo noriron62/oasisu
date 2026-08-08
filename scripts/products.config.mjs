@@ -2246,7 +2246,10 @@ export const products = [
       if (!name) return false;
       const n = name.replace(/\s/g, "");
       if (/(マルチフォーカル|遠近両用|乱視用|トーリック|toric)/i.test(n)) return false;
-      return /プレシジョン/.test(n);
+      // 「プレシジョン」だけだと、包丁・タイムカード等の無関係商品まで
+      // 誤って拾ってしまうため、「プレシジョンワン」と続けて書かれている
+      // 場合のみ該当とする(ローマ字表記のPRECISION1にも対応)
+      return /プレシジョンワン/.test(n) || /precision1/i.test(n);
     },
 
     // 標準サイズ(30枚入り)とバリューパック(90枚入り)で内容量(1箱あたりの
