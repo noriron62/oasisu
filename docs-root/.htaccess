@@ -8,6 +8,15 @@
 
 RewriteEngine On
 
+# ---- https化 + wwwなしへの統一 ----
+# http://newmediagallery.org/ や https://www.newmediagallery.org/ 等、
+# 表記ゆれのあるアクセスを、正式なURL(https://newmediagallery.org/)へ
+# 301リダイレクトで統一する。Search Consoleで「重複ページ」として
+# 検出されないようにするための対応。
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^www\.newmediagallery\.org$ [NC]
+RewriteRule ^(.*)$ https://newmediagallery.org/$1 [R=301,L]
+
 # ---- シード関連(通常用): 箱数・モール別ページ ----
 RewriteRule ^1hako/?$ /seed-saiyasu/ [R=301,L]
 RewriteRule ^2hako/?$ /seed-saiyasu/ [R=301,L]
