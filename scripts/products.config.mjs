@@ -2422,6 +2422,33 @@ export const products = [
             },
           },
         },
+        {
+          name: "レンズゼロ",
+          // 送料無料（商品ページに明記）
+          shippingFor: () => 0,
+          pages: {
+            1: {
+              scrapeUrl: "https://www.lenszero.com/goods/index/gc/C1O/",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=2ZU4AP+2ZSUNM+76W+TR13N&a8ejpredirect=https%3A%2F%2Fwww.lenszero.com%2Fgoods%2Findex%2Fgc%2FC1O%2F",
+            },
+            2: {
+              scrapeUrl: "https://www.lenszero.com/goods/index/gc/C1O!2/",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=2ZU4AP+2ZSUNM+76W+TR13N&a8ejpredirect=https%3A%2F%2Fwww.lenszero.com%2Fgoods%2Findex%2Fgc%2FC1O%212%2F",
+            },
+            4: {
+              scrapeUrl: "https://www.lenszero.com/goods/index/gc/C1O!4/",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=2ZU4AP+2ZSUNM+76W+TR13N&a8ejpredirect=https%3A%2F%2Fwww.lenszero.com%2Fgoods%2Findex%2Fgc%2FC1O%214%2F",
+            },
+            6: {
+              scrapeUrl: "https://www.lenszero.com/goods/index/gc/C1O!6/",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=2ZU4AP+2ZSUNM+76W+TR13N&a8ejpredirect=https%3A%2F%2Fwww.lenszero.com%2Fgoods%2Findex%2Fgc%2FC1O%216%2F",
+            },
+          },
+        },
       ],
     },
 
