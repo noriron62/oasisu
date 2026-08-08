@@ -586,7 +586,14 @@ export function renderRxFreeSection({ productName, quantities, shopResults }) {
       const cellsHtml = quantities
         .map((qty) => {
           const q = shop.quantities.find((x) => x.qty === qty);
-          if (!q || q.productPrice === null) {
+          if (!q) {
+            // そもそもその箱数の取り扱いが無いショップ（設定自体が存在しない）
+            return `        <div class="rx-price-cell" style="opacity:.5;">
+          <div class="unit">${qty}箱(送料込み)</div><div class="unit-note">該当ありません</div>
+        </div>`;
+          }
+          if (q.productPrice === null) {
+            // 取り扱いはあるはずだが、今回の取得に失敗した場合
             return `        <div class="rx-price-cell" style="opacity:.5;">
           <div class="unit">${qty}箱(送料込み)</div><div class="unit-note">現在取得できません</div>
         </div>`;
