@@ -398,7 +398,11 @@ async function buildOneProduct(product, template) {
   // ---- HTML生成 ----
   const canonicalUrl = siteUrl;
   const allItems = unitResults.flatMap((r) => [...r.rakutenRanking, ...r.yahooRanking]);
+  // 通常は楽天ランキング1位の商品画像を自動流用するが、並行輸入品など
+  // 実際の商品と異なる画像が紛れ込むことがあるため、商品ごとに固定の
+  // 画像URL(productInfoImageOverride)を指定できるようにしている。
   const rakutenImage =
+    product.productInfoImageOverride ||
     unitResults.flatMap((r) => r.rakutenRanking).find((i) => i.image)?.image ||
     "images/product-1.jpg";
 

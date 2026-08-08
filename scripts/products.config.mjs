@@ -2040,6 +2040,11 @@ export const products = [
       "「100枚パック2箱」「100枚パック1箱」「35枚2箱」「35枚1箱」それぞれの単位を基準に、楽天市場・Yahoo!ショッピングの価格を毎日チェックし、それぞれのショップ別最安値トップ5を掲載しています。",
     productSchemaName: "デイリーズアクティブ 100枚パック×2箱セット（200枚）",
     brandName: "Alcon", // JSON-LD(構造化データ)のbrand.nameに使用（アルコン社製のため他商品と異なる）
+    // 楽天ランキング1位が並行輸入品(デイリーズプライム名義)になることが
+    // あり、その場合パッケージ画像も実際の商品と異なってしまうため、
+    // 正規品の商品画像を固定で指定している
+    productInfoImageOverride:
+      "https://www.opt-blanc.com/wp-content/uploads/2022/04/eyecatching_dailies-active-100_220427.jpg",
     brand: "アルコン", // トップページのブランド別グルーピングに使用
     brandKey: "alcon",
     shortName: "デイリーズアクティブ", // トップページの商品カード・フッターで使う短い正式名称
@@ -2075,7 +2080,7 @@ export const products = [
           const n = stripShippingPromoText(name.replace(/\s/g, ""));
           if (/単品/.test(n)) return false;
           if (/200枚/.test(n)) return true;
-          const has100 = /100/.test(n);
+          const has100 = /100枚/.test(n);
           const has2Box =
             /(2箱|×2箱|ｘ2箱|x2箱|2箱セット|100.{0,4}×2|100.{0,4}x2|100.{0,4}ｘ2)/i.test(n);
           const mentions1BoxOnly = /1箱/.test(n) && !has2Box;
@@ -2103,7 +2108,7 @@ export const products = [
           if (!name) return false;
           const n = stripShippingPromoText(name.replace(/\s/g, ""));
           if (/単品/.test(n)) return false;
-          if (!/100/.test(n)) return false;
+          if (!/100枚/.test(n)) return false;
           if (/200枚/.test(n)) return false;
           if (/(2箱|3箱|4箱|5箱|6箱|×2|ｘ2|x2)/i.test(n)) return false;
           return true;
@@ -2128,7 +2133,7 @@ export const products = [
           if (!name) return false;
           const n = stripShippingPromoText(name.replace(/\s/g, ""));
           if (/単品/.test(n)) return false;
-          if (/100/.test(n)) return false;
+          if (/100枚/.test(n)) return false;
           if (/(3箱|4箱|5箱|6箱)/.test(n)) return false;
           return isBoxCount(n, 2) || /70枚/.test(n);
         },
@@ -2151,7 +2156,7 @@ export const products = [
         matches(name) {
           if (!name) return false;
           const n = stripShippingPromoText(name.replace(/\s/g, ""));
-          if (/(100|2箱|3箱|4箱|5箱|6箱|70枚|200枚)/.test(n)) return false;
+          if (/(100枚|2箱|3箱|4箱|5箱|6箱|70枚|200枚)/.test(n)) return false;
           return true;
         },
       },
