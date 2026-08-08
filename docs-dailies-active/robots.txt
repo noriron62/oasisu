@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://newmediagallery.org/dailies-active-saiyasu/sitemap.xml
