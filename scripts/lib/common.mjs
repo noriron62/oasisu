@@ -448,7 +448,7 @@ export function renderList(items) {
 }
 
 /** 1つの比較単位（例:「6箱」）ぶんの見出し＋楽天/Yahoo!2列のHTMLを生成する */
-export function renderUnitSection(unit, rakutenItems, yahooItems) {
+export function renderUnitSection(unit, rakutenItems, yahooItems, otherShopsHtml = "") {
   return `  ${unit.introHtml || ""}
   <section class="shop-section" aria-label="楽天市場ランキング(${escapeHtml(unit.label)})">
     <h2 class="shop-heading"><span class="shop-mark rakuten">楽天</span>楽天市場 ${escapeHtml(unit.label)} 最安値TOP5</h2>
@@ -461,6 +461,25 @@ ${renderList(rakutenItems)}
     <h2 class="shop-heading"><span class="shop-mark yahoo">Yahoo!</span>Yahoo!ショッピング ${escapeHtml(unit.label)} 最安値TOP5</h2>
     <div class="chart">
 ${renderList(yahooItems)}
+    </div>
+  </section>
+${otherShopsHtml}
+`;
+}
+
+/**
+ * 「その他のショップ」セクションを生成する。楽天・Yahoo!以外の独自サイト
+ * (処方箋あり・なし問わず、運営者が個別に確認して手動登録したショップ)を
+ * 表示する。該当ショップが無い場合は空文字を返す（セクション自体を
+ * 表示しない）。
+ */
+export function renderOtherShopsSection(unit, otherShopItems) {
+  if (!otherShopItems || otherShopItems.length === 0) return "";
+  return `  <section class="shop-section" aria-label="その他のショップ(${escapeHtml(unit.label)})">
+    <h2 class="shop-heading"><span class="shop-mark other">その他</span>その他のショップ ${escapeHtml(unit.label)}</h2>
+    <p class="other-shops-note">※ 楽天市場・Yahoo!ショッピング以外の、運営者が個別に確認したショップです。価格は自動更新されないため、実際のご購入前に商品ページで最新価格をご確認ください。</p>
+    <div class="chart">
+${renderList(otherShopItems)}
     </div>
   </section>
 `;

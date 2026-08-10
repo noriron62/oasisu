@@ -134,3 +134,67 @@ export async function scrapeShopPrice(url, expectedQty) {
     return null;
   }
 }
+
+/**
+ * 「処方箋不要」専門店とは別に、「楽天でもYahoo!でもない、独自の
+ * 通販サイト」(処方箋あり・なし問わず)の価格を取得するための関数。
+ * サイトによって「¥1,234」ではなく「1,234円税込」のような表記を
+ * 使っていることがあるため、rx-free専用のextractPriceとは別に、
+ * こちらは「数字+円」という表記も対象に含めた、より広めの抽出を行う。
+ * （rx-free側の抽出ロジックを汚染しないよう、あえて分離している）
+ */
+export function extractGenericYenPrice(html) {
+  // 1. JSON-LD（他の抽出と同様、最も信頼できる場合はこちらを優先する）
+  const jsonLdBlocks = [...html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
+  for (const block of jsonLdBlocks) {
+    try {
+      const data = JSON.parse(block[1]);
+      const candidates = Array.isArray(data) ? data : [data];
+      for (const item of candidates) {
+        const offers = item?.offers || item?.Offers;
+        const priceRaw = offers?.price ?? offers?.[0]?.price ?? item?.price;
+        const price = typeof priceRaw === "string" ? parseYen(priceRaw) : priceRaw;
+        if (typeof price === "number" && price > 0) return { price: Math.round(price), method: "JSON-LD" };
+      }
+    } catch {
+      // JSON-LDの形式が想定と違う場合はスキップ
+    }
+  }
+
+  // 2. 「1,234円税込」「1,234円（税込）」のように、数字の直後に「円」が
+  // 付く表記（ページ内で最初に見つかったものを採用する）
+  const yenSuffixMatch = html.match(/([\d,，]{3,8})\s*円\s*(?:\(?税込\)?)?/);
+  if (yenSuffixMatch) {
+    const price = parseYen(yenSuffixMatch[1]);
+    if (price) return { price, method: "円表記" };
+  }
+
+  return { price: null, method: null };
+}
+
+/** 「その他のショップ」の価格を取得する（extractGenericYenPriceを使う点のみ rx-free 用と異なる） */
+export async function scrapeOtherShopPrice(url) {
+  try {
+    const res = await fetch(url, {
+      headers: { "User-Agent": USER_AGENT },
+    });
+    if (!res.ok) {
+      console.warn(`  [warn] その他のショップの取得に失敗（HTTP ${res.status}）: ${url}`);
+      return null;
+    }
+    const html = await res.text();
+    const { price, method } = extractGenericYenPrice(html);
+    console.log(
+      price !== null
+        ? `  [debug] ${url} 抽出結果: ¥${price}（方法: ${method}）`
+        : `  [debug] ${url} 抽出失敗`
+    );
+    if (price === null) {
+      console.warn(`  [warn] その他のショップのページから価格を抽出できませんでした: ${url}`);
+    }
+    return price;
+  } catch (err) {
+    console.warn(`  [warn] その他のショップの取得中にエラー: ${url} (${err.message})`);
+    return null;
+  }
+}
