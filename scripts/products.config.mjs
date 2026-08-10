@@ -3036,7 +3036,7 @@ export const products = [
         heroName: "デイリーズトータルワン 90枚パック1箱",
         // 参考価格(90枚パック1箱9,590円)をもとに、価格帯を直接指定して追加取得する
         priceHint: { min: 7700, max: 11800 },
-        hintedKeyword: "デイリーズトータルワン 90枚パック",
+        hintedKeyword: "デイリーズトータルワン 90枚",
         introHtml: `    <h2 class="section-heading">90枚パック(単品)でも比較したい方へ</h2>
     <p>
       90枚パックを1箱(単品)で販売しているショップも見つかった場合は、
