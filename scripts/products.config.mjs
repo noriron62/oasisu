@@ -2520,6 +2520,17 @@ export const products = [
           if (/(2箱|3箱|4箱|5箱|6箱|×2|ｘ2|x2)/i.test(n)) return false;
           return true;
         },
+        // 「その他のショップ」(楽天/Yahoo!以外の独自サイト)。
+        // アットレンズはこの単位で他より安いことを確認済み。処方箋は必要。
+        otherShops: [
+          {
+            shop: "アットレンズ",
+            scrapeUrl: "https://www.atlens.jp/item/K_AL_PR90Z0_01_H.html",
+            affiliateUrl:
+              "https://px.a8.net/svt/ejp?a8mat=2C2PYA+2F4KY+20YY+ZPD5F&a8ejpredirect=https%3A%2F%2Fwww.atlens.jp%2Fitem%2FK_AL_PR90Z0_01_H.html",
+            image: "https://www.atlens.jp/client_info/ATLENS_JP/itemimage/K_AL_PR90Z0_01_H.jpg",
+          },
+        ],
       },
       {
         key: "box2",
@@ -2567,6 +2578,17 @@ export const products = [
           if (/(90枚|2箱|3箱|4箱|5箱|6箱|60枚|180枚)/.test(n)) return false;
           return true;
         },
+        // 「その他のショップ」(楽天/Yahoo!以外の独自サイト)。
+        // アットレンズはこの単位で僅かに安いことを確認済み。処方箋は必要。
+        otherShops: [
+          {
+            shop: "アットレンズ",
+            scrapeUrl: "https://www.atlens.jp/item/K_AL_PR30Z0_01_H.html",
+            affiliateUrl:
+              "https://px.a8.net/svt/ejp?a8mat=2C2PYA+2F4KY+20YY+ZPD5F&a8ejpredirect=https%3A%2F%2Fwww.atlens.jp%2Fitem%2FK_AL_PR30Z0_01_H.html",
+            image: "https://www.atlens.jp/client_info/ATLENS_JP/itemimage/K_AL_PR30Z0_01_H.jpg",
+          },
+        ],
       },
     ],
 
