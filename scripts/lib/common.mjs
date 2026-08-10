@@ -729,16 +729,22 @@ export function updatePriceHistory(history, todayEntry) {
 }
 
 function historyMarkClass(source) {
-  return source === "楽天市場" ? "rakuten" : "yahoo";
+  if (source === "楽天市場") return "rakuten";
+  if (source === "Yahoo!ショッピング") return "yahoo";
+  return "other";
 }
 function historyMarkLabel(source) {
-  return source === "楽天市場" ? "楽天" : "Yahoo!";
+  if (source === "楽天市場") return "楽天";
+  if (source === "Yahoo!ショッピング") return "Yahoo!";
+  return "その他";
 }
 function historyDotColor(source) {
-  // グラフ上の点は、楽天=赤・Yahoo!=青で塗り分ける
+  // グラフ上の点は、楽天=赤・Yahoo!=青・その他=グレーで塗り分ける
   // （文字表記のYahoo!ブランドピンクと、赤系の楽天色が近く見分けにくいため、
   //   点の色だけは視認性を優先して青にしている）
-  return source === "楽天市場" ? "#bf0000" : "#1D5C99";
+  if (source === "楽天市場") return "#bf0000";
+  if (source === "Yahoo!ショッピング") return "#1D5C99";
+  return "#6b7280";
 }
 
 /** 折れ線グラフ(SVG)を生成する */
