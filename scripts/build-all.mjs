@@ -235,18 +235,47 @@ async function buildOneProduct(product, template) {
     return { unit, rakutenRanking, yahooRanking };
   });
 
+  // ---- 「その他のショップ」(楽天/Yahoo!以外の独自サイト)の価格取得 ----
+  // unit.otherShops に設定がある比較単位だけ対象にする。
+  // 「総合最安値」の比較対象にも含めるため、楽天/Yahoo!の総合最安値計算より
+  // 前にここで取得しておく。
+  const otherShopsRankedByUnitKey = {};
+  for (const unit of product.units) {
+    if (!unit.otherShops || unit.otherShops.length === 0) continue;
+    const items = [];
+    for (const shop of unit.otherShops) {
+      const price =
+        typeof shop.staticPrice === "number" ? shop.staticPrice : await scrapeOtherShopPrice(shop.scrapeUrl);
+      console.log(
+        price !== null
+          ? `  [その他のショップ] ${shop.shop} ${unit.label}: ¥${price}${typeof shop.staticPrice === "number" ? "（固定値）" : ""}`
+          : `  [その他のショップ] ${shop.shop} ${unit.label}: 取得失敗`
+      );
+      if (price === null) continue;
+      items.push({ shop: shop.shop, price, url: shop.affiliateUrl, source: "その他のショップ", image: shop.image });
+    }
+    // 通常の楽天/Yahoo!ランキングと同じ関数(buildRanking)に通すことで、
+    // 順位・1箱あたり単価・1枚あたり単価を正しく計算する
+    // （直接pushしただけでは、これらの項目がundefinedのままになってしまう）。
+    otherShopsRankedByUnitKey[unit.key] = buildRanking(items, unit.totalLenses, items.length, product.lensesPerBox || 30);
+  }
+
   // 「総合最安値」は、特定の比較単位に固定するのではなく、
   // 全ユニット(1箱・2箱・6箱など)の最安値候補の中から、
   // 1枚あたり単価(rawUnitPrice、四捨五入前の値)が最も安いものを選ぶ。
   // 四捨五入後のunitPriceで比較すると、同額になった際に配列内で先に
   // 出てくるユニットが残ってしまい、実際にはわずかに安い方を見逃す
   // ことがあるため、必ず四捨五入前の値で比較する。
+  // 「その他のショップ」(アットレンズ等)も、同じページ内に掲載している以上、
+  // 「最安値」と謳うからには比較対象に含める（楽天/Yahoo!だけで計算すると、
+  // 実際にはその他のショップの方が安いのに矛盾した表示になってしまうため）。
   let overallBest = null;
   let overallBestUnit = null;
   let overallBestUnitResult = null;
   for (const unitResult of unitResults) {
     const { unit, rakutenRanking, yahooRanking } = unitResult;
-    for (const candidate of [rakutenRanking[0], yahooRanking[0]]) {
+    const otherShopBest = (otherShopsRankedByUnitKey[unit.key] || [])[0];
+    for (const candidate of [rakutenRanking[0], yahooRanking[0], otherShopBest]) {
       if (!candidate) continue;
       if (!overallBest || candidate.rawUnitPrice < overallBest.rawUnitPrice) {
         overallBest = candidate;
@@ -424,28 +453,11 @@ async function buildOneProduct(product, template) {
     unitResults.flatMap((r) => r.rakutenRanking).find((i) => i.image)?.image ||
     "images/product-1.jpg";
 
-  // ---- 「その他のショップ」(楽天/Yahoo!以外の独自サイト)の価格取得 ----
-  // unit.otherShops に設定がある比較単位だけ対象にする。
+  // 上ですでに取得済みの otherShopsRankedByUnitKey から、表示用HTMLを生成する
   const otherShopsHtmlByUnitKey = {};
   for (const unit of product.units) {
-    if (!unit.otherShops || unit.otherShops.length === 0) continue;
-    const items = [];
-    for (const shop of unit.otherShops) {
-      const price =
-        typeof shop.staticPrice === "number" ? shop.staticPrice : await scrapeOtherShopPrice(shop.scrapeUrl);
-      console.log(
-        price !== null
-          ? `  [その他のショップ] ${shop.shop} ${unit.label}: ¥${price}${typeof shop.staticPrice === "number" ? "（固定値）" : ""}`
-          : `  [その他のショップ] ${shop.shop} ${unit.label}: 取得失敗`
-      );
-      if (price === null) continue;
-      items.push({ shop: shop.shop, price, url: shop.affiliateUrl, source: shop.shop, image: shop.image });
-    }
-    // 通常の楽天/Yahoo!ランキングと同じ関数(buildRanking)に通すことで、
-    // 順位・1箱あたり単価・1枚あたり単価を正しく計算する
-    // （直接pushしただけでは、これらの項目がundefinedのままになってしまう）。
-    const rankedItems = buildRanking(items, unit.totalLenses, items.length, product.lensesPerBox || 30);
-    otherShopsHtmlByUnitKey[unit.key] = renderOtherShopsSection(unit, rankedItems);
+    if (!otherShopsRankedByUnitKey[unit.key]) continue;
+    otherShopsHtmlByUnitKey[unit.key] = renderOtherShopsSection(unit, otherShopsRankedByUnitKey[unit.key]);
   }
 
   const unitsHtml = unitResults
