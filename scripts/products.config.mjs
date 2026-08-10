@@ -3032,10 +3032,30 @@ export const products = [
         // （目安2週間ごと）実際の価格を確認し、更新する方針とする。
         manualListings: {
           rakuten: [
-            { shop: "アイトゥコンタクト", price: 18240, url: "https://item.rakuten.co.jp/ito-con/total190-1/" },
-            { shop: "measis(メイシス)", price: 18240, url: "https://item.rakuten.co.jp/measis/4933370349218-1/" },
-            { shop: "ひとみにティ", price: 18240, url: "https://item.rakuten.co.jp/hitominity/4933370349218-1/" },
-            { shop: "アットコンタクト", price: 18240, url: "https://item.rakuten.co.jp/atcontact/k_al_dt90z0_02_h/" },
+            {
+              shop: "measis(メイシス)",
+              price: 18240,
+              url: "https://hb.afl.rakuten.co.jp/ichiba/56792351.fc6150fe.56792352.2839bb0e/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fmeasis%2F4933370349218-1%2F&link_type=hybrid_url&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJoeWJyaWRfdXJsIiwic2l6ZSI6IjQwMHg0MDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
+              image: "https://shop.r10s.jp/measis/cabinet/rakuten/08-alcon/dt/total190_02.jpg",
+            },
+            {
+              shop: "ひとみにティ",
+              price: 18240,
+              url: "https://hb.afl.rakuten.co.jp/ichiba/56792693.c1bfab15.56792694.2a540ee0/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fhitominity%2F4933370349218-1%2F&link_type=hybrid_url&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJoeWJyaWRfdXJsIiwic2l6ZSI6IjQwMHg0MDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
+              image: "https://shop.r10s.jp/hitominity/cabinet/hitominity/08-alcon/dt/dt90_02.jpg",
+            },
+            {
+              shop: "アットコンタクト",
+              price: 18240,
+              url: "https://hb.afl.rakuten.co.jp/ichiba/5679275f.71b0765a.56792760.70c822f2/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fatcontact%2Fk_al_dt90z0_02_h%2F&link_type=hybrid_url&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJoeWJyaWRfdXJsIiwic2l6ZSI6IjQwMHg0MDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
+              image: "https://image.rakuten.co.jp/atcontact/cabinet/thumb2021/event/al_dt90z0_02_h_p10.jpg",
+            },
+            {
+              shop: "アットレンズ",
+              price: 18240,
+              url: "https://hb.afl.rakuten.co.jp/ichiba/4d268b41.ea14d16f.4d268b42.70e3f409/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fpricon%2Fk_al_dt90z0_02_h%2F&link_type=hybrid_url&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJoeWJyaWRfdXJsIiwic2l6ZSI6IjQwMHg0MDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
+              image: "https://shop.r10s.jp/pricon/cabinet/item-thumb/alcon/dt1/k_al_dt90z0_02_h_r.jpg",
+            },
           ],
         },
       },
