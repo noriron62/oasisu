@@ -243,6 +243,16 @@ h1 {
   background: #ff0033;
 }
 
+.shop-mark.other {
+  background: var(--ink-soft);
+}
+
+.other-shops-note {
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin: -6px 0 12px;
+}
+
 .row .thumb {
   width: 48px;
   height: 48px;
