@@ -282,7 +282,10 @@ async function buildOneProduct(product, template) {
           rxFreeBestForHistory = {
             rawUnitPrice,
             unitPrice: Math.round(rawUnitPrice),
-            price: total,
+            // グラフには合計金額ではなく「1箱あたり」の金額を記録する。
+            // 合計金額のままだと、日によって最安の箱数(1/2/4/6箱)が
+            // 入れ替わるたびにグラフの数字が大きく飛んでしまうため。
+            price: Math.round(total / q.qty),
             shop: shop.name,
             source: shop.name,
             url: q.affiliateUrl,
