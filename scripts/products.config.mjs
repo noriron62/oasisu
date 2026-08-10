@@ -3027,6 +3027,17 @@ export const products = [
           if (mentions1BoxOnly) return false;
           return has90 && has2Box;
         },
+        // 楽天APIの検索結果に、なぜか毎回出てこない4店舗を手動で救済登録。
+        // ※手動登録のため価格は自動更新されない。運営者が定期的に
+        // （目安2週間ごと）実際の価格を確認し、更新する方針とする。
+        manualListings: {
+          rakuten: [
+            { shop: "アイトゥコンタクト", price: 18240, url: "https://item.rakuten.co.jp/ito-con/total190-1/" },
+            { shop: "measis(メイシス)", price: 18240, url: "https://item.rakuten.co.jp/measis/4933370349218-1/" },
+            { shop: "ひとみにティ", price: 18240, url: "https://item.rakuten.co.jp/hitominity/4933370349218-1/" },
+            { shop: "アットコンタクト", price: 18240, url: "https://item.rakuten.co.jp/atcontact/k_al_dt90z0_02_h/" },
+          ],
+        },
       },
       {
         key: "pack90x1",

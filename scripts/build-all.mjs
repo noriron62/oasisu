@@ -211,6 +211,19 @@ async function buildOneProduct(product, template) {
     const yahooCandidates = yahooItems.filter(
       (i) => !claimedYahoo.has(itemKey(i)) && unit.matches(i.name, i.price)
     );
+
+    // APIの検索結果に、たまたま毎回出てこないショップがあった場合の救済策。
+    // unit.manualListings に手動で登録しておくと、API結果に合流させる。
+    // 手動登録なので価格が自動更新されない点に注意（運営者が定期的に見直す）。
+    if (unit.manualListings) {
+      for (const m of unit.manualListings.rakuten || []) {
+        rakutenCandidates.push({ ...m, source: "楽天市場" });
+      }
+      for (const m of unit.manualListings.yahoo || []) {
+        yahooCandidates.push({ ...m, source: "Yahoo!ショッピング" });
+      }
+    }
+
     for (const i of rakutenCandidates) claimedRakuten.add(itemKey(i));
     for (const i of yahooCandidates) claimedYahoo.add(itemKey(i));
 
