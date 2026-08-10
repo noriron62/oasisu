@@ -3033,7 +3033,7 @@ export const products = [
         manualListings: {
           rakuten: [
             {
-              shop: "measis(メイシス)",
+              shop: "measis(メアシス)",
               price: 18240,
               url: "https://hb.afl.rakuten.co.jp/ichiba/56792351.fc6150fe.56792352.2839bb0e/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fmeasis%2F4933370349218-1%2F&link_type=hybrid_url&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJoeWJyaWRfdXJsIiwic2l6ZSI6IjQwMHg0MDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
               image: "https://shop.r10s.jp/measis/cabinet/rakuten/08-alcon/dt/total190_02.jpg",
@@ -3051,7 +3051,7 @@ export const products = [
               image: "https://image.rakuten.co.jp/atcontact/cabinet/thumb2021/event/al_dt90z0_02_h_p10.jpg",
             },
             {
-              shop: "アットレンズ",
+              shop: "アットレンズ(楽天市場店)",
               price: 18240,
               url: "https://hb.afl.rakuten.co.jp/ichiba/4d268b41.ea14d16f.4d268b42.70e3f409/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fpricon%2Fk_al_dt90z0_02_h%2F&link_type=hybrid_url&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJoeWJyaWRfdXJsIiwic2l6ZSI6IjQwMHg0MDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
               image: "https://shop.r10s.jp/pricon/cabinet/item-thumb/alcon/dt1/k_al_dt90z0_02_h_r.jpg",
@@ -3084,6 +3084,16 @@ export const products = [
           if (/(2箱|3箱|4箱|5箱|6箱|×2|ｘ2|x2)/i.test(n)) return false;
           return true;
         },
+        // 「その他のショップ」(楽天/Yahoo!以外の独自サイト)。
+        // アットレンズはこの単位で他より安いことを確認済み。処方箋は必要。
+        otherShops: [
+          {
+            shop: "アットレンズ",
+            scrapeUrl: "https://www.atlens.jp/item/K_AL_DT90Z0_01_H.html",
+            affiliateUrl:
+              "https://px.a8.net/svt/ejp?a8mat=2C2PYA+2F4KY+20YY+ZPD5F&a8ejpredirect=https%3A%2F%2Fwww.atlens.jp%2Fitem%2FK_AL_DT90Z0_01_H.html",
+          },
+        ],
       },
       {
         key: "box2",
@@ -3130,6 +3140,16 @@ export const products = [
           if (/(90枚|2箱|3箱|4箱|5箱|6箱|60枚|180枚)/.test(n)) return false;
           return true;
         },
+        // 「その他のショップ」(楽天/Yahoo!以外の独自サイト)。
+        // アットレンズはこの単位で他より安いことを確認済み。処方箋は必要。
+        otherShops: [
+          {
+            shop: "アットレンズ",
+            scrapeUrl: "https://www.atlens.jp/item/K_AL_DT10Z0_01_H.html",
+            affiliateUrl:
+              "https://px.a8.net/svt/ejp?a8mat=2C2PYA+2F4KY+20YY+ZPD5F&a8ejpredirect=https%3A%2F%2Fwww.atlens.jp%2Fitem%2FK_AL_DT10Z0_01_H.html",
+          },
+        ],
       },
     ],
 

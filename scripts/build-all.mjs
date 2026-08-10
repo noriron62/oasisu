@@ -27,6 +27,7 @@ import { products } from "./products.config.mjs";
 import { generateRootFiles } from "./generate-root-files.mjs";
 import { generateTopPage } from "./generate-top-page.mjs";
 import { scrapeShopPrice } from "./lib/scrape-rx-free.mjs";
+import { scrapeOtherShopPrice } from "./lib/scrape-rx-free.mjs";
 import {
   escapeHtml,
   renderTemplate,
@@ -48,6 +49,7 @@ import {
   updatePriceHistory,
   renderPriceHistorySection,
   renderRxFreeSection,
+  renderOtherShopsSection,
 } from "./lib/common.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -422,9 +424,30 @@ async function buildOneProduct(product, template) {
     unitResults.flatMap((r) => r.rakutenRanking).find((i) => i.image)?.image ||
     "images/product-1.jpg";
 
+  // ---- 「その他のショップ」(楽天/Yahoo!以外の独自サイト)の価格取得 ----
+  // unit.otherShops に設定がある比較単位だけ対象にする。
+  const otherShopsHtmlByUnitKey = {};
+  for (const unit of product.units) {
+    if (!unit.otherShops || unit.otherShops.length === 0) continue;
+    const items = [];
+    for (const shop of unit.otherShops) {
+      const price =
+        typeof shop.staticPrice === "number" ? shop.staticPrice : await scrapeOtherShopPrice(shop.scrapeUrl);
+      console.log(
+        price !== null
+          ? `  [その他のショップ] ${shop.shop} ${unit.label}: ¥${price}${typeof shop.staticPrice === "number" ? "（固定値）" : ""}`
+          : `  [その他のショップ] ${shop.shop} ${unit.label}: 取得失敗`
+      );
+      if (price === null) continue;
+      items.push({ shop: shop.shop, price, url: shop.affiliateUrl, source: shop.shop });
+    }
+    items.sort((a, b) => a.price - b.price);
+    otherShopsHtmlByUnitKey[unit.key] = renderOtherShopsSection(unit, items);
+  }
+
   const unitsHtml = unitResults
     .map(({ unit, rakutenRanking, yahooRanking }) =>
-      renderUnitSection(unit, rakutenRanking, yahooRanking)
+      renderUnitSection(unit, rakutenRanking, yahooRanking, otherShopsHtmlByUnitKey[unit.key] || "")
     )
     .join("\n");
 
