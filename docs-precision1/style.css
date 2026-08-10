@@ -1025,7 +1025,16 @@ footer.sitemap .op-link { font-size: 12px; color: var(--teal); font-weight: 700;
   border-radius: var(--radius);
   background: var(--surface);
 }
-#spec-table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 13px; }
+/* table-layout:fixed にしないと、中身の長さに応じてブラウザが自動的に
+   列幅を再配分してしまい、指定した幅(特に商品名列)が無視されてしまう。
+   fixedにする代わりに、全列に幅を指定しておく必要がある。 */
+#spec-table { border-collapse: collapse; width: 100%; min-width: 900px; font-size: 13px; table-layout: fixed; }
+#spec-table th:nth-child(2), #spec-table td:nth-child(2) { width: 110px; } /* 最安値 */
+#spec-table th:nth-child(3), #spec-table td:nth-child(3) { width: 230px; white-space: normal; } /* 素材(長いので折り返し許可) */
+#spec-table th:nth-child(4), #spec-table td:nth-child(4) { width: 90px; } /* 含水率 */
+#spec-table th:nth-child(5), #spec-table td:nth-child(5) { width: 140px; } /* 酸素透過率 */
+#spec-table th:nth-child(6), #spec-table td:nth-child(6) { width: 90px; } /* UVカット */
+#spec-table th:nth-child(7), #spec-table td:nth-child(7) { width: 90px; } /* 産地 */
 #spec-table th, #spec-table td { padding: 10px 12px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--line); }
 #spec-table thead th {
   background: var(--teal-dim);
