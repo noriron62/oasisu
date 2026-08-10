@@ -142,8 +142,13 @@ export async function scrapeShopPrice(url, expectedQty) {
  * 使っていることがあるため、rx-free専用のextractPriceとは別に、
  * こちらは「数字+円」という表記も対象に含めた、より広めの抽出を行う。
  * （rx-free側の抽出ロジックを汚染しないよう、あえて分離している）
+ *
+ * itemCode を渡すと、ページ内でその商品コードが最初に出てくる位置より
+ * 「後ろ」だけを検索対象にする。ページ上部のクーポンバナー等に含まれる
+ * 無関係な「◯◯円」表記（例:「500円OFFクーポン」）を、実際の商品価格と
+ * 誤認しないようにするための対策。
  */
-export function extractGenericYenPrice(html) {
+export function extractGenericYenPrice(html, { itemCode } = {}) {
   // 1. JSON-LD（他の抽出と同様、最も信頼できる場合はこちらを優先する）
   const jsonLdBlocks = [...html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
   for (const block of jsonLdBlocks) {
@@ -161,9 +166,17 @@ export function extractGenericYenPrice(html) {
     }
   }
 
+  // 商品コードが出てくる位置より前の部分（ヘッダー・クーポンバナー等）は
+  // 検索対象から除外する
+  let searchTarget = html;
+  if (itemCode) {
+    const idx = html.indexOf(itemCode);
+    if (idx !== -1) searchTarget = html.slice(idx);
+  }
+
   // 2. 「1,234円税込」「1,234円（税込）」のように、数字の直後に「円」が
-  // 付く表記（ページ内で最初に見つかったものを採用する）
-  const yenSuffixMatch = html.match(/([\d,，]{3,8})\s*円\s*(?:\(?税込\)?)?/);
+  // 付く表記（検索対象の中で最初に見つかったものを採用する）
+  const yenSuffixMatch = searchTarget.match(/([\d,，]{3,8})\s*円\s*(?:\(?税込\)?)?/);
   if (yenSuffixMatch) {
     const price = parseYen(yenSuffixMatch[1]);
     if (price) return { price, method: "円表記" };
@@ -183,7 +196,11 @@ export async function scrapeOtherShopPrice(url) {
       return null;
     }
     const html = await res.text();
-    const { price, method } = extractGenericYenPrice(html);
+    // URLの末尾（例: K_AL_DT90Z0_01_H.html）から商品コードを取り出し、
+    // その商品コードがページ内に出てくる位置より後ろだけを検索対象にする
+    const itemCodeMatch = url.match(/\/([^/]+)\.html?$/i);
+    const itemCode = itemCodeMatch ? itemCodeMatch[1] : null;
+    const { price, method } = extractGenericYenPrice(html, { itemCode });
     console.log(
       price !== null
         ? `  [debug] ${url} 抽出結果: ¥${price}（方法: ${method}）`

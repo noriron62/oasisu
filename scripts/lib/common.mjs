@@ -477,7 +477,7 @@ export function renderOtherShopsSection(unit, otherShopItems) {
   if (!otherShopItems || otherShopItems.length === 0) return "";
   return `  <section class="shop-section" aria-label="その他のショップ(${escapeHtml(unit.label)})">
     <h2 class="shop-heading"><span class="shop-mark other">その他</span>その他のショップ ${escapeHtml(unit.label)}</h2>
-    <p class="other-shops-note">※ 楽天市場・Yahoo!ショッピング以外の、運営者が個別に確認したショップです。価格は自動更新されないため、実際のご購入前に商品ページで最新価格をご確認ください。</p>
+    <p class="other-shops-note">※ 楽天市場・Yahoo!ショッピング以外の、運営者が個別に確認したショップです。</p>
     <div class="chart">
 ${renderList(otherShopItems)}
     </div>
