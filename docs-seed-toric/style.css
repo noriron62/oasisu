@@ -1045,6 +1045,13 @@ footer.sitemap .op-link { font-size: 12px; color: var(--teal); font-weight: 700;
   z-index: 1;
   font-weight: 700;
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.04);
+  /* 商品名の長さに合わせて列が伸びると、スマホで他の列が隠れてしまうため、
+     幅を固定して長い商品名は折り返す */
+  width: 130px;
+  max-width: 130px;
+  white-space: normal;
+  font-size: 12px;
+  line-height: 1.4;
 }
 #spec-table thead th.spec-name-col { background: var(--teal-dim-solid); z-index: 3; }
 #spec-table td.spec-name-col a { color: var(--teal); text-decoration: none; }
