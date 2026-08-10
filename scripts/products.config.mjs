@@ -3011,7 +3011,7 @@ export const products = [
         heroLabel: "本日の総合最安値（1枚あたり）",
         heroName: "デイリーズトータルワン 90枚パック×2箱セット(180枚)",
         // 参考価格(90枚パック2箱18,240円)をもとに、価格帯を直接指定して追加取得する
-        priceHint: { min: 14500, max: 22500 },
+        priceHint: { min: 17000, max: 22500 },
         hintedKeyword: "デイリーズトータルワン 90枚 2箱",
         introHtml: "",
         /** 「90枚パックを2箱」らしきものだけを判定する */
