@@ -3092,6 +3092,7 @@ export const products = [
             scrapeUrl: "https://www.atlens.jp/item/K_AL_DT90Z0_01_H.html",
             affiliateUrl:
               "https://px.a8.net/svt/ejp?a8mat=2C2PYA+2F4KY+20YY+ZPD5F&a8ejpredirect=https%3A%2F%2Fwww.atlens.jp%2Fitem%2FK_AL_DT90Z0_01_H.html",
+            image: "https://www.atlens.jp/client_info/ATLENS_JP/itemimage/K_AL_DT90Z0_01_H.jpg",
           },
         ],
       },
@@ -3148,6 +3149,7 @@ export const products = [
             scrapeUrl: "https://www.atlens.jp/item/K_AL_DT10Z0_01_H.html",
             affiliateUrl:
               "https://px.a8.net/svt/ejp?a8mat=2C2PYA+2F4KY+20YY+ZPD5F&a8ejpredirect=https%3A%2F%2Fwww.atlens.jp%2Fitem%2FK_AL_DT10Z0_01_H.html",
+            image: "https://www.atlens.jp/client_info/ATLENS_JP/itemimage/K_AL_DT10Z0_01_H.jpg",
           },
         ],
       },

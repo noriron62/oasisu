@@ -439,10 +439,13 @@ async function buildOneProduct(product, template) {
           : `  [その他のショップ] ${shop.shop} ${unit.label}: 取得失敗`
       );
       if (price === null) continue;
-      items.push({ shop: shop.shop, price, url: shop.affiliateUrl, source: shop.shop });
+      items.push({ shop: shop.shop, price, url: shop.affiliateUrl, source: shop.shop, image: shop.image });
     }
-    items.sort((a, b) => a.price - b.price);
-    otherShopsHtmlByUnitKey[unit.key] = renderOtherShopsSection(unit, items);
+    // 通常の楽天/Yahoo!ランキングと同じ関数(buildRanking)に通すことで、
+    // 順位・1箱あたり単価・1枚あたり単価を正しく計算する
+    // （直接pushしただけでは、これらの項目がundefinedのままになってしまう）。
+    const rankedItems = buildRanking(items, unit.totalLenses, items.length, product.lensesPerBox || 30);
+    otherShopsHtmlByUnitKey[unit.key] = renderOtherShopsSection(unit, rankedItems);
   }
 
   const unitsHtml = unitResults
