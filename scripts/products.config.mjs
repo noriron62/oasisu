@@ -2639,6 +2639,258 @@ export const products = [
   },
 
   // ------------------------------------------------------------------
-  // 14. 新しい商品を追加する場合は、ここに同じ形式でオブジェクトを追加する。
+  // 14. プレシジョンワン 乱視用
+  // ------------------------------------------------------------------
+  {
+    id: "precision1-toric-saiyasu",
+    slug: "precision1-toric-saiyasu",
+    outputDir: "docs-precision1-toric",
+    siteName: "プレシジョンワン 乱視用最安値通販価格情報",
+    theme: { accent: "#9C5B8E", gold: "#B8892B" }, // モーブ系(他14サイトと見分けやすい配色)
+    historyUnitKey: "pack90x2", // 価格推移グラフで記録する比較単位（90枚パック2箱が実勢価格でも最安のため）
+    searchKeyword: "プレシジョンワン 乱視用",
+    metaDescription:
+      "プレシジョンワン 乱視用の楽天市場・Yahoo!ショッピングの価格を毎日チェックし、処方箋不要で購入できるショップを中心に、30枚1箱・30枚2箱・90枚パック1箱・90枚パック2箱それぞれの最安値トップ3を掲載しています。",
+    subtitle:
+      "「90枚パック2箱」「90枚パック1箱」「30枚2箱」「30枚1箱」それぞれの単位を基準に、楽天市場・Yahoo!ショッピングの価格を毎日チェックし、それぞれのショップ別最安値トップ3を掲載しています。",
+    productSchemaName: "プレシジョンワン 乱視用 90枚パック×2箱セット（180枚）",
+    brandName: "Alcon", // JSON-LD(構造化データ)のbrand.nameに使用（アルコン社製のため他商品と異なる）
+    brand: "アルコン", // トップページのブランド別グルーピングに使用
+    brandKey: "alcon",
+    shortName: "プレシジョンワン 乱視用", // トップページの商品カード・フッターで使う短い正式名称
+    // 処方箋不要ショップのセクションがある分、ページが長くなりすぎないよう
+    // 楽天/Yahoo!ランキングは各ベスト3に絞る
+    rankingTopN: 3,
+
+    // 「処方箋不要」を明言している専門ショップ。レンズモードのみを掲載する
+    // （レンズゼロは価格が高いため掲載しない方針、レンズラボは乱視用の
+    // 取り扱い自体が無いため対象外）。
+    rxFreeShops: {
+      quantities: [1, 2, 4, 6],
+      shops: [
+        {
+          name: "レンズモード",
+          // 送料: 300円×箱数（最低1,000円）
+          shippingFor: (boxes) => Math.max(300 * boxes, 1000),
+          // JavaScriptで価格を表示する作りのため自動取得ができない。
+          // 商品価格は固定値（staticPrice）で運用し、運営者が定期的に
+          // （目安2週間ごと）手動で最新価格に更新する方針とする。
+          pages: {
+            1: {
+              staticPrice: 2880,
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FC1O5%2F",
+            },
+            2: {
+              staticPrice: 5756,
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FC1O5%212%2F",
+            },
+            4: {
+              staticPrice: 11500,
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FC1O5%214%2F",
+            },
+            6: {
+              staticPrice: 17244,
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FC1O5%216%2F",
+            },
+          },
+        },
+      ],
+    },
+
+    // トップページのスペック比較表に使用(メーカー公式・販売店情報を確認のうえ設定)
+    specs: {
+      material: "verofilcon A(シリコーンハイドロゲル)",
+      water: 51, // 含水率(%)
+      dk: 100, // 酸素透過率(Dk/t)
+      uv: true, // UVカットの有無
+      origin: "海外",
+      type: "乱視用",
+    },
+
+    /** 商品名が「プレシジョンワン乱視用」であることを確認する */
+    isCorrectProduct(name) {
+      if (!name) return false;
+      const n = name.replace(/\s/g, "");
+      const isPrecision1 = /プレシジョンワン/.test(n) || /precision1/i.test(n);
+      if (!isPrecision1) return false;
+      return /(乱視用|トーリック|toric)/i.test(n);
+    },
+
+    // 標準サイズ(30枚入り)と90枚パックで内容量(1箱あたりの枚数)が
+    // 異なる点に注意。それぞれの箱数(1箱/2箱)とあわせて、計4つの
+    // 比較単位を設定する。
+    units: [
+      {
+        key: "pack90x2",
+        label: "90枚パック2箱セット(180枚)",
+        totalLenses: 180,
+        heroLabel: "本日の総合最安値（1枚あたり）",
+        heroName: "プレシジョンワン 乱視用 90枚パック×2箱セット(180枚)",
+        // 参考価格(90枚パック2箱15,390円)をもとに、価格帯を直接指定して追加取得する
+        priceHint: { min: 12500, max: 19000 },
+        hintedKeyword: "プレシジョンワン 乱視用 90枚 2箱",
+        introHtml: "",
+        /** 「90枚パックを2箱」らしきものだけを判定する */
+        matches(name) {
+          if (!name) return false;
+          const n = stripShippingPromoText(name.replace(/\s/g, ""));
+          if (/単品/.test(n)) return false;
+          if (/180枚/.test(n)) return true;
+          const has90 = /90枚/.test(n);
+          const has2Box =
+            /(2箱|×2箱|ｘ2箱|x2箱|2箱セット|90.{0,4}×2|90.{0,4}x2|90.{0,4}ｘ2)/i.test(n);
+          const mentions1BoxOnly = /1箱/.test(n) && !has2Box;
+          if (mentions1BoxOnly) return false;
+          return has90 && has2Box;
+        },
+      },
+      {
+        key: "pack90x1",
+        label: "90枚パック1箱",
+        totalLenses: 90,
+        heroLabel: "本日の総合最安値（1枚あたり）",
+        heroName: "プレシジョンワン 乱視用 90枚パック1箱",
+        // 参考価格(90枚パック1箱7,900円)をもとに、価格帯を直接指定して追加取得する
+        priceHint: { min: 6300, max: 9800 },
+        hintedKeyword: "プレシジョンワン 乱視用 90枚パック",
+        introHtml: `    <h2 class="section-heading">90枚パック(単品)でも比較したい方へ</h2>
+    <p>
+      90枚パックを1箱(単品)で販売しているショップも見つかった場合は、
+      こちらに別枠で掲載しています。<strong>2箱セットとは金額の単位が異なる</strong>
+      ため、混同しないようご注意ください(こちらは90枚1箱分の価格です)。
+    </p>`,
+        /** 「90枚パックを1箱」らしきものだけを判定する（2箱を示す表記は除外） */
+        matches(name) {
+          if (!name) return false;
+          const n = stripShippingPromoText(name.replace(/\s/g, ""));
+          if (/単品/.test(n)) return false;
+          if (!/90枚/.test(n)) return false;
+          if (/180枚/.test(n)) return false;
+          if (/(2箱|3箱|4箱|5箱|6箱|×2|ｘ2|x2)/i.test(n)) return false;
+          return true;
+        },
+      },
+      {
+        key: "box2",
+        label: "30枚入り2箱セット(60枚)",
+        totalLenses: 60,
+        heroLabel: "本日の総合最安値（1枚あたり）",
+        heroName: "プレシジョンワン 乱視用 30枚入り×2箱セット(60枚)",
+        // 参考価格(2箱5,910円)をもとに、価格帯を直接指定して追加取得する
+        priceHint: { min: 4800, max: 7200 },
+        introHtml: `    <h2 class="section-heading">30枚入り2箱でも比較したい方へ</h2>
+    <p>
+      90枚パックとは別に、標準サイズ(30枚入り)を2箱で販売しているショップも
+      見つかった場合は、こちらに別枠で掲載しています。<strong>90枚パックとは
+      金額の単位が異なる</strong>ため、比較する際は1枚あたりの単価をご確認ください。
+    </p>`,
+        // 90枚パック系との混同を防ぐため、「90枚」を含む商品は除外する
+        matches(name) {
+          if (!name) return false;
+          const n = stripShippingPromoText(name.replace(/\s/g, ""));
+          if (/単品/.test(n)) return false;
+          if (/90枚/.test(n)) return false;
+          if (/(3箱|4箱|5箱|6箱)/.test(n)) return false;
+          return isBoxCount(n, 2) || /60枚/.test(n);
+        },
+      },
+      {
+        key: "box1",
+        label: "30枚入り1箱",
+        totalLenses: 30,
+        heroLabel: "本日の総合最安値（1枚あたり）",
+        heroName: "プレシジョンワン 乱視用 30枚入り1箱",
+        // 参考価格(1箱3,000円)をもとに、価格帯を直接指定して追加取得する
+        priceHint: { min: 2400, max: 3800 },
+        introHtml: `    <h2 class="section-heading">30枚入り1箱(単品)でも比較したい方へ</h2>
+    <p>
+      「まずは1箱だけ試したい」という方向けに、標準サイズ(30枚入り)1箱の
+      価格帯も別枠で掲載しています。<strong>90枚パック・2箱セットとは
+      金額の単位が異なる</strong>ため、比較する際は1枚あたりの単価をご確認ください。
+    </p>`,
+        // 90枚パック系・他の箱数をはっきり示す表記がある商品は、こちらでは対象外にする
+        matches(name) {
+          if (!name) return false;
+          const n = stripShippingPromoText(name.replace(/\s/g, ""));
+          if (/(90枚|2箱|3箱|4箱|5箱|6箱|60枚|180枚)/.test(n)) return false;
+          return true;
+        },
+      },
+    ],
+
+    productIntroHtml: `    <h2 class="section-heading">処方箋不要で購入できるショップを中心に比較しています</h2>
+    <p>
+      プレシジョンワン 乱視用は、コンタクトレンズの中でも「処方箋の提示が必要」な
+      ショップで取り扱われることが多い商品です。当サイトでは、商品名や説明文に
+      「処方箋あり」「処方箋必要」などと明記された商品はあらかじめ除外していて、
+      処方箋不要で購入できるショップを中心に価格を比較しています。
+    </p>
+    <p>
+      楽天・Yahooで扱っているお店は処方箋が必要です。でも店頭で購入するよりは
+      安いので処方箋を用意できる方は、ぜひ利用したいですね！
+      処方箋が不要というと一般激安サイトで手にすることになりますが、安いサイトも
+      ありますので、参考にしてくださいね。掲載金額はもちろん送料無料（又は込み）です。
+    </p>
+    <p>
+      あわせて、購入する数量によって1枚あたりの単価が変わる点にも注目しています。
+      標準サイズ(30枚入り)を何箱まとめて購入するかや、まとめ買い向けの「90枚
+      パック」を選ぶかによっても、1枚あたりの単価が変わります。1枚あたりの
+      単価がもっとも下がりやすいのは、この90枚パックを2箱まとめて購入した
+      場合です。そのため当サイトでは、90枚パック2箱セットを中心に比較しつつ、
+      90枚パック1箱・標準サイズ(30枚入り)の2箱・1箱で見つかった場合も、
+      それぞれ別枠であわせて掲載しています。
+    </p>
+    <p class="note">
+      ※ 「処方箋不要」とは、購入時に処方箋の提示を求めないショップがある、という
+      販売形態の説明であり、眼科での検査が不要という意味ではありません。
+      コンタクトレンズは高度管理医療機器です。目の健康のため、定期的に眼科での
+      検査を受けたうえでご購入・ご使用くださいね。
+    </p>
+    <p style="text-align:center; font-weight:700; color:var(--teal); margin-top:16px;">
+      瞳を美しく維持するためにも…..
+    </p>`,
+
+    productInfoHeading: "プレシジョンワン 乱視用とは",
+    productInfoHtml: `        <p>
+          プレシジョンワン 乱視用は、日本アルコンが展開する1日使い捨てタイプの
+          乱視矯正用コンタクトレンズです。近視用と同じシリコーンハイドロゲル
+          素材「verofilcon A」を採用し、「スマートサーフェステクノロジー」に
+          より、レンズ表面の含水率を80%以上まで高めているのが特徴とされています。
+        </p>
+        <h3>独自レンズデザインによる軸安定性</h3>
+        <p>
+          乱視用レンズは、まばたきのたびにレンズが回転してしまうと見え方が
+          ぼやけてしまいます。8時・4時の方向を厚く、6時方向を薄くする独自の
+          レンズデザインにより、レンズの回転を抑え、クリアな見え方を保ちやすい
+          設計とされています。
+        </p>
+        <h3>高い酸素透過率とUVカット</h3>
+        <p>
+          近視用と同様、高い酸素透過率(Dk/t=100、-3.00Dの場合)を実現している
+          とされています。あわせてUVカット機能も備えています(UVカット機能は
+          あくまで補助的なものであり、サングラス等の代わりにはなりませんので
+          ご注意ください)。
+        </p>
+        <h3>こんな方におすすめ</h3>
+        <ul>
+          <li>乱視があり、装用中のうるおいを重視したい方</li>
+          <li>レンズのズレ・回転による見え方のぼやけが気になる方</li>
+          <li>90枚パックでまとめ買いし、コストを抑えたい方</li>
+        </ul>
+        <p class="note">
+          ※ 度数・乱視軸・カーブなどの詳細仕様は変更される場合があります。
+          乱視用レンズは特にご自身の乱視軸に合った処方が重要なため、
+          ご購入前に、眼科での検査・処方をふまえたうえでご確認ください。
+          本ページは購入の最終判断材料としてではなく、比較検討のための
+          参考情報としてご活用ください。
+        </p>`,
+  },
+
+  // ------------------------------------------------------------------
+  // 15. 新しい商品を追加する場合は、ここに同じ形式でオブジェクトを追加する。
   // ------------------------------------------------------------------
 ];
