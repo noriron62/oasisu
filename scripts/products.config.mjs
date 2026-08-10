@@ -2891,6 +2891,285 @@ export const products = [
   },
 
   // ------------------------------------------------------------------
-  // 15. 新しい商品を追加する場合は、ここに同じ形式でオブジェクトを追加する。
+  // 15. デイリーズトータルワン
+  // ------------------------------------------------------------------
+  {
+    id: "dailies-total-one-saiyasu",
+    slug: "dailies-total-one-saiyasu",
+    outputDir: "docs-dailies-total-one",
+    siteName: "デイリーズトータルワン最安値通販価格情報",
+    theme: { accent: "#2E7D6B", gold: "#B8892B" }, // ディープティール系(他14サイトと見分けやすい配色)
+    historyUnitKey: "pack90x2", // 価格推移グラフで記録する比較単位（90枚パック2箱が実勢価格でも最安のため）
+    searchKeyword: "デイリーズトータルワン",
+    metaDescription:
+      "デイリーズトータルワンの楽天市場・Yahoo!ショッピングの価格を毎日チェックし、処方箋不要で購入できるショップを中心に、30枚1箱・30枚2箱・90枚パック1箱・90枚パック2箱それぞれの最安値トップ3を掲載しています。",
+    subtitle:
+      "「90枚パック2箱」「90枚パック1箱」「30枚2箱」「30枚1箱」それぞれの単位を基準に、楽天市場・Yahoo!ショッピングの価格を毎日チェックし、それぞれのショップ別最安値トップ3を掲載しています。",
+    productSchemaName: "デイリーズトータルワン 90枚パック×2箱セット（180枚）",
+    brandName: "Alcon", // JSON-LD(構造化データ)のbrand.nameに使用（アルコン社製のため他商品と異なる）
+    brand: "アルコン", // トップページのブランド別グルーピングに使用
+    brandKey: "alcon",
+    shortName: "デイリーズトータルワン", // トップページの商品カード・フッターで使う短い正式名称
+    // 処方箋不要ショップのセクションがある分、ページが長くなりすぎないよう
+    // 楽天/Yahoo!ランキングは各ベスト3に絞る
+    rankingTopN: 3,
+
+    // 「処方箋不要」を明言している専門ショップ(レンズモード・レンズラボ)。
+    // ※アフィリエイトリンクのプログラムコード(a8mat)は、以前いただいた
+    // 各ショップのコードを流用しています。念のため実際のリンク先が
+    // 正しいか確認をお願いします。
+    rxFreeShops: {
+      quantities: [1, 2, 4, 6],
+      shops: [
+        {
+          name: "レンズモード",
+          // 送料: 300円×箱数（最低1,000円）
+          shippingFor: (boxes) => Math.max(300 * boxes, 1000),
+          // JavaScriptで価格を表示する作りのため自動取得ができない。
+          // 商品価格は固定値（staticPrice）で運用し、運営者が定期的に
+          // （目安2週間ごと）手動で最新価格に更新する方針とする。
+          pages: {
+            1: {
+              staticPrice: 3810,
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FC1T%2F",
+            },
+            2: {
+              staticPrice: 7656,
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FC1T%212%2F",
+            },
+            4: {
+              staticPrice: 15300,
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FC1T%214%2F",
+            },
+            6: {
+              staticPrice: 22944,
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=25PI8T+9SI0AA+76W+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lensmode.com%2Fgoods%2Findex%2Fgc%2FC1T%216%2F",
+            },
+          },
+        },
+        {
+          name: "レンズラボ",
+          // 送料: 全国一律700円
+          shippingFor: () => 700,
+          pages: {
+            1: {
+              scrapeUrl: "https://www.lens-labo.com/item/detail?itemcd=L0039-1",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=2ZH1FY+BRCL9U+3SZ4+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lens-labo.com%2Fitem%2Fdetail%3Fitemcd%3DL0039-1",
+            },
+            2: {
+              scrapeUrl: "https://www.lens-labo.com/item/detail?itemcd=L0039-2",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=2ZH1FY+BRCL9U+3SZ4+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lens-labo.com%2Fitem%2Fdetail%3Fitemcd%3DL0039-2",
+            },
+            4: {
+              scrapeUrl: "https://www.lens-labo.com/item/detail?itemcd=L0039-4",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=2ZH1FY+BRCL9U+3SZ4+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lens-labo.com%2Fitem%2Fdetail%3Fitemcd%3DL0039-4",
+            },
+            6: {
+              scrapeUrl: "https://www.lens-labo.com/item/detail?itemcd=L0039-6",
+              affiliateUrl:
+                "https://px.a8.net/svt/ejp?a8mat=2ZH1FY+BRCL9U+3SZ4+BW0YB&a8ejpredirect=https%3A%2F%2Fwww.lens-labo.com%2Fitem%2Fdetail%3Fitemcd%3DL0039-6",
+            },
+          },
+        },
+      ],
+    },
+
+    // トップページのスペック比較表に使用(メーカー公式・販売店情報を確認のうえ設定)
+    specs: {
+      material: "delefilcon A(シリコーンハイドロゲル)",
+      water: 33, // 含水率(%)(レンズコア部分。レンズ表面は80%以上)
+      dk: 156, // 酸素透過率(Dk/t)
+      uv: false, // UVカットの有無(公式情報での明記が確認できなかったためなし扱い)
+      origin: "海外",
+      type: "標準（近視）",
+    },
+
+    /** 商品名が「デイリーズトータルワン」（マルチフォーカル・乱視用等の別ラインではない）であることを確認する */
+    isCorrectProduct(name) {
+      if (!name) return false;
+      const n = name.replace(/\s/g, "");
+      if (/(マルチフォーカル|遠近両用|乱視用|トーリック|toric)/i.test(n)) return false;
+      if (!/デイリーズ/.test(n)) return false;
+      return /(トータルワン|トータル1|トータル１)/.test(n);
+    },
+
+    // 標準サイズ(30枚入り)と90枚パックで内容量(1箱あたりの枚数)が
+    // 異なる点に注意。それぞれの箱数(1箱/2箱)とあわせて、計4つの
+    // 比較単位を設定する。
+    units: [
+      {
+        key: "pack90x2",
+        label: "90枚パック2箱セット(180枚)",
+        totalLenses: 180,
+        heroLabel: "本日の総合最安値（1枚あたり）",
+        heroName: "デイリーズトータルワン 90枚パック×2箱セット(180枚)",
+        // 参考価格(90枚パック2箱18,240円)をもとに、価格帯を直接指定して追加取得する
+        priceHint: { min: 14500, max: 22500 },
+        hintedKeyword: "デイリーズトータルワン 90枚 2箱",
+        introHtml: "",
+        /** 「90枚パックを2箱」らしきものだけを判定する */
+        matches(name) {
+          if (!name) return false;
+          const n = stripShippingPromoText(name.replace(/\s/g, ""));
+          if (/単品/.test(n)) return false;
+          if (/180枚/.test(n)) return true;
+          const has90 = /90枚/.test(n);
+          const has2Box =
+            /(2箱|×2箱|ｘ2箱|x2箱|2箱セット|90.{0,4}×2|90.{0,4}x2|90.{0,4}ｘ2)/i.test(n);
+          const mentions1BoxOnly = /1箱/.test(n) && !has2Box;
+          if (mentions1BoxOnly) return false;
+          return has90 && has2Box;
+        },
+      },
+      {
+        key: "pack90x1",
+        label: "90枚パック1箱",
+        totalLenses: 90,
+        heroLabel: "本日の総合最安値（1枚あたり）",
+        heroName: "デイリーズトータルワン 90枚パック1箱",
+        // 参考価格(90枚パック1箱9,590円)をもとに、価格帯を直接指定して追加取得する
+        priceHint: { min: 7700, max: 11800 },
+        hintedKeyword: "デイリーズトータルワン 90枚パック",
+        introHtml: `    <h2 class="section-heading">90枚パック(単品)でも比較したい方へ</h2>
+    <p>
+      90枚パックを1箱(単品)で販売しているショップも見つかった場合は、
+      こちらに別枠で掲載しています。<strong>2箱セットとは金額の単位が異なる</strong>
+      ため、混同しないようご注意ください(こちらは90枚1箱分の価格です)。
+    </p>`,
+        /** 「90枚パックを1箱」らしきものだけを判定する（2箱を示す表記は除外） */
+        matches(name) {
+          if (!name) return false;
+          const n = stripShippingPromoText(name.replace(/\s/g, ""));
+          if (/単品/.test(n)) return false;
+          if (!/90枚/.test(n)) return false;
+          if (/180枚/.test(n)) return false;
+          if (/(2箱|3箱|4箱|5箱|6箱|×2|ｘ2|x2)/i.test(n)) return false;
+          return true;
+        },
+      },
+      {
+        key: "box2",
+        label: "30枚入り2箱セット(60枚)",
+        totalLenses: 60,
+        heroLabel: "本日の総合最安値（1枚あたり）",
+        heroName: "デイリーズトータルワン 30枚入り×2箱セット(60枚)",
+        // 参考価格(2箱7,029円)をもとに、価格帯を直接指定して追加取得する
+        priceHint: { min: 5600, max: 8700 },
+        introHtml: `    <h2 class="section-heading">30枚入り2箱でも比較したい方へ</h2>
+    <p>
+      90枚パックとは別に、標準サイズ(30枚入り)を2箱で販売しているショップも
+      見つかった場合は、こちらに別枠で掲載しています。<strong>90枚パックとは
+      金額の単位が異なる</strong>ため、比較する際は1枚あたりの単価をご確認ください。
+    </p>`,
+        // 90枚パック系との混同を防ぐため、「90枚」を含む商品は除外する
+        matches(name) {
+          if (!name) return false;
+          const n = stripShippingPromoText(name.replace(/\s/g, ""));
+          if (/単品/.test(n)) return false;
+          if (/90枚/.test(n)) return false;
+          if (/(3箱|4箱|5箱|6箱)/.test(n)) return false;
+          return isBoxCount(n, 2) || /60枚/.test(n);
+        },
+      },
+      {
+        key: "box1",
+        label: "30枚入り1箱",
+        totalLenses: 30,
+        heroLabel: "本日の総合最安値（1枚あたり）",
+        heroName: "デイリーズトータルワン 30枚入り1箱",
+        // 参考価格(1箱3,760円)をもとに、価格帯を直接指定して追加取得する
+        priceHint: { min: 3000, max: 4700 },
+        introHtml: `    <h2 class="section-heading">30枚入り1箱(単品)でも比較したい方へ</h2>
+    <p>
+      「まずは1箱だけ試したい」という方向けに、標準サイズ(30枚入り)1箱の
+      価格帯も別枠で掲載しています。<strong>90枚パック・2箱セットとは
+      金額の単位が異なる</strong>ため、比較する際は1枚あたりの単価をご確認ください。
+    </p>`,
+        // 90枚パック系・他の箱数をはっきり示す表記がある商品は、こちらでは対象外にする
+        matches(name) {
+          if (!name) return false;
+          const n = stripShippingPromoText(name.replace(/\s/g, ""));
+          if (/(90枚|2箱|3箱|4箱|5箱|6箱|60枚|180枚)/.test(n)) return false;
+          return true;
+        },
+      },
+    ],
+
+    productIntroHtml: `    <h2 class="section-heading">処方箋不要で購入できるショップを中心に比較しています</h2>
+    <p>
+      デイリーズトータルワンは、コンタクトレンズの中でも「処方箋の提示が必要」な
+      ショップで取り扱われることが多い商品です。当サイトでは、商品名や説明文に
+      「処方箋あり」「処方箋必要」などと明記された商品はあらかじめ除外していて、
+      処方箋不要で購入できるショップを中心に価格を比較しています。
+    </p>
+    <p>
+      楽天・Yahooで扱っているお店は処方箋が必要です。でも店頭で購入するよりは
+      安いので処方箋を用意できる方は、ぜひ利用したいですね！
+      処方箋が不要というと一般激安サイトで手にすることになりますが、安いサイトも
+      ありますので、参考にしてくださいね。掲載金額はもちろん送料無料（又は込み）です。
+    </p>
+    <p>
+      あわせて、購入する数量によって1枚あたりの単価が変わる点にも注目しています。
+      標準サイズ(30枚入り)を何箱まとめて購入するかや、まとめ買い向けの「90枚
+      パック」を選ぶかによっても、1枚あたりの単価が変わります。1枚あたりの
+      単価がもっとも下がりやすいのは、この90枚パックを2箱まとめて購入した
+      場合です。そのため当サイトでは、90枚パック2箱セットを中心に比較しつつ、
+      90枚パック1箱・標準サイズ(30枚入り)の2箱・1箱で見つかった場合も、
+      それぞれ別枠であわせて掲載しています。
+    </p>
+    <p class="note">
+      ※ 「処方箋不要」とは、購入時に処方箋の提示を求めないショップがある、という
+      販売形態の説明であり、眼科での検査が不要という意味ではありません。
+      コンタクトレンズは高度管理医療機器です。目の健康のため、定期的に眼科での
+      検査を受けたうえでご購入・ご使用くださいね。
+    </p>
+    <p style="text-align:center; font-weight:700; color:var(--teal); margin-top:16px;">
+      瞳を美しく維持するためにも…..
+    </p>`,
+
+    productInfoHeading: "デイリーズトータルワンとは",
+    productInfoHtml: `        <p>
+          デイリーズトータルワンは、日本アルコンが展開する1日使い捨てタイプの
+          コンタクトレンズです。シリコーンハイドロゲル素材「delefilcon A」を
+          採用し、レンズの内部と表面で異なる性質を持たせる「水分三層構造」を
+          特徴としています。
+        </p>
+        <h3>水分三層構造によるうるおい</h3>
+        <p>
+          レンズのコア(内部)は含水率33%でしっかりと形状を保持しつつ、レンズ
+          表面は80%以上の水分を含む設計とされています。表面の水分が涙液に
+          近い構造とされ、装用中のうるおいが続きやすいとされています。
+        </p>
+        <h3>高い酸素透過率</h3>
+        <p>
+          シリコーンハイドロゲル素材により、酸素透過率(Dk/t=156、-3.00Dの場合)
+          を実現しているとされています。従来のアルコン製ワンデーレンズと
+          比べても高い水準とされています。
+        </p>
+        <h3>こんな方におすすめ</h3>
+        <ul>
+          <li>装用中のうるおい・乾燥感を特に重視したい方</li>
+          <li>長時間の装用で終日の快適さを求める方</li>
+          <li>90枚パックでまとめ買いし、コストを抑えたい方</li>
+        </ul>
+        <p class="note">
+          ※ 度数・カーブなどの詳細仕様は変更される場合があります。
+          ご購入前に、各販売店の商品ページやメーカーの公式情報で
+          最新の仕様をご確認ください。コンタクトレンズは高度管理医療機器のため、
+          眼科での検査・処方をふまえたうえでのご購入・ご使用をおすすめします。
+          本ページは購入の最終判断材料としてではなく、比較検討のための
+          参考情報としてご活用ください。
+        </p>`,
+  },
+
+  // ------------------------------------------------------------------
+  // 16. 新しい商品を追加する場合は、ここに同じ形式でオブジェクトを追加する。
   // ------------------------------------------------------------------
 ];
