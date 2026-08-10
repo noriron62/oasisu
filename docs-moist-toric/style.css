@@ -1045,6 +1045,21 @@ footer.sitemap .op-link { font-size: 12px; color: var(--teal); font-weight: 700;
   z-index: 1;
   font-weight: 700;
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.04);
+  /* 商品名の長さに合わせて列が伸びると、他の列が隠れてしまうため幅を固定する。
+     PCは横幅に余裕があるので広め、スマホは他の列を見せるため狭めにする
+     (下の@mediaで上書き)。長い商品名は折り返して複数行にする。 */
+  width: 220px;
+  max-width: 220px;
+  white-space: normal;
+  font-size: 13px;
+  line-height: 1.4;
+}
+@media (max-width: 560px) {
+  #spec-table td.spec-name-col, #spec-table th.spec-name-col {
+    width: 120px;
+    max-width: 120px;
+    font-size: 12px;
+  }
 }
 #spec-table thead th.spec-name-col { background: var(--teal-dim-solid); z-index: 3; }
 #spec-table td.spec-name-col a { color: var(--teal); text-decoration: none; }
