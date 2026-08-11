@@ -3865,7 +3865,7 @@ export const products = [
         // itemCodeを指定しているので、毎回のワークフローで自動的に
         // 最新価格を取得する（試験的な運用。うまくいけば他商品にも展開）。
         manualListings: {
-          rakuten: [{ itemCode: "aiaimarket:bl-biotrue1dmf-30-04" }],
+          rakuten: [{ itemCode: "aiaimarket:10000594" }],
         },
       },
       {
@@ -3888,7 +3888,7 @@ export const products = [
         // 楽天APIのキーワード検索に出てこないショップを、商品コード
         // (itemCode)による直接指定で救済登録する。
         manualListings: {
-          rakuten: [{ itemCode: "aiaimarket:bl-biotrue1dmf-30-02" }],
+          rakuten: [{ itemCode: "aiaimarket:10000595" }],
         },
       },
       {
