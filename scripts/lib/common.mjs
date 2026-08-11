@@ -253,6 +253,45 @@ export async function fetchRakutenRaw({
 }
 
 /**
+ * 商品コード(itemCode、「ショップコード:商品URLコード」形式。例:
+ * "aiaimarket:bl-biotrue1dmf-30-04"）を指定して、その商品1件だけを
+ * ピンポイントで取得する。楽天APIのキーワード検索に、なぜか特定の
+ * ショップが出てこないことがある問題への対策として、商品コードによる
+ * 直接指定を使う（unit.manualListings.rakuten の各エントリで、
+ * price の代わりに itemCode を指定すると、この関数で毎回自動的に
+ * 最新価格を取得する）。
+ */
+export async function fetchRakutenByItemCode(itemCode, { appId, accessKey, affiliateId, siteUrl, moshimo }) {
+  if (!appId || !accessKey) return null;
+  const url = new URL(
+    "https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601"
+  );
+  url.searchParams.set("applicationId", appId);
+  url.searchParams.set("accessKey", accessKey);
+  if (affiliateId) url.searchParams.set("affiliateId", affiliateId);
+  url.searchParams.set("itemCode", itemCode);
+  url.searchParams.set("hits", "1");
+  url.searchParams.set("imageFlag", "1");
+  url.searchParams.set("formatVersion", "2");
+
+  await throttleRakuten();
+  const res = await fetchRakutenWithRetry(url, {
+    headers: { Origin: siteUrl, Referer: siteUrl },
+  });
+  if (!res.ok) {
+    console.warn(`  [warn] itemCode指定の取得に失敗（HTTP ${res.status}）: ${itemCode}`);
+    return null;
+  }
+  const json = await res.json();
+  const item = (json.Items || [])[0];
+  if (!item) {
+    console.warn(`  [warn] itemCode指定の商品が見つかりませんでした: ${itemCode}`);
+    return null;
+  }
+  return normalizeRakutenItem(item, { affiliateId, moshimo });
+}
+
+/**
  * Yahoo!ショッピングAPIへのfetchを行う。429（Too Many Requests）が返ってきた場合、
  * Yahoo側の「1アプリケーションIDにつき1分間30リクエスト」という利用制限に
  * 一時的に達しただけの可能性が高いため、少し待ってから自動的に再試行する。
