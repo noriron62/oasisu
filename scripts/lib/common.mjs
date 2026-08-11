@@ -45,6 +45,13 @@ export function sleep(ms) {
 let lastRakutenCallAt = 0;
 let rakutenChain = Promise.resolve();
 const RAKUTEN_MIN_INTERVAL_MS = 1100;
+
+// 商品ページを直接取得する際に使うUser-Agent（scrape-rx-free.mjs内の
+// 定義と同じ値。ブラウザからのアクセスに見せかけることで、
+// 一部サイトでのブロックを避けるため）。
+const USER_AGENT =
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+
 function throttleRakuten() {
   const next = rakutenChain.then(async () => {
     const elapsed = Date.now() - lastRakutenCallAt;
@@ -289,6 +296,49 @@ export async function fetchRakutenByItemCode(itemCode, { appId, accessKey, affil
     return null;
   }
   return normalizeRakutenItem(item, { affiliateId, moshimo });
+}
+
+/**
+ * 楽天の商品ページURL(例: https://item.rakuten.co.jp/aiaimarket/xxx/)から、
+ * 商品コード(itemCode、「ショップコード:商品番号」形式)を自動抽出する。
+ *
+ * 楽天の商品ページには、商品番号がURLのスラッグ(見た目の名前)とは別に、
+ * アクセス解析用のトラッキングURL(item_id=数字)や、お気に入り登録用の
+ * リンク(iid=数字)の中に、生のHTML上でだけ埋め込まれている。ページの
+ * 見た目のテキストだけを抽出するツールでは見えないが、生のHTMLをそのまま
+ * 取得するこの関数(サーバー側のfetch)でなら、正規表現で拾い出せる。
+ *
+ * ショップコードはURLのパス(item.rakuten.co.jp/【ここ】/...)からそのまま
+ * 取り出せるので、両方を組み合わせて itemCode を組み立てる。
+ */
+export async function resolveRakutenItemCodeFromPageUrl(pageUrl) {
+  try {
+    const shopMatch = pageUrl.match(/item\.rakuten\.co\.jp\/([^/]+)\//);
+    if (!shopMatch) {
+      console.warn(`  [warn] URLからショップコードを取り出せませんでした: ${pageUrl}`);
+      return null;
+    }
+    const shopCode = shopMatch[1];
+
+    const res = await fetch(pageUrl, { headers: { "User-Agent": USER_AGENT } });
+    if (!res.ok) {
+      console.warn(`  [warn] 商品コード抽出用のページ取得に失敗（HTTP ${res.status}）: ${pageUrl}`);
+      return null;
+    }
+    const html = await res.text();
+    // item_id=1234 / iid=1234 のどちらかのパターンで商品番号を探す
+    const idMatch = html.match(/[?&](?:item_id|iid)=(\d+)/);
+    if (!idMatch) {
+      console.warn(`  [warn] ページ内から商品番号を見つけられませんでした: ${pageUrl}`);
+      return null;
+    }
+    const itemCode = `${shopCode}:${idMatch[1]}`;
+    console.log(`  [debug] ページURLから商品コードを自動抽出: ${pageUrl} → ${itemCode}`);
+    return itemCode;
+  } catch (err) {
+    console.warn(`  [warn] 商品コード抽出中にエラー: ${pageUrl} (${err.message})`);
+    return null;
+  }
 }
 
 /**
