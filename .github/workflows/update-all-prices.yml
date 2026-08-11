@@ -20,6 +20,7 @@ on:
           - precision1-saiyasu
           - precision1-toric-saiyasu
           - dailies-total-one-saiyasu
+          - seed-multistage-saiyasu
           - seed-saiyasu
           - moist-multifocal-saiyasu
           - seed-ranshi-saiyasu
