@@ -29,7 +29,7 @@ const OUT_DIR = path.join(ROOT, "docs-root");
 const SITE_BASE_URL = (process.env.SITE_BASE_URL || "https://example.com").replace(/\/+$/, "");
 
 // ブランドの表示順（この配列に無い brandKey の商品は末尾にまとめて表示する）
-const BRAND_ORDER = ["seed", "acuvue", "coopervision", "bausch"];
+const BRAND_ORDER = ["seed", "acuvue", "coopervision", "bausch", "alcon"];
 
 // コラム（FAQ）。表示用HTMLと、FAQPage構造化データの両方をこの1つの配列から生成する。
 const COLUMNS = [
@@ -193,11 +193,27 @@ function renderJumpNav(productsWithData) {
 }
 
 function renderFooterLinks(productsWithData) {
-  return productsWithData
-    .map(
-      ({ product }) =>
-        `        <a href="/${product.slug}/">${escapeHtml(product.shortName)}</a>`
-    )
+  const groups = new Map();
+  for (const { product } of productsWithData) {
+    const key = product.brandKey || product.brand || "other";
+    if (!groups.has(key)) groups.set(key, { brand: product.brand || "その他", items: [] });
+    groups.get(key).items.push(product);
+  }
+  const orderedKeys = [
+    ...BRAND_ORDER.filter((k) => groups.has(k)),
+    ...[...groups.keys()].filter((k) => !BRAND_ORDER.includes(k)),
+  ];
+  return orderedKeys
+    .map((key) => {
+      const { brand, items } = groups.get(key);
+      const linksHtml = items
+        .map((p) => `          <a href="/${p.slug}/">${escapeHtml(p.shortName)}</a>`)
+        .join("\n");
+      return `        <div class="footer-brand-group">
+          <p class="footer-brand-name">${escapeHtml(brand)}</p>
+${linksHtml}
+        </div>`;
+    })
     .join("\n");
 }
 
