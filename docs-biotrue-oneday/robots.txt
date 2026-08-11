@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://newmediagallery.org/biotrue-oneday-saiyasu/sitemap.xml
