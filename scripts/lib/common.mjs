@@ -329,7 +329,13 @@ export async function resolveRakutenItemCodeFromPageUrl(pageUrl) {
     // item_id=1234 / iid=1234 のどちらかのパターンで商品番号を探す
     const idMatch = html.match(/[?&](?:item_id|iid)=(\d+)/);
     if (!idMatch) {
-      console.warn(`  [warn] ページ内から商品番号を見つけられませんでした: ${pageUrl}`);
+      // 原因切り分けのため、実際に何が取得できたのかをログに残す
+      // （ボット対策等で、狙ったページと違う内容が返ってきていないか確認するため）
+      console.warn(
+        `  [warn] ページ内から商品番号を見つけられませんでした: ${pageUrl}\n` +
+          `    HTTPステータス: ${res.status} / 取得したHTMLの長さ: ${html.length}文字\n` +
+          `    先頭200文字: ${html.slice(0, 200).replace(/\s+/g, " ")}`
+      );
       return null;
     }
     const itemCode = `${shopCode}:${idMatch[1]}`;
