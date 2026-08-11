@@ -116,6 +116,17 @@ function normalizeFullWidthDigits(n) {
 }
 
 /**
+ * 「見切り品」「訳あり」「アウトレット」「在庫処分」など、通常の
+ * 販売価格ではない一時的な処分品を判定する。1個限定・在庫限りの
+ * ケースが多く、継続的な最安値としてふさわしくないため除外する。
+ */
+export function isClearanceListing(name) {
+  if (!name) return false;
+  const n = name.replace(/\s/g, "");
+  return /(見切り品|訳あり|わけあり|アウトレット|在庫処分|在庫限り|特価処分)/.test(n);
+}
+
+/**
  * 「2~12箱セット」「2箱 4箱 6箱 12箱」のように、購入時に複数の箱数から
  * 選べるタイプの商品を判定する。この手の商品はAPIが返す価格が
  * どの箱数に対応するものか特定できない（多くの場合、最小数量の価格）ため、
@@ -143,10 +154,11 @@ export function isAmbiguousMultiBoxListing(name) {
  */
 export function stripShippingPromoText(n) {
   const normalized = normalizeFullWidthDigits(n);
-  // 「2箱で送料無料」「2箱購入で送料無料」「2箱でポスト便送料無料」のように、
-  // 「箱」と「で」の間、「で」と「送料無料」の間、それぞれに別の単語が
-  // 挟まる表記ゆれがあるため、どちらの間にも短い語句が入ってよいようにする
-  return normalized.replace(/\d箱.{0,10}?で.{0,10}?送料無料/g, "");
+  // 「2箱で送料無料」「2箱購入で送料無料」「2箱でポスト便送料無料」
+  // 「2箱購入から送料無料」のように、「箱」と接続語(で/から)の間、
+  // 接続語と「送料無料」の間、それぞれに別の単語が挟まる表記ゆれが
+  // あるため、どちらの間にも短い語句が入ってよいようにする
+  return normalized.replace(/\d箱.{0,10}?(で|から).{0,10}?送料無料/g, "");
 }
 
 /** 処方箋の提出が必要な商品を除外する */
@@ -377,6 +389,7 @@ export function applyCommonFilters(items) {
       !hasRxCode(item.itemCode) &&
       !hasRxCode(item.reviewUrl) &&
       !isAmbiguousMultiBoxListing(item.name) &&
+      !isClearanceListing(item.name) &&
       !hasSeparateShipping(item.name) &&
       !hasSeparateShipping(item.caption) &&
       !hasSeparateShipping(item.catchcopy) &&
