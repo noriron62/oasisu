@@ -3274,11 +3274,14 @@ export const products = [
       type: "遠近両用",
     },
 
-    /** 商品名が「シードワンデーピュアマルチステージ」であることを確認する */
+    /** 商品名が「シードワンデーピュアマルチステージ」（2週間用ではない）であることを確認する */
     isCorrectProduct(name) {
       if (!name) return false;
       const n = name.replace(/\s/g, "");
       if (!/マルチステージ/.test(n)) return false;
+      // 同名の2週間使い捨てタイプ(「2weekピュアマルチステージ」)が別途
+      // 存在するため、こちらはワンデー(1日使い捨て)専用として明示的に除外する
+      if (/(2week|2ウィーク|2週間)/i.test(n)) return false;
       return /(シード|seed)/i.test(n) || /ピュア/.test(n);
     },
 
