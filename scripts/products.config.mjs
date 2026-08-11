@@ -3860,6 +3860,13 @@ export const products = [
         matches(name) {
           return isBoxCount(name, 4) || /120枚/.test(name.replace(/\s/g, ""));
         },
+        // 楽天APIのキーワード検索に出てこないショップを、商品コード
+        // (itemCode)による直接指定で救済登録する。price固定ではなく
+        // itemCodeを指定しているので、毎回のワークフローで自動的に
+        // 最新価格を取得する（試験的な運用。うまくいけば他商品にも展開）。
+        manualListings: {
+          rakuten: [{ itemCode: "aiaimarket:bl-biotrue1dmf-30-04" }],
+        },
       },
       {
         key: "box2",
@@ -3877,6 +3884,11 @@ export const products = [
     </p>`,
         matches(name) {
           return isBoxCount(name, 2) || /60枚/.test(name.replace(/\s/g, ""));
+        },
+        // 楽天APIのキーワード検索に出てこないショップを、商品コード
+        // (itemCode)による直接指定で救済登録する。
+        manualListings: {
+          rakuten: [{ itemCode: "aiaimarket:bl-biotrue1dmf-30-02" }],
         },
       },
       {

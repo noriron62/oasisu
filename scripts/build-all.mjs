@@ -34,6 +34,7 @@ import {
   renderThemeStyle,
   sleep,
   fetchRakutenRaw,
+  fetchRakutenByItemCode,
   fetchYahooRaw,
   normalizeRakutenItem,
   normalizeYahooItem,
@@ -250,7 +251,8 @@ async function buildOneProduct(product, template) {
   const claimedYahoo = new Set();
   const itemKey = (item) => `${item.shop}__${item.price}__${item.url}`;
 
-  const unitResults = product.units.map((unit) => {
+  const unitResults = [];
+  for (const unit of product.units) {
     const rakutenCandidates = rakutenItems.filter(
       (i) => !claimedRakuten.has(itemKey(i)) && unit.matches(i.name, i.price)
     );
@@ -260,10 +262,31 @@ async function buildOneProduct(product, template) {
 
     // APIの検索結果に、たまたま毎回出てこないショップがあった場合の救済策。
     // unit.manualListings に手動で登録しておくと、API結果に合流させる。
-    // 手動登録なので価格が自動更新されない点に注意（運営者が定期的に見直す）。
+    // 各エントリは price（固定値・手動更新）と itemCode（商品コードで
+    // 毎回自動的に最新価格を取得）のどちらかを指定できる。
     if (unit.manualListings) {
       for (const m of unit.manualListings.rakuten || []) {
-        rakutenCandidates.push({ ...m, source: "楽天市場" });
+        if (m.itemCode) {
+          const fetched = await fetchRakutenByItemCode(m.itemCode, {
+            appId: RAKUTEN_APP_ID,
+            accessKey: RAKUTEN_ACCESS_KEY,
+            affiliateId: RAKUTEN_AFFILIATE_ID,
+            siteUrl,
+          });
+          console.log(
+            fetched
+              ? `  [manualListings/itemCode] ${m.itemCode}: ¥${fetched.price}（自動取得）`
+              : `  [manualListings/itemCode] ${m.itemCode}: 取得失敗`
+          );
+          if (fetched) {
+            // itemCode指定の場合、店舗名・アフィリエイトリンク・画像は
+            // APIから取得したものをそのまま使う（設定で上書きされていれば
+            // そちらを優先する）。
+            rakutenCandidates.push({ ...fetched, ...(m.shop ? { shop: m.shop } : {}) });
+          }
+        } else {
+          rakutenCandidates.push({ ...m, source: "楽天市場" });
+        }
       }
       for (const m of unit.manualListings.yahoo || []) {
         yahooCandidates.push({ ...m, source: "Yahoo!ショッピング" });
@@ -276,8 +299,8 @@ async function buildOneProduct(product, template) {
     const topN = product.rankingTopN || 5;
     const rakutenRanking = buildRanking(rakutenCandidates, unit.totalLenses, topN, product.lensesPerBox || 30);
     const yahooRanking = buildRanking(yahooCandidates, unit.totalLenses, topN, product.lensesPerBox || 30);
-    return { unit, rakutenRanking, yahooRanking };
-  });
+    unitResults.push({ unit, rakutenRanking, yahooRanking });
+  }
 
   // ---- 「その他のショップ」(楽天/Yahoo!以外の独自サイト)の価格取得 ----
   // unit.otherShops に設定がある比較単位だけ対象にする。
