@@ -35,6 +35,7 @@ import {
   sleep,
   fetchRakutenRaw,
   fetchRakutenByItemCode,
+  resolveRakutenItemCodeFromPageUrl,
   fetchYahooRaw,
   normalizeRakutenItem,
   normalizeYahooItem,
@@ -262,12 +263,21 @@ async function buildOneProduct(product, template) {
 
     // APIの検索結果に、たまたま毎回出てこないショップがあった場合の救済策。
     // unit.manualListings に手動で登録しておくと、API結果に合流させる。
-    // 各エントリは price（固定値・手動更新）と itemCode（商品コードで
-    // 毎回自動的に最新価格を取得）のどちらかを指定できる。
+    // 各エントリは次の3通りのいずれかを指定できる:
+    //   price    … 固定値（手動更新）
+    //   itemCode … 商品コードで毎回自動的に最新価格を取得
+    //   pageUrl  … 商品ページのURLから商品コードを自動で見つけ出したうえで、
+    //              毎回自動的に最新価格を取得（itemCodeが分からない場合の
+    //              入り口。一度見つけた商品コードは変わらないことが多いが、
+    //              念のため毎回解決し直す）
     if (unit.manualListings) {
       for (const m of unit.manualListings.rakuten || []) {
-        if (m.itemCode) {
-          const fetched = await fetchRakutenByItemCode(m.itemCode, {
+        let itemCode = m.itemCode;
+        if (!itemCode && m.pageUrl) {
+          itemCode = await resolveRakutenItemCodeFromPageUrl(m.pageUrl);
+        }
+        if (itemCode) {
+          const fetched = await fetchRakutenByItemCode(itemCode, {
             appId: RAKUTEN_APP_ID,
             accessKey: RAKUTEN_ACCESS_KEY,
             affiliateId: RAKUTEN_AFFILIATE_ID,
@@ -275,8 +285,8 @@ async function buildOneProduct(product, template) {
           });
           console.log(
             fetched
-              ? `  [manualListings/itemCode] ${m.itemCode}: ¥${fetched.price}（自動取得）`
-              : `  [manualListings/itemCode] ${m.itemCode}: 取得失敗`
+              ? `  [manualListings/itemCode] ${itemCode}: ¥${fetched.price}（自動取得）`
+              : `  [manualListings/itemCode] ${itemCode}: 取得失敗`
           );
           if (fetched) {
             // itemCode指定の場合、店舗名・アフィリエイトリンク・画像は
