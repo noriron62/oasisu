@@ -36,6 +36,7 @@ import {
   fetchRakutenRaw,
   fetchRakutenByItemCode,
   resolveRakutenItemCodeFromPageUrl,
+  scrapeRakutenSearchPage,
   fetchYahooRaw,
   normalizeRakutenItem,
   normalizeYahooItem,
@@ -260,6 +261,33 @@ async function buildOneProduct(product, template) {
     const yahooCandidates = yahooItems.filter(
       (i) => !claimedYahoo.has(itemKey(i)) && unit.matches(i.name, i.price)
     );
+
+    // 【実験的機能】楽天のキーワード検索API(IchibaItem/Search)が、なぜか
+    // 特定のショップを検索結果に含めてくれないことがある問題への対策。
+    // unit.enableSearchPageScrape: true を指定した比較単位だけ、公式APIを
+    // 使わず検索結果ページを直接読み取り、そこで見つかった商品も候補に
+    // 加える。ページの内部構造に依存した緩い抽出のため、既存の商品には
+    // 影響が出ないよう、明示的に有効化した単位でしか動かない。
+    if (unit.enableSearchPageScrape && unit.priceHint) {
+      const scraped = await scrapeRakutenSearchPage(unit.hintedKeyword || product.searchKeyword, {
+        minPrice: unit.priceHint.min,
+        maxPrice: unit.priceHint.max,
+      });
+      for (const s of scraped) {
+        if (!s.name) continue; // 商品名を抽出できなかったものは判定できないため除外
+        if (!product.isCorrectProduct(s.name)) continue;
+        if (!unit.matches(s.name, s.price)) continue;
+        rakutenCandidates.push({
+          source: "楽天市場",
+          name: s.name,
+          price: s.price,
+          url: s.url,
+          shop: s.shop,
+          caption: "",
+          catchcopy: "",
+        });
+      }
+    }
 
     // APIの検索結果に、たまたま毎回出てこないショップがあった場合の救済策。
     // unit.manualListings に手動で登録しておくと、API結果に合流させる。
