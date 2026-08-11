@@ -122,6 +122,7 @@ function renderProductCard(product, overallBest) {
     : "商品画像";
 
   let priceHtml;
+  let dealLink; // 商品名・価格・単価(上3つ)を、実際の最安値ショップへ飛ばすためのリンク先
   if (overallBest && typeof overallBest.rawUnitPrice === "number") {
     const lensesPerBox = product.lensesPerBox || 30;
     const perBoxPrice = Math.round(overallBest.rawUnitPrice * lensesPerBox);
@@ -129,17 +130,29 @@ function renderProductCard(product, overallBest) {
     priceHtml = `
           <p class="price-main"><span class="unit-label">1箱</span>¥${perBoxPrice.toLocaleString("ja-JP")}</p>
           <p class="price-sub">${escapeHtml(unitLabel ? `(${unitLabel}換算) ` : "")}1枚あたり¥${overallBest.unitPrice}</p>`;
+    dealLink = overallBest.url || null;
   } else {
     priceHtml = `<p class="price-unavailable">価格情報を準備中です</p>`;
+    dealLink = null;
   }
 
-  return `      <a class="top-product-card" id="product-${product.slug}" href="/${product.slug}/" style="--card-c:${accent}; --card-dim:${accent}1a">
-        <div class="thumb">${thumbHtml}</div>
-        <div class="body">
-          <p class="name">${escapeHtml(product.shortName)}</p>${priceHtml}
-          <span class="cta">最安値を見る →</span>
-        </div>
-      </a>`;
+  // 上3つ(商品名・画像・価格)は、実際の最安値ショップ(楽天/Yahoo!等)へ
+  // 直接リンクする。ショップのURLがまだ無い場合は、代わりに自サイトの
+  // 商品ページへのリンクにフォールバックする。
+  const dealHref = dealLink || `/${product.slug}/`;
+  const dealAttrs = dealLink
+    ? `href="${escapeHtml(dealHref)}" target="_blank" rel="noopener sponsored"`
+    : `href="${escapeHtml(dealHref)}"`;
+
+  return `      <div class="top-product-card" id="product-${product.slug}" style="--card-c:${accent}; --card-dim:${accent}1a">
+        <a class="top-product-card-deal" ${dealAttrs}>
+          <div class="thumb">${thumbHtml}</div>
+          <div class="body">
+            <p class="name">${escapeHtml(product.shortName)}</p>${priceHtml}
+          </div>
+        </a>
+        <a class="cta" href="/${product.slug}/">最安値を見る →</a>
+      </div>`;
 }
 
 function renderBrandSections(productsWithData) {
