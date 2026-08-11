@@ -302,7 +302,7 @@ async function buildOneProduct(product, template) {
       for (const m of unit.manualListings.rakuten || []) {
         let itemCode = m.itemCode;
         if (!itemCode && m.pageUrl) {
-          itemCode = await resolveRakutenItemCodeFromPageUrl(m.pageUrl);
+          itemCode = await resolveRakutenItemCodeFromPageUrl(m.pageUrl, { siteUrl });
         }
         if (itemCode) {
           const fetched = await fetchRakutenByItemCode(itemCode, {
