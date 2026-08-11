@@ -3345,6 +3345,19 @@ export const products = [
         matches(name) {
           return isBoxCount(name, 2) || /64枚/.test(name.replace(/\s/g, ""));
         },
+        // 楽天APIの検索結果になぜか出てこないショップを手動で救済登録。
+        // ※手動登録のため価格は自動更新されない。運営者が定期的に
+        // （目安2週間ごと）実際の価格を確認し、更新する方針とする。
+        manualListings: {
+          rakuten: [
+            {
+              shop: "コンタクト通販 レンズフリー",
+              price: 4230,
+              url: "https://hb.afl.rakuten.co.jp/ichiba/4d268a06.c9e06913.4d268a07.60f2a21d/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Flensfree%2Fsd1dpms32-2%2F&link_type=hybrid_url&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJoeWJyaWRfdXJsIiwic2l6ZSI6IjQwMHg0MDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
+              image: "https://shop.r10s.jp/lensfree/cabinet/product/sd1dpms32p-2.jpg",
+            },
+          ],
+        },
       },
       {
         key: "box1",
