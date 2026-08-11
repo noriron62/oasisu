@@ -57,6 +57,42 @@ const ROOT = path.join(__dirname, "..");
 const TEMPLATE_PATH = path.join(ROOT, "docs-template", "site.template.html");
 const STYLE_CSS_PATH = path.join(ROOT, "docs-template", "style.css");
 
+// トップページ(generate-top-page.mjs)と同じ並び順にするための、
+// ブランド(メーカー)表示順。ここに無いブランドは末尾に追加される。
+const BRAND_ORDER = ["seed", "acuvue", "coopervision", "bausch", "alcon"];
+
+/**
+ * 各ページ最下部の「取り扱い商品一覧」を、メーカー(brand)ごとに
+ * 見出し付きでグループ化して生成する。
+ */
+function renderProductListFooterByBrand(products) {
+  const groups = new Map();
+  for (const p of products) {
+    const key = p.brandKey || p.brand || "other";
+    if (!groups.has(key)) groups.set(key, { brand: p.brand || "その他", items: [] });
+    groups.get(key).items.push(p);
+  }
+  const orderedKeys = [
+    ...BRAND_ORDER.filter((k) => groups.has(k)),
+    ...[...groups.keys()].filter((k) => !BRAND_ORDER.includes(k)),
+  ];
+  return orderedKeys
+    .map((key) => {
+      const { brand, items } = groups.get(key);
+      const linksHtml = items
+        .map(
+          (p) =>
+            `          <a href="/${p.slug}/">${escapeHtml(p.shortName || p.siteName)}</a>`
+        )
+        .join("\n");
+      return `        <div class="footer-brand-group">
+          <p class="footer-brand-name">${escapeHtml(brand)}</p>
+${linksHtml}
+        </div>`;
+    })
+    .join("\n");
+}
+
 const SITE_BASE_URL = (process.env.SITE_BASE_URL || "https://example.com").replace(/\/+$/, "");
 const DELAY_BETWEEN_PRODUCTS_MS = 1500; // 商品間の待ち時間（API負荷対策）
 
@@ -453,13 +489,10 @@ async function buildOneProduct(product, template) {
   // ---- HTML生成 ----
   const canonicalUrl = siteUrl;
   const allItems = unitResults.flatMap((r) => [...r.rakutenRanking, ...r.yahooRanking]);
-  // 通常は楽天ランキング1位の商品画像を自動流用するが、並行輸入品など
-  // 実際の商品と異なる画像が紛れ込むことがあるため、商品ごとに固定の
-  // 画像URL(productInfoImageOverride)を指定できるようにしている。
-  const rakutenImage =
-    product.productInfoImageOverride ||
-    unitResults.flatMap((r) => r.rakutenRanking).find((i) => i.image)?.image ||
-    "images/product-1.jpg";
+  // 「商品とは」欄の画像は、各商品フォルダに用意しているproduct-1.jpg
+  // (運営者が手動でアップロードした、確実に正しい商品写真)を常に使う。
+  // productInfoImageOverride(外部URL指定)がある場合のみ、そちらを優先する。
+  const rakutenImage = product.productInfoImageOverride || "images/product-1.jpg";
 
   // 上ですでに取得済みの otherShopsRankedByUnitKey から、表示用HTMLを生成する
   const otherShopsHtmlByUnitKey = {};
@@ -497,12 +530,7 @@ async function buildOneProduct(product, template) {
     BREADCRUMB_HTML: `  <nav class="breadcrumb" aria-label="パンくずリスト">
     <a href="/">ホーム</a><span class="sep">&gt;</span><span>${escapeHtml(product.shortName || product.siteName)}</span>
   </nav>`,
-    PRODUCT_LIST_FOOTER_HTML: products
-      .map(
-        (p) =>
-          `        <a href="/${p.slug}/">${escapeHtml(p.shortName || p.siteName)}</a>`
-      )
-      .join("\n"),
+    PRODUCT_LIST_FOOTER_HTML: renderProductListFooterByBrand(products),
     UPDATED_TEXT: escapeHtml(formatUpdatedText(updatedAt)),
     HERO_SECTION: overallBest
       ? renderHeroSection(overallBest, overallBestUnit.heroLabel, overallBestUnit.heroName)
