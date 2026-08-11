@@ -212,7 +212,7 @@ export async function fetchRakutenRaw({
   const allItems = [];
   for (let page = 1; page <= maxPages; page++) {
     const url = new URL(
-      "https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601"
+      "https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260701"
     );
     url.searchParams.set("applicationId", appId);
     url.searchParams.set("accessKey", accessKey);
@@ -264,7 +264,7 @@ export async function fetchRakutenRaw({
 export async function fetchRakutenByItemCode(itemCode, { appId, accessKey, affiliateId, siteUrl, moshimo }) {
   if (!appId || !accessKey) return null;
   const url = new URL(
-    "https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601"
+    "https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260701"
   );
   url.searchParams.set("applicationId", appId);
   url.searchParams.set("accessKey", accessKey);
