@@ -342,6 +342,78 @@ export async function resolveRakutenItemCodeFromPageUrl(pageUrl) {
 }
 
 /**
+ * 楽天の「検索結果ページ」を直接取得し、商品を抽出する（APIを使わない）。
+ *
+ * 楽天のキーワード検索API(IchibaItem/Search)が、なぜか特定のショップを
+ * 検索結果に含めてくれないことがある一方、検索結果ページ自体には
+ * その商品が載っていることが確認できたための実験的な対策。
+ *
+ * ※このサイトでは通常、公式APIを優先して使う方針としている。この関数は
+ * 「APIが返してこない商品を見つけ出す」という限定的な目的のためだけに、
+ * 商品ページの生HTMLを直接読み取る。ページの内部構造（クラス名など）に
+ * 依存しないよう、URLと価格の位置関係だけを手がかりにした緩めの
+ * 正規表現で抽出しているため、楽天側のページ構成が変わると抽出できなく
+ * なる可能性がある（その場合は空配列を返し、警告ログを出す）。
+ */
+export async function scrapeRakutenSearchPage(keyword, { minPrice, maxPrice, page = 1 } = {}) {
+  try {
+    const url = new URL(`https://search.rakuten.co.jp/search/mall/${encodeURIComponent(keyword)}/`);
+    // s=11 は「安い順(価格)」でのソート（検索結果ページの並び替えリンクから確認した値）
+    url.searchParams.set("s", "11");
+    if (page > 1) url.searchParams.set("p", String(page));
+    if (minPrice) url.searchParams.set("min", String(Math.round(minPrice)));
+    if (maxPrice) url.searchParams.set("max", String(Math.round(maxPrice)));
+
+    const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
+    if (!res.ok) {
+      console.warn(`  [warn] 検索結果ページの取得に失敗（HTTP ${res.status}）: ${url}`);
+      return [];
+    }
+    const html = await res.text();
+
+    // 商品ページへのリンク(href="https://item.rakuten.co.jp/ショップ/商品/...")を
+    // すべて拾い、それぞれのリンクの近く(前後2,000文字以内)に出てくる
+    // 価格(「◯◯円」)と、商品名らしき文字列(img要素のalt属性、または
+    // リンクのtitle属性のうち、一番長いもの)を、その商品の情報とみなす。
+    const linkPattern = /href="(https:\/\/item\.rakuten\.co\.jp\/([a-zA-Z0-9_-]+)\/([^/"?]+)\/?)[^"]*"/g;
+    const seen = new Set();
+    const results = [];
+    let match;
+    while ((match = linkPattern.exec(html)) !== null) {
+      const [, fullUrlRaw, shopCode, itemSlug] = match;
+      const itemUrl = `https://item.rakuten.co.jp/${shopCode}/${itemSlug}/`;
+      if (seen.has(itemUrl)) continue;
+
+      const windowStart = Math.max(0, match.index - 500);
+      const windowEnd = Math.min(html.length, match.index + 2000);
+      const nearby = html.slice(windowStart, windowEnd);
+
+      const priceMatch = nearby.match(/([\d,，]{3,8})\s*円/);
+      if (!priceMatch) continue;
+      const price = Number(priceMatch[1].replace(/[,，]/g, ""));
+      if (!price || price < 100) continue; // ポイント数などの誤検出を除外
+
+      // alt属性・title属性の中から、一番長い文字列を商品名とみなす
+      // （短いものは「もっと見る」等のUI文言である可能性が高いため）
+      const nameCandidates = [...nearby.matchAll(/(?:alt|title)="([^"]{10,300})"/g)].map((m) => m[1]);
+      const name = nameCandidates.sort((a, b) => b.length - a.length)[0] || null;
+
+      seen.add(itemUrl);
+      results.push({ shop: shopCode, name, price, url: itemUrl });
+    }
+
+    console.log(
+      `  [debug] 検索結果ページから直接抽出: ${url} → ${results.length}件` +
+        (results.length ? ` (例: ${results[0].shop} ¥${results[0].price} 「${(results[0].name || "").slice(0, 20)}」)` : "")
+    );
+    return results;
+  } catch (err) {
+    console.warn(`  [warn] 検索結果ページのスクレイピング中にエラー: ${keyword} (${err.message})`);
+    return [];
+  }
+}
+
+/**
  * Yahoo!ショッピングAPIへのfetchを行う。429（Too Many Requests）が返ってきた場合、
  * Yahoo側の「1アプリケーションIDにつき1分間30リクエスト」という利用制限に
  * 一時的に達しただけの可能性が高いため、少し待ってから自動的に再試行する。
