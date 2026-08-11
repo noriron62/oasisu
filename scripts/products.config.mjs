@@ -1583,6 +1583,11 @@ export const products = [
           if (/マキシ/.test(n)) return false;
           return isBoxCount(n, 6) || /180枚/.test(n);
         },
+        // 楽天APIのキーワード検索に出てこないショップを、商品コード
+        // (itemCode)の直接指定で救済登録する。
+        manualListings: {
+          rakuten: [{ itemCode: "otsuyocontactlens:10000008" }],
+        },
       },
       {
         key: "box1_90",
