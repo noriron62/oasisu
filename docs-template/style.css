@@ -896,9 +896,10 @@ footer.bottom {
 .top-product-card .cta {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
-  align-self: flex-start;
-  margin-top: 12px;
+  align-self: center;
+  margin-top: auto;
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 700;
