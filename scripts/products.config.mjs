@@ -3842,6 +3842,15 @@ export const products = [
         matches(name) {
           return isBoxCount(name, 6) || /180枚/.test(name.replace(/\s/g, ""));
         },
+        // 楽天APIのキーワード検索に出てこないショップを、pageUrl方式
+        // (毎回自動でページから商品コードを解決し、最新価格を取得)で救済登録。
+        manualListings: {
+          rakuten: [
+            { pageUrl: "https://item.rakuten.co.jp/aiaimarket/bl-biotrue1dmf-30-06/" },
+            { pageUrl: "https://item.rakuten.co.jp/visionstyle/2172-6-1/" },
+            { pageUrl: "https://item.rakuten.co.jp/hitominity/4961308001068-3/" },
+          ],
+        },
       },
       {
         key: "box4",
@@ -3861,11 +3870,14 @@ export const products = [
           return isBoxCount(name, 4) || /120枚/.test(name.replace(/\s/g, ""));
         },
         // 楽天APIのキーワード検索に出てこないショップを、商品コード
-        // (itemCode)による直接指定で救済登録する。price固定ではなく
-        // itemCodeを指定しているので、毎回のワークフローで自動的に
-        // 最新価格を取得する（試験的な運用。うまくいけば他商品にも展開）。
+        // (itemCode)/pageUrlによる直接指定で救済登録する。price固定では
+        // なくitemCode/pageUrlを指定しているので、毎回のワークフローで
+        // 自動的に最新価格を取得する。
         manualListings: {
-          rakuten: [{ itemCode: "aiaimarket:10000594" }],
+          rakuten: [
+            { itemCode: "aiaimarket:10000594" },
+            { pageUrl: "https://item.rakuten.co.jp/visionstyle/2172-4-1/" },
+          ],
         },
       },
       {
@@ -3891,9 +3903,13 @@ export const products = [
           return isBoxCount(name, 2) || /60枚/.test(name.replace(/\s/g, ""));
         },
         // 楽天APIのキーワード検索に出てこないショップを、商品コード
-        // (itemCode)による直接指定で救済登録する。
+        // (itemCode)/pageUrlによる直接指定で救済登録する。
         manualListings: {
-          rakuten: [{ itemCode: "aiaimarket:10000595" }],
+          rakuten: [
+            { itemCode: "aiaimarket:10000595" },
+            { pageUrl: "https://item.rakuten.co.jp/yokohamacontact/k-r-02-1d-add-1980-4-set-02-001/" },
+            { pageUrl: "https://item.rakuten.co.jp/visionstyle/2172-2-1/" },
+          ],
         },
       },
       {
@@ -3915,6 +3931,12 @@ export const products = [
           const n = stripShippingPromoText(name.replace(/\s/g, ""));
           if (/(2箱|3箱|4箱|5箱|6箱|60枚|120枚|180枚)/.test(n)) return false;
           return true;
+        },
+        // 楽天APIのキーワード検索に出てこないショップを、pageUrl方式で救済登録。
+        manualListings: {
+          rakuten: [
+            { pageUrl: "https://item.rakuten.co.jp/yokohamacontact/k-r-02-1d-add-1980-4-one-01-001/" },
+          ],
         },
       },
     ],
