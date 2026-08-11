@@ -910,9 +910,11 @@ footer.sitemap {
   gap: 20px;
 }
 footer.sitemap h3 { font-size: 13px; color: var(--ink-soft); margin: 0 0 10px; }
-footer.sitemap .links { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+footer.sitemap .links { display: flex; flex-direction: column; gap: 16px; font-size: 12px; }
 footer.sitemap .links a { color: var(--ink-soft); }
 footer.sitemap .op-link { font-size: 12px; color: var(--teal); font-weight: 700; white-space: nowrap; }
+.footer-brand-group { display: flex; flex-direction: column; gap: 6px; }
+.footer-brand-name { font-size: 12px; font-weight: 700; color: var(--teal); margin: 0 0 2px; }
 
 /* ---------- パンくずリスト ---------- */
 .breadcrumb {
