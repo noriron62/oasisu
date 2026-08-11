@@ -3876,10 +3876,11 @@ export const products = [
         heroName: "バイオトゥルーワンデーマルチフォーカル(遠近両用) 2箱セット(60枚)",
         // 参考価格(2箱5,570円)をもとに、価格帯を直接指定して追加取得する
         priceHint: { min: 4400, max: 6900 },
-        // 【実験的機能】楽天APIが返してこないショップ(yokohamacontact・
-        // visionstyle等)がいたため、検索結果ページを直接読み取る機能を
-        // 試験導入する。うまくいけば他の単位・商品にも展開する。
-        enableSearchPageScrape: true,
+        // 【試験導入→無効化済み】楽天の検索結果ページを直接読み取る機能
+        // (enableSearchPageScrape)を試したが、検索結果ページ自体が
+        // JavaScriptで後から商品を描画する作りのため、0件しか取得できず
+        // 無効化した。同じ問題が起きた場合は、itemCode/pageUrl方式で
+        // 個別に対応する。
         introHtml: `    <h2 class="section-heading">2箱(単品)でも比較したい方へ</h2>
     <p>
       2箱セット(60枚)で販売しているショップも見つかった場合は、
