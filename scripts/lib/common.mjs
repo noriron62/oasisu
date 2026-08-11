@@ -311,7 +311,7 @@ export async function fetchRakutenByItemCode(itemCode, { appId, accessKey, affil
  * ショップコードはURLのパス(item.rakuten.co.jp/【ここ】/...)からそのまま
  * 取り出せるので、両方を組み合わせて itemCode を組み立てる。
  */
-export async function resolveRakutenItemCodeFromPageUrl(pageUrl) {
+export async function resolveRakutenItemCodeFromPageUrl(pageUrl, { siteUrl } = {}) {
   try {
     const shopMatch = pageUrl.match(/item\.rakuten\.co\.jp\/([^/]+)\//);
     if (!shopMatch) {
@@ -320,7 +320,17 @@ export async function resolveRakutenItemCodeFromPageUrl(pageUrl) {
     }
     const shopCode = shopMatch[1];
 
-    const res = await fetch(pageUrl, { headers: { "User-Agent": USER_AGENT } });
+    // 楽天API(fetchRakutenRaw)への呼び出しと同じヘッダー構成にする。
+    // 商品ページへの単純なfetchだけではボット対策で弾かれる（42文字の
+    // 「Reference #...」というブロックページが返る）ことが分かったため、
+    // Origin/Refererを付けることで通常のブラウザからのアクセスに
+    // 近づける（それでも弾かれる可能性はある）。
+    const headers = { "User-Agent": USER_AGENT };
+    if (siteUrl) {
+      headers.Origin = siteUrl;
+      headers.Referer = siteUrl;
+    }
+    const res = await fetch(pageUrl, { headers });
     if (!res.ok) {
       console.warn(`  [warn] 商品コード抽出用のページ取得に失敗（HTTP ${res.status}）: ${pageUrl}`);
       return null;
