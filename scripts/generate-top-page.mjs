@@ -85,9 +85,20 @@ const COLUMNS = [
 
 /** 西暦の日付から「2026年8月3日(令和8年)」のような文字列を作る */
 function formatTodayText(date) {
-  const y = date.getFullYear();
-  const m = date.getMonth() + 1;
-  const d = date.getDate();
+  // GitHub ActionsのサーバーはUTCで動いているため、getFullYear()等の
+  // ローカルタイムのメソッドをそのまま使うとUTCの日付になってしまう
+  // （日本時間の深夜0時〜9時台は、UTC的にはまだ「前日」になるため、
+  // 1日遅れて表示されるバグの原因だった）。Intl.DateTimeFormatで
+  // 日本時間(Asia/Tokyo)の年・月・日を明示的に取り出す。
+  const parts = new Intl.DateTimeFormat("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).formatToParts(date);
+  const y = Number(parts.find((p) => p.type === "year").value);
+  const m = Number(parts.find((p) => p.type === "month").value);
+  const d = Number(parts.find((p) => p.type === "day").value);
   const reiwaYear = y - 2018; // 令和1年 = 2019年
   return `${y}年${m}月${d}日(令和${reiwaYear}年)`;
 }
