@@ -1,13 +1,5 @@
 [
   {
-    "date": "2026-08-03",
-    "price": 3320,
-    "unitLabel": "6箱(180枚)",
-    "source": "Yahoo!ショッピング",
-    "shop": "東海コンタクトYahoo!店",
-    "url": "https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3306714&pid=892662190&vc_url=https%3A%2F%2Fstore.shopping.yahoo.co.jp%2Ftokaicontact%2Fk-y-01-1d-trc-2286-6-set-06-001.html"
-  },
-  {
     "date": "2026-08-04",
     "price": 3320,
     "unitLabel": "6箱(180枚)",
@@ -233,6 +225,14 @@
   },
   {
     "date": "2026-09-01",
+    "price": 3320,
+    "unitLabel": "6箱(180枚)",
+    "source": "Yahoo!ショッピング",
+    "shop": "コンタクト通販 アットコンタクト",
+    "url": "https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3306714&pid=892662190&vc_url=https%3A%2F%2Fstore.shopping.yahoo.co.jp%2Fatcontact%2Fk-jj-1otcz0-06-h.html"
+  },
+  {
+    "date": "2026-09-02",
     "price": 3320,
     "unitLabel": "6箱(180枚)",
     "source": "Yahoo!ショッピング",
