@@ -1,13 +1,5 @@
 [
   {
-    "date": "2026-08-07",
-    "price": 1750,
-    "unitLabel": "2箱(64枚)",
-    "source": "Yahoo!ショッピング",
-    "shop": "コンタクト通販 レンズフリー",
-    "url": "https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3306714&pid=892662190&vc_url=https%3A%2F%2Fstore.shopping.yahoo.co.jp%2Flensfree%2Fsd1dpupt-2.html"
-  },
-  {
     "date": "2026-08-08",
     "price": 1750,
     "unitLabel": "2箱(64枚)",
@@ -233,6 +225,14 @@
   },
   {
     "date": "2026-09-05",
+    "price": 1500,
+    "unitLabel": "1箱(32枚)",
+    "source": "楽天市場",
+    "shop": "東海メガネ・コンタクト",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00pw135.fawug283.g00pw135.fawuh673/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Ftokaimegane%2F1daypureup_trc_exp%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Ftokaimegane%2Fi%2F10000485%2F&rafcid=wsc_i_is_30d87102-fb00-408b-8387-fabf15b02086"
+  },
+  {
+    "date": "2026-09-06",
     "price": 1500,
     "unitLabel": "1箱(32枚)",
     "source": "楽天市場",
