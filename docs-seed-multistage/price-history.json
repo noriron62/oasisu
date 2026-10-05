@@ -1,13 +1,5 @@
 [
   {
-    "date": "2026-09-06",
-    "price": 1916,
-    "unitLabel": "6箱(192枚)",
-    "source": "Yahoo!ショッピング",
-    "shop": "コンタクト通販 アットコンタクト",
-    "url": "https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3306714&pid=892662190&vc_url=https%3A%2F%2Fstore.shopping.yahoo.co.jp%2Fatcontact%2Fk-se-1pmsz0-06-h.html"
-  },
-  {
     "date": "2026-09-07",
     "price": 1916,
     "unitLabel": "6箱(192枚)",
@@ -233,6 +225,14 @@
   },
   {
     "date": "2026-10-05",
+    "price": 1900,
+    "unitLabel": "6箱(192枚)",
+    "source": "楽天市場",
+    "shop": "アットネットコンタクト",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00s2v85.fawugbfb.g00s2v85.fawuhb0b/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fatnet-cl%2Fk_se_1pmsz0_06_h%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fatnet-cl%2Fi%2F10002290%2F&rafcid=wsc_i_is_30d87102-fb00-408b-8387-fabf15b02086"
+  },
+  {
+    "date": "2026-10-06",
     "price": 1900,
     "unitLabel": "6箱(192枚)",
     "source": "楽天市場",
